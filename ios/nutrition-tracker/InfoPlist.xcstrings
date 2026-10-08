@@ -1,0 +1,22 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "NSHealthShareUsageDescription": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nutrition Tracker reads your weight, activity and nutrition data from Apple Health to show your history and progress."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nutrition Tracker lee tus datos de peso, actividad y nutrición de Apple Health para mostrar tu historial y progreso."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

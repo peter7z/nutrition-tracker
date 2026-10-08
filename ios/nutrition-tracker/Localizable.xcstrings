@@ -1,0 +1,26 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Nutrition Tracker": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nutrition Tracker"
+          }
+        }
+      }
+    },
+    "Your nutrition history and progress. Apple Health import is the first feature planned.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu historial y progreso nutricional. La importación de Apple Health es la primera función prevista."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
