@@ -13,7 +13,10 @@ import XCTest
         let total = store.totals(on: today)
         XCTAssertEqual(total.energy.value, 61.5); XCTAssertEqual(total.protein.value, 5)
         XCTAssertEqual(total.saturatedFat.missingCount, 1); XCTAssertNil(total.saturatedFat.value)
-        let energyCalculatedFromMacros: Double = 5 * 4 + 7.5 * 4 + 1.5 * 9
+        let proteinEnergy = 5.0 * 4.0
+        let carbohydrateEnergy = 7.5 * 4.0
+        let fatEnergy = 1.5 * 9.0
+        let energyCalculatedFromMacros = proteinEnergy + carbohydrateEnergy + fatEnergy
         XCTAssertNotEqual(total.energy.value, energyCalculatedFromMacros, "Never replace label energy with 4/4/9")
     }
     func testMissingNutrientsAndRealZeroAreDifferent() async throws {
