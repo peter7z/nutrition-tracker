@@ -30,7 +30,23 @@ enum TrackingCSVExport {
         func nutrients(_ values: NutrientValues) -> [String: String] { ["kcal":number(values.energy),"protein_g":number(values.protein),"carbohydrates_g":number(values.carbohydrates),"fat_g":number(values.fat),"saturated_fat_g":number(values.saturatedFat)] }
         func draft(_ d: FoodEntryDraft) -> [String: String] {
             var cells = nutrients(d.nutrition)
-            cells.merge(["name":d.name,"meal":d.mealName,"recorded_at":timestamp(d.consumedAt),"date":nutrition.profile.dayID(for:d.consumedAt),"quantity":number(d.amount),"unit":d.unit.rawValue,"preparation":d.preparation.rawValue,"nutrition_basis":d.basis.rawValue,"source":d.source.rawValue,"notes":d.notes,"grams_per_serving":number(d.conversion?.gramsPerServing),"milliliters_per_serving":number(d.conversion?.millilitersPerServing),"grams_per_milliliter":number(d.conversion?.gramsPerMilliliter),"product_id":d.productID?.uuidString ?? "","product_version":d.productVersion.map(String.init) ?? "","recipe_id":d.recipeID?.uuidString ?? "","recipe_version":d.recipeVersion.map(String.init) ?? ""], uniquingKeysWith: { _,new in new })
+            cells["name"] = d.name
+            cells["meal"] = d.mealName
+            cells["recorded_at"] = timestamp(d.consumedAt)
+            cells["date"] = nutrition.profile.dayID(for: d.consumedAt)
+            cells["quantity"] = number(d.amount)
+            cells["unit"] = d.unit.rawValue
+            cells["preparation"] = d.preparation.rawValue
+            cells["nutrition_basis"] = d.basis.rawValue
+            cells["source"] = d.source.rawValue
+            cells["notes"] = d.notes
+            cells["grams_per_serving"] = number(d.conversion?.gramsPerServing)
+            cells["milliliters_per_serving"] = number(d.conversion?.millilitersPerServing)
+            cells["grams_per_milliliter"] = number(d.conversion?.gramsPerMilliliter)
+            cells["product_id"] = d.productID?.uuidString ?? ""
+            cells["product_version"] = d.productVersion.map { String($0) } ?? ""
+            cells["recipe_id"] = d.recipeID?.uuidString ?? ""
+            cells["recipe_version"] = d.recipeVersion.map { String($0) } ?? ""
             return cells
         }
         append("profile", ["notes":nutrition.profile.preferences,"details_json":try details(nutrition.profile)])
