@@ -1,0 +1,43 @@
+services:
+  api:
+    build: .
+    env_file: .env
+    environment:
+      NUTRITION_ENV: production
+      NUTRITION_DATABASE: /data/nutrition.sqlite3
+    volumes:
+      - nutrition_data:/data
+    networks:
+      nutrition:
+        ipv4_address: 172.28.0.3
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8000/healthz',headers={'X-Forwarded-Proto':'https'}))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  proxy:
+    image: caddy:2.10.0-alpine
+    environment:
+      NUTRITION_DOMAIN: ${NUTRITION_DOMAIN:-localhost}
+    ports:
+      - "127.0.0.1:8443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      nutrition:
+        ipv4_address: 172.28.0.2
+    depends_on:
+      - api
+    restart: unless-stopped
+networks:
+  nutrition:
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+volumes:
+  nutrition_data:
+  caddy_data:
+  caddy_config:

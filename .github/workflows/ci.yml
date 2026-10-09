@@ -1,0 +1,140 @@
+name: Nutrition Tracker validation
+
+on:
+  pull_request:
+  push:
+    branches: [main, 'codex/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: backend/requirements-lock.txt
+      - name: Install locked test dependencies
+        run: python -m pip install -r requirements-lock.txt
+      - name: Test ownership, persistence, idempotency and assistant contracts
+        run: python -m pytest -q --junitxml=test-results.xml
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: backend-test-results
+          path: backend/test-results.xml
+          if-no-files-found: warn
+          retention-days: 7
+
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - name: Start the isolated HTTP service for conversational UI tests
+        run: |
+          python -m venv "$RUNNER_TEMP/nutrition-ui-server"
+          "$RUNNER_TEMP/nutrition-ui-server/bin/pip" install -r backend/requirements-lock.txt
+          cd backend
+          "$RUNNER_TEMP/nutrition-ui-server/bin/python" -m tests.ui_server --port 8766 > "$RUNNER_TEMP/nutrition-ui-server.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/nutrition-ui-server.pid"
+          python - <<'PY'
+          import time, urllib.request
+          for _ in range(30):
+              try:
+                  with urllib.request.urlopen('http://127.0.0.1:8766/healthz', timeout=1) as response:
+                      if response.status == 200:
+                          break
+              except OSError:
+                  time.sleep(0.5)
+          else:
+              raise SystemExit('The isolated conversational test service did not start')
+          PY
+      - name: Select an installed Xcode with Swift 6.2 support
+        run: |
+          python3 - <<'PY'
+          import glob, os, re
+          candidates = []
+          for path in glob.glob('/Applications/Xcode_*.app'):
+              match = re.fullmatch(r'/Applications/Xcode_(\d+)(?:\.(\d+))?(?:\.(\d+))?\.app', path)
+              if match and int(match[1]) >= 26:
+                  candidates.append((tuple(int(x or 0) for x in match.groups()), path))
+          if not candidates:
+              raise SystemExit('Xcode 26 or later is required for the project actor-isolation settings')
+          _, path = max(candidates)
+          print('Selected Xcode:', path)
+          with open(os.environ['GITHUB_ENV'], 'a') as f:
+              f.write('DEVELOPER_DIR=' + path + '/Contents/Developer\n')
+          PY
+      - name: Inspect the selected Xcode and available runtimes
+        run: |
+          xcodebuild -version
+          xcrun simctl list devices available --json > "$RUNNER_TEMP/simulators.json"
+          python3 - <<'PY'
+          import json, os
+          with open(os.environ['RUNNER_TEMP'] + '/simulators.json') as f:
+              devices = json.load(f)['devices']
+          candidates = [(runtime, device) for runtime, values in devices.items() if '.iOS-' in runtime for device in values if device.get('isAvailable') and device['name'].startswith('iPhone')]
+          if not candidates:
+              raise SystemExit('No available iOS Simulator runtime on this runner')
+          candidates.sort(key=lambda item: (tuple(int(x) for x in item[0].split('.iOS-')[-1].split('-')), item[1]['name']), reverse=True)
+          runtime, device = candidates[0]
+          print('Selected simulator:', device['name'], runtime)
+          with open(os.environ['GITHUB_ENV'], 'a') as f:
+              f.write('NUTRITION_SIMULATOR_ID=' + device['udid'] + '\n')
+          PY
+      - name: Run unit and UI acceptance tests on isolated local data
+        run: |
+          xcodebuild -project ios/NutritionTracker.xcodeproj -scheme NutritionTracker \
+            -configuration Debug -destination "platform=iOS Simulator,id=$NUTRITION_SIMULATOR_ID" \
+            -derivedDataPath "$RUNNER_TEMP/NutritionTrackerDerivedData" \
+            -resultBundlePath "$RUNNER_TEMP/NutritionTrackerTests.xcresult" \
+            -parallel-testing-enabled NO -collect-test-diagnostics never -testLanguage en -testRegion US \
+            CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY="-" test
+      - name: Build Release for iOS
+        run: |
+          xcodebuild -project ios/NutritionTracker.xcodeproj -scheme NutritionTracker \
+            -configuration Release -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/NutritionTrackerRelease" \
+            CODE_SIGNING_ALLOWED=NO build
+      - name: Validate the bundled privacy manifest
+        run: plutil -lint "$RUNNER_TEMP/NutritionTrackerRelease/Build/Products/Release-iphoneos/nutrition-tracker.app/PrivacyInfo.xcprivacy"
+      - name: Stop the isolated test service
+        if: always()
+        run: |
+          python - <<'PY'
+          import os, pathlib, signal
+          path = pathlib.Path(os.environ['RUNNER_TEMP']) / 'nutrition-ui-server.pid'
+          if path.exists():
+              try:
+                  os.kill(int(path.read_text()), signal.SIGTERM)
+              except ProcessLookupError:
+                  pass
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ios-test-results
+          path: ${{ runner.temp }}/NutritionTrackerTests.xcresult
+          if-no-files-found: warn
+          retention-days: 7

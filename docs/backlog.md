@@ -1,30 +1,30 @@
 # Nutrition Tracker iOS — alcance y backlog
 
-Fecha: 8 de octubre de 2026. Repositorio: `peter7z/nutrition-tracker`.
+Fecha: 9 de octubre de 2026. Repositorio: `peter7z/nutrition-tracker`.
 
 ## Objetivo y estado
 
-App nativa iOS para registrar comidas por chat y fotos, visualizar calorías y macros y seguir peso y actividad. **Primera prioridad: NUT-01, importar los datos de Apple Health mediante HealthKit.** No depende de implementar chat ni servicios remotos.
+App nativa iOS para registrar comidas desde chat/dictado con propuestas conversacionales confirmables, visualizar calorías/macros y seguir peso y actividad. **Primera prioridad: NUT-01, importar los datos de Apple Health mediante HealthKit.** Esa integración debe seguir funcionando localmente sin login ni servicios remotos. La entrada manual de macros y el catálogo de alimentos/recetas no forman parte del MVP actual.
 
-El commit inicial prepara el proyecto SwiftUI, configuración iOS, esquema compartido, traducciones de la pantalla inicial y capability HealthKit. La importación y las otras funciones aún no están implementadas; ningún ticket se considera completado por crear el scaffold.
+El estado actual del código incluye proyecto SwiftUI, diario nutricional interno y objetivos versionados, cierre/reapertura explícitos, importación local de HealthKit y planillas, progreso, chat con confirmación explícita y un backend FastAPI/SQLite de desarrollo. El chat es la ruta de entrada de comidas del MVP; el diario conserva y calcula entradas confirmadas, pero no se ofrece una pantalla de ingreso manual de macros. Productos guardados, catálogos y recetas quedan diferidos. La integración de HealthKit persiste muestras y cursores, mantiene la procedencia y presenta el historial; las fuentes nutricionales se reconcilian sin sumar un resumen histórico sobre comidas. El backend no tiene endpoint público configurado. La aceptación con datos personales en iPhone, la distribución TestFlight y las pruebas integradas de release siguen pendientes. **Los criterios vigentes de MVP permanecen abiertos y sin marcar** hasta documentar evidencia suficiente; la presencia de una implementación no equivale a aceptación. Ver [detalle de implementación](health-import.md).
 
 ## Requisitos conservados
 
-El backlog original revisó `seguimiento_calorias_peso.xlsx` versión 16 y requisitos de “Calorie tracking”, sin una transcripción íntegra. Esa fuente no se releyó en esta conversión; la evidencia original permanece en [backlog PWA archivado](archive/backlog-pwa-2026-10-05.md).
+El backlog original se basó en `seguimiento_calorias_peso.xlsx` versión 16 y requisitos de “Calorie tracking”, sin transcripción íntegra; la evidencia de requisitos permanece en [backlog PWA archivado](archive/backlog-pwa-2026-10-05.md). Además, se comparó de forma local y de solo lectura el parser nativo con el XLSX original: identificó dos hojas y coincidió el mapeo estructural de fecha, peso, calorías y proteína. En la hoja principal, coincidieron las ocho filas activas de preview y se omitieron 82 filas futuras vacías; la comparación no encontró divergencias de fecha, calorías, proteína ni peso. La auditoría no guardó celdas ni valores personales, no modificó el original y solo verifica compatibilidad del parser: no demuestra idempotencia de lote, importación confirmada, deshacer ni cumplimiento completo de NUT-06.
 
-Conservar registro conversacional y correcciones, crudo/cocido, unidades, cantidad consumida y sobrantes, estimaciones visibles, objetivos versionados y cierre explícito del día. Cada entrada persiste antes de cerrar; medianoche no cierra automáticamente. Ausencia de datos no es cero. Un resumen histórico nunca fabrica comidas. Mantener importación de planilla sin escribir en el original, fotos/etiquetas, productos/recetas, preguntas y exportación/restauración.
+Conservar registro conversacional y correcciones, crudo/cocido, unidades, cantidad consumida y sobrantes, estimaciones visibles, objetivos versionados y cierre explícito del día. Cada propuesta de comida muestra nutrientes estimados y se confirma antes de guardarse. El diario interno persiste y calcula entradas confirmadas; el MVP no incluye una pantalla para ingresar macros manualmente ni un catálogo de alimentos/recetas. Cada entrada persiste antes de cerrar; medianoche no cierra automáticamente. Ausencia de datos no es cero. Un resumen histórico nunca fabrica comidas. Mantener importación de planilla sin escribir en el original, análisis de fotos/etiquetas, preguntas y exportación/restauración.
 
-## Arquitectura inicial
+## Arquitectura vigente
 
-Monorepo: `ios/` contiene proyecto y fuentes iOS; `backend/` reserva el servicio futuro y `docs/` aloja contratos y planificación. Las validaciones deben ejecutarse por componente desde la raíz.
+Monorepo: `ios/` contiene el proyecto SwiftUI y sus módulos de Salud, nutrición, importación, tracking y remoto; `backend/` contiene una API FastAPI/SQLite para desarrollo local; `docs/` aloja contratos, privacidad y planificación. Las validaciones se ejecutan por componente desde la raíz. La existencia de esos componentes no prueba despliegue público, TestFlight ni aceptación de todos los tickets.
 
 - SwiftUI nativo, iOS 18+, iPhone prioritario e iPad como destino soportado; UI accesible y localizada en español/inglés.
-- HealthKit de lectura como primera integración; persistencia local y sincronización histórica/incremental. No se escribe en Salud ni se solicita background delivery en el scaffold.
-- Persistencia, migraciones, backend y autenticación se concretan en NUT-02. No elegir proveedor ni contratar servicios por esta conversión.
+- HealthKit de lectura como primera integración; persistencia local y sincronización histórica/incremental. No se escribe en Salud ni se habilita entrega en segundo plano en esta entrega.
+- El tracking local y sus cambios versionados están separados de la sincronización remota. El backend de desarrollo documenta migraciones, autenticación y contratos; no hay proveedor de hosting contratado ni endpoint público.
 - IA desde backend autenticado con secretos en servidor; app por HTTPS y credenciales en Keychain. Ninguna clave de IA en el binario.
 - Procedencia por registro: Salud/manual/planilla/etiqueta/catálogo/estimación; snapshots nutricionales y metas versionadas. Reconcilación explícita evita dobles conteos.
 - Zona horaria del perfil, inicialmente America/Montevideo; separar instante de registro y fecha del consumo. Nutrientes desconocidos son null, no cero.
-- Datos de Salud locales por defecto. Cualquier envío a backend/IA requiere consentimiento específico, con contexto mínimo.
+- Datos de Salud locales por defecto. El envío a backend/IA se limita a una consulta y propósito con consentimiento explícito y contexto agregado mínimo; no se sincronizan muestras crudas de HealthKit.
 
 Entidades previstas: Profile, GoalVersion, DayLog, Meal, FoodEntry, FoodDefinition, WeightEntry, ActivityEntry, ChatMessage, Attachment, ChangeEvent, ImportBatch, HealthSample y HealthSyncCursor. La política de agregación separa comidas, totales históricos y energía activa.
 
@@ -83,19 +83,19 @@ Objetivo: extender la base SwiftUI nativa para el registro nutricional y el chat
 - [ ] Datos, fotos y consultas remotos se filtran por propietario; una prueba con dos identidades impide acceso cruzado. Logout separa o elimina la caché privada del usuario y evita mezcla de datos al cambiar de cuenta.
 - [ ] Backend arranca con configuración documentada, migraciones reproducibles y entornos separados; despliegue de desarrollo verificable. Registrar permisos y consentimiento necesarios antes de enviar datos de salud fuera del dispositivo.
 
-### [NUT-03 — Registro manual de alimentos y cálculo nutricional](https://github.com/peter7z/nutrition-tracker/issues/3)
+### [NUT-03 — Diario nutricional interno y cálculo](https://github.com/peter7z/nutrition-tracker/issues/3)
 
 P0 · M · Depende de: #2.
 
-Objetivo: construir la fuente de verdad antes de introducir el chat.
+Objetivo de MVP: mantener el diario nutricional interno usado por Hoy y Chat. El usuario registra comidas con Chat (#8); esta historia cubre el modelo, las conversiones, los totales y la persistencia, no una pantalla de macros manuales.
 
 ## Criterios de aceptación
 
-- [ ] Crear, editar y borrar alimentos de una comida con cantidad, unidad, estado crudo/cocido, fecha, nutrientes y procedencia.
-- [ ] Soportar valores por 100 g, 100 ml o porción con conversión explícita; no asumir densidad universal.
-- [ ] Totales por comida y día se calculan en código; nutrientes faltantes se identifican como desconocidos.
-- [ ] Reintentos no duplican entradas; correcciones tienen versión y pueden deshacerse.
-- [ ] Casos verificados: porción parcial, cambio de cantidad, saturadas desconocidas y etiqueta que no coincide exactamente con 4/4/9.
+- [ ] Persistir propuestas de comida aceptadas desde Chat con cantidad consumida, unidad, estado crudo/cocido, fecha, nutrientes y procedencia; no requiere formulario manual de macros.
+- [ ] Conservar bases nutricionales por 100 g, 100 ml o porción y convertir explícitamente; nunca asumir densidad universal.
+- [ ] Calcular totales por comida y día en código; mostrar nutrientes faltantes como desconocidos.
+- [ ] Hacer los reintentos idempotentes y versionar correcciones confirmadas con posibilidad de deshacer.
+- [ ] Verificar porciones parciales, cambios de cantidad, grasas saturadas desconocidas y etiquetas cuyo valor energético no coincide exactamente con 4/4/9.
 
 ### [NUT-04 — Día abierto, cierre y correcciones históricas](https://github.com/peter7z/nutrition-tracker/issues/4)
 
@@ -165,11 +165,11 @@ P0 · L · Depende de: #7, #4.
 - [ ] Refrescar el estado observable de SwiftUI tras cada operación exitosa; deshacer y mostrar errores sin afirmar que una mutación fallida se guardó.
 
 
-### [NUT-09 — Guardar productos frecuentes, etiquetas y recetas](https://github.com/peter7z/nutrition-tracker/issues/9)
+### [NUT-09 — Productos y recetas (diferido fuera del MVP)](https://github.com/peter7z/nutrition-tracker/issues/9)
 
-P1 · M · Depende de: #3, #8.
+**Diferido fuera del MVP por decisión de producto.** No agregar botones de catálogo, guardado de producto o receta ni hacerlos requisito del flujo de comida. El alcance futuro se conserva abajo como referencia, sin contarse entre los criterios vigentes de MVP.
 
-## Criterios de aceptación
+### Alcance futuro (sin aceptación para este MVP)
 
 - [ ] Guardar productos con nombre/marca, porción y nutrientes, y seleccionarlos al mencionarlos otra vez.
 - [ ] Priorizar etiqueta confirmada sobre estimación genérica; si la marca o versión es ambigua, pedir elección.
@@ -178,19 +178,19 @@ P1 · M · Depende de: #3, #8.
 
 ### [NUT-10 — Estimar comidas y leer etiquetas con cámara y PhotosPicker](https://github.com/peter7z/nutrition-tracker/issues/10)
 
-P1 · L · Depende de: #7, #8, #9.
+P1 · L · Depende de: #7, #8.
 
 ## Criterios de aceptación
 
 - [ ] Capturar con cámara nativa o elegir imágenes con PhotosPicker; permiso de cámara contextual y descripción localizada, sin solicitar acceso general a la fototeca para el picker. Validar tipo/tamaño y convertir HEIC u otros formatos soportados antes del análisis.
-- [ ] Devolver componentes editables, cantidad estimada, kcal/macros y supuestos; no presentar gramos deducidos visualmente como medición.
+- [ ] Devolver componentes editables, cantidad estimada, kcal/macros y supuestos; no presentar gramos deducidos visualmente como medición. Los nutrientes confirmados se guardan como snapshot de esa comida, sin crear un producto en catálogo.
 - [ ] Pedir peso o aclaración cuando sea necesario; estimación visual se confirma antes de registrar.
-- [ ] Etiqueta: distinguir porción de 100 g/ml, transcribir valores y señalar texto ilegible; usuario confirma antes de guardar producto.
+- [ ] Etiqueta: distinguir porción de 100 g/ml, transcribir valores y señalar texto ilegible; usuario confirma antes de guardar el snapshot nutricional de la comida. Guardar productos queda diferido a NUT-09.
 - [ ] Adjuntos privados, metadatos de ubicación eliminados y acción de borrar foto; reintentar análisis no duplica comida.
 
 ### [NUT-11 — Recomendar comidas según el día y responder preguntas](https://github.com/peter7z/nutrition-tracker/issues/11)
 
-P1 · M · Depende de: #7, #9.
+P1 · M · Depende de: #7.
 
 ## Criterios de aceptación
 
@@ -235,7 +235,7 @@ Objetivo: reemplazar instalación PWA y service worker por instalación y ciclo 
 ## Criterios de aceptación
 
 - [ ] Icono de app, nombre, bundle ID y versiones definitivos; firma, capability HealthKit y perfiles de distribución verificados. Archivo Release y build TestFlight instalable; revisar descripciones de permisos, política de privacidad y declaraciones de datos/dependencias exigidas al distribuir.
-- [ ] Probar instalación, sesión persistente, permisos de Salud y cámara, PhotosPicker, teclado, safe areas, navegación, Dynamic Type, VoiceOver, modo claro/oscuro y tamaños iPhone; verificar layout iPad si se mantiene ese destino.
+- [ ] Probar instalación, sesión persistente, permisos de Salud y cámara, PhotosPicker, teclado, safe areas, navegación del flujo principal Chat/propuestas, Dynamic Type, VoiceOver, modo claro/oscuro y tamaños iPhone; verificar layout iPad si se mantiene ese destino. La captura manual de macros y el catálogo no son requisitos de este flujo.
 - [ ] Sin red: indicador explícito, lectura de registros persistidos y borrador local; HealthKit local disponible según permisos. IA requiere conexión; registrar operaciones pendientes sin afirmar que fueron sincronizadas.
 - [ ] Al recuperar red, reenvío explícito e idempotente de borradores; logout elimina/separa caché privada y credenciales. Probar suspensión, terminación, relanzamiento y conflictos entre sesiones.
 - [ ] Actualizar la versión no pierde datos ni conversaciones; probar migración de persistencia local y recuperación tras fallo. Sincronizar Salud al volver a primer plano; la entrega en segundo plano no se promete en el MVP.
@@ -249,7 +249,7 @@ P1 · M · Depende de: #1, #6, #8, #10, #11, #12, #13, #14.
 
 - [ ] Exportar datos estructurados a JSON/CSV con unidades, fechas, fuentes y notas; procedimiento de backup y restauración probado.
 - [ ] Borrado de cuenta/datos incluye adjuntos y explica retención de backups configurada.
-- [ ] Verificar flujo completo: conectar Apple Health e importar Salud y planilla, añadir comida, corregir, analizar foto, consultar cena, registrar peso/actividad, cerrar día y revisar progreso.
+- [ ] Verificar flujo completo: conectar Apple Health e importar Salud y planilla, añadir y corregir comida mediante Chat, analizar foto, consultar cena, registrar peso/actividad, cerrar día y revisar progreso.
 - [ ] Evaluación con frases representativas y resultados esperados; errores críticos: duplicar, registrar hipótesis, confundir crudo/cocido, fechar mal o exponer otro usuario.
 - [ ] Revisar costos y latencias observados en uso personal antes de habilitar más usuarios.
 - [ ] Exportar mediante share sheet de iOS y restaurar mediante document picker. Exportación de copia HealthKit es explícita; borrado de la app/cuenta incluye la copia local y cursores, sin borrar datos originales de Salud. Restaurar y reimportar Salud no duplica registros.

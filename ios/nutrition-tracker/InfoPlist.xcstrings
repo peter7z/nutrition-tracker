@@ -1,22 +1,65 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "NSHealthShareUsageDescription": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nutrition Tracker reads your weight, activity and nutrition data from Apple Health to show your history and progress."
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Nutrition Tracker"
+          }
+        }
+      }
+    },
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "nutrition-tracker"
+          }
+        }
+      }
+    },
+    "NSCameraUsageDescription" : {
+      "comment" : "Privacy - Camera Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Nutrition Tracker uses the camera when you choose to photograph a meal or nutrition label."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nutrition Tracker lee tus datos de peso, actividad y nutrición de Apple Health para mostrar tu historial y progreso."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nutrition Tracker usa la cámara solo cuando elegís sacar una foto de una comida o etiqueta nutricional."
+          }
+        }
+      }
+    },
+    "NSHealthShareUsageDescription" : {
+      "comment" : "Privacy - Health Share Usage Description",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nutrition Tracker reads your weight, activity and nutrition data from Apple Health to show your history and progress."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nutrition Tracker lee tus datos de peso, actividad y nutrición de Apple Health para mostrar tu historial y progreso."
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }
