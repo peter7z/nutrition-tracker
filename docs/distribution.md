@@ -1,5 +1,7 @@
 # Distribución y aceptación de Nutrition Tracker
 
+> **Cambio de producto — 10 de octubre de 2026:** este documento conserva implementación/evidencia del enfoque anterior. El alcance vigente se define en [especificación de producto](product.md) y el backlog: companion iOS de consulta/Salud, registro desde el plugin de ChatGPT y widgets futuros con Extensions. Sus referencias a chat, registro o edición en iOS no son requisitos vigentes. La adaptación del código y de los contratos está pendiente.
+
 Estado de preparación: 9 de octubre de 2026. El archivo vigente es **1.0 (build 3)**, firmado para desarrollo; build 2 es histórico. La suite actual valida el flujo chat-first. Este documento distingue compilación, instalación de desarrollo, aceptación funcional y distribución. Ninguno de estos resultados constituye un build TestFlight.
 
 ## Identidad y recursos
@@ -55,7 +57,7 @@ xcodebuild -project ios/NutritionTracker.xcodeproj -scheme NutritionTracker \
 6. En Organizer, **Distribute App → App Store Connect → Upload**. Verificar procesamiento exitoso, versión/build y grupo de testers en TestFlight. Para testers externos, completar la revisión beta exigida por Apple.
 7. Instalar **ese build** desde TestFlight, anotar versión/build y ejecutar la aceptación siguiente. Un upload procesado sin instalación no demuestra que el build sea instalable.
 
-El archive `NutritionTrackerMVP-1.0-2.xcarchive` es de build 2 (8 de octubre) y queda como historial. El archive vigente, `/private/tmp/NutritionTrackerMVP-1.0-3.xcarchive`, se generó el 9 de octubre y pasó `ARCHIVE SUCCEEDED` y `codesign --verify --deep --strict`. Contiene versión 1.0/build 3, mínimo iOS 18, iPhone/iPad, icono, manifest, HealthKit y descripciones localizadas de cámara/Salud. Su perfil es **de desarrollo** (`get-task-allow=true`), no de distribución. La exportación de build 3 del 9 de octubre con `ios/Configuration/ExportOptions-AppStore.plist` y método `app-store-connect` falló por **No Accounts** y falta de perfil iOS App Store para el bundle, igual que el intento histórico de build 2; esto no se ha resuelto ni se ha subido build 3. `devicectl` instaló build 3 en el iPhone autorizado, pero no pudo abrirlo porque el dispositivo estaba bloqueado. No hay lanzamiento físico, upload ni instalación TestFlight acreditados. No se automatiza publicación ni se incluyen credenciales de App Store Connect en Git.
+El archive `NutritionTrackerMVP-1.0-2.xcarchive` es de build 2 (8 de octubre) y queda como historial. El archive vigente del código chat-first actualizado, `/private/tmp/NutritionTrackerMVP-1.0-3-Chat.xcarchive`, se generó el 9 de octubre y pasó `ARCHIVE SUCCEEDED` y `codesign --verify --deep --strict`. Contiene versión 1.0/build 3, mínimo iOS 18, iPhone/iPad, icono, manifest, HealthKit y descripciones localizadas de cámara/Salud. Su perfil es **de desarrollo** (`get-task-allow=true`), no de distribución. La exportación de build 3 del 9 de octubre con `ios/Configuration/ExportOptions-AppStore.plist` y método `app-store-connect` falló por **No Accounts** y falta de perfil iOS App Store para el bundle, igual que el intento histórico de build 2; esto no se ha resuelto ni se ha subido build 3. `devicectl` instaló de nuevo build 3 desde el archive actualizado en el iPhone autorizado. El primer intento de abrirlo falló por dispositivo bloqueado y el último por conexión XPC de CoreDevice no disponible. No hay lanzamiento físico, upload ni instalación TestFlight acreditados. No se automatiza publicación ni se incluyen credenciales de App Store Connect en Git.
 
 ## Aceptación en dispositivo y accesibilidad
 
@@ -63,7 +65,7 @@ Registrar evidencia sin copiar salud personal a logs, capturas públicas o artef
 
 | Área | Prueba y evidencia requerida | Estado de esta preparación |
 |---|---|---|
-| Instalación de desarrollo | Firma e instalación/launch en el iPhone autorizado | Build 3 se instaló con `devicectl`; launch pendiente porque el dispositivo estaba bloqueado |
+| Instalación de desarrollo | Firma e instalación/launch en el iPhone autorizado | Build 3 actualizado se instaló con `devicectl`; launch físico pendiente (primer intento bloqueado; último intento sin conexión XPC de CoreDevice) |
 | Salud real | Elegir tipos/rango, continuar, permitir o denegar lectura, revisar y confirmar; refrescar; desconectar/borrar copia sin alterar originales | Aceptación con datos reales no acreditada |
 | Comida por Chat | Describir comida, revisar cantidad y nutrientes propuestos, confirmar el registro, corregir mediante Chat y validar totales al cerrar/reabrir | UITest final pasó; una comida sintética se corrigió y continuó como una sola entrada al cerrar, relanzar y reabrir |
 | Persistencia y recuperación | Relanzamiento, migración/backup válido y fallo de restore sin perder estado; imágenes y Salud opt-in cuando formen parte de la copia | Tests de dominio existentes; completar aceptación UI de archivos |

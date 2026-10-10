@@ -1,260 +1,317 @@
-# Nutrition Tracker iOS — alcance y backlog
+# Nutrition Tracker — backlog companion iOS + plugin ChatGPT
 
-Fecha: 9 de octubre de 2026. Repositorio: `peter7z/nutrition-tracker`.
+Fecha: **10 de octubre de 2026**. Repositorio: `peter7z/nutrition-tracker`.
 
-## Objetivo y estado
+## Alcance vigente
 
-App nativa iOS para registrar comidas desde chat/dictado con propuestas conversacionales confirmables, visualizar calorías/macros y seguir peso y actividad. **Primera prioridad: NUT-01, importar los datos de Apple Health mediante HealthKit.** Esa integración debe seguir funcionando localmente sin login ni servicios remotos. La entrada manual de macros y el catálogo de alimentos/recetas no forman parte del MVP actual.
+La [especificación de producto](product.md) define el enfoque vigente: **iOS sincroniza Apple Health y muestra datos, historial y gráficas; el registro y las correcciones se hacen desde ChatGPT mediante un plugin**. El plugin incluye MCP e instrucciones/skills; eventualmente renderizará widgets con **ChatGPT Extensions**. No estamos construyendo solamente un servidor MCP ni otro chat dentro de iOS.
 
-El estado actual del código incluye proyecto SwiftUI, diario nutricional interno y objetivos versionados, cierre/reapertura explícitos, importación local de HealthKit y planillas, progreso, chat con confirmación explícita y un backend FastAPI/SQLite de desarrollo. El chat es la ruta de entrada de comidas del MVP; el diario conserva y calcula entradas confirmadas, pero no se ofrece una pantalla de ingreso manual de macros. Productos guardados, catálogos y recetas quedan diferidos. La integración de HealthKit persiste muestras y cursores, mantiene la procedencia y presenta el historial; las fuentes nutricionales se reconcilian sin sumar un resumen histórico sobre comidas. El backend no tiene endpoint público configurado. La aceptación con datos personales en iPhone, la distribución TestFlight y las pruebas integradas de release siguen pendientes. **Los criterios vigentes de MVP permanecen abiertos y sin marcar** hasta documentar evidencia suficiente; la presencia de una implementación no equivale a aceptación. Ver [detalle de implementación](health-import.md).
+Sin registro manual/conversacional de tracking en iOS, cámara propia para comida, catálogo de alimentos ni carga manual de macros. ChatGPT estima nutrientes; el backend valida, persiste y calcula totales; iOS consulta. La escritura técnica para sincronizar Salud y la configuración de cuenta/consentimiento no habilitan edición de tracking en la app.
 
-## Requisitos conservados
+**Apple Health sigue como primera y máxima prioridad, NUT-01.** Su lectura local funciona sin backend/login; compartir datos con backend/plugin requiere un consentimiento adicional definido en NUT-18.
 
-El backlog original se basó en `seguimiento_calorias_peso.xlsx` versión 16 y requisitos de “Calorie tracking”, sin transcripción íntegra; la evidencia de requisitos permanece en [backlog PWA archivado](archive/backlog-pwa-2026-10-05.md). Además, se comparó de forma local y de solo lectura el parser nativo con el XLSX original: identificó dos hojas y coincidió el mapeo estructural de fecha, peso, calorías y proteína. En la hoja principal, coincidieron las ocho filas activas de preview y se omitieron 82 filas futuras vacías; la comparación no encontró divergencias de fecha, calorías, proteína ni peso. La auditoría no guardó celdas ni valores personales, no modificó el original y solo verifica compatibilidad del parser: no demuestra idempotencia de lote, importación confirmada, deshacer ni cumplimiento completo de NUT-06.
+## Estado y migración
 
-Conservar registro conversacional y correcciones, crudo/cocido, unidades, cantidad consumida y sobrantes, estimaciones visibles, objetivos versionados y cierre explícito del día. Cada propuesta de comida muestra nutrientes estimados y se confirma antes de guardarse. El diario interno persiste y calcula entradas confirmadas; el MVP no incluye una pantalla para ingresar macros manualmente ni un catálogo de alimentos/recetas. Cada entrada persiste antes de cerrar; medianoche no cierra automáticamente. Ausencia de datos no es cero. Un resumen histórico nunca fabrica comidas. Mantener importación de planilla sin escribir en el original, análisis de fotos/etiquetas, preguntas y exportación/restauración.
+Se reformularon NUT-01 a NUT-15 conservando sus números y se agregaron NUT-16 a NUT-21. Todos siguen abiertos; ningún criterio se considera aceptado por existir código del enfoque anterior. NUT-09 es diferido y NUT-21 es roadmap posterior al MVP.
 
-## Arquitectura vigente
+La implementación actual aún contiene chat, registro y editores de la app anterior. NUT-07 los retira; NUT-02/NUT-15 preservan y migran el historial. Los permisos, políticas, contratos y pruebas deben actualizarse para el nuevo flujo, sin borrar datos silenciosamente.
 
-Monorepo: `ios/` contiene el proyecto SwiftUI y sus módulos de Salud, nutrición, importación, tracking y remoto; `backend/` contiene una API FastAPI/SQLite para desarrollo local; `docs/` aloja contratos, privacidad y planificación. Las validaciones se ejecutan por componente desde la raíz. La existencia de esos componentes no prueba despliegue público, TestFlight ni aceptación de todos los tickets.
+Antecedentes: [backlog iOS con chat archivado](archive/backlog-ios-chat-2026-10-09.md), [snapshot de issues anterior al pivot](archive/issues-ios-chat-2026-10-10.json), [backlog PWA original](archive/backlog-pwa-2026-10-05.md). Las capturas actuales documentan la implementación anterior, no el nuevo diseño.
 
-- SwiftUI nativo, iOS 18+, iPhone prioritario e iPad como destino soportado; UI accesible y localizada en español/inglés.
-- HealthKit de lectura como primera integración; persistencia local y sincronización histórica/incremental. No se escribe en Salud ni se habilita entrega en segundo plano en esta entrega.
-- El tracking local y sus cambios versionados están separados de la sincronización remota. El backend de desarrollo documenta migraciones, autenticación y contratos; no hay proveedor de hosting contratado ni endpoint público.
-- IA desde backend autenticado con secretos en servidor; app por HTTPS y credenciales en Keychain. Ninguna clave de IA en el binario.
-- Procedencia por registro: Salud/manual/planilla/etiqueta/catálogo/estimación; snapshots nutricionales y metas versionadas. Reconcilación explícita evita dobles conteos.
-- Zona horaria del perfil, inicialmente America/Montevideo; separar instante de registro y fecha del consumo. Nutrientes desconocidos son null, no cero.
-- Datos de Salud locales por defecto. El envío a backend/IA se limita a una consulta y propósito con consentimiento explícito y contexto agregado mínimo; no se sincronizan muestras crudas de HealthKit.
+## Orden de entrega
 
-Entidades previstas: Profile, GoalVersion, DayLog, Meal, FoodEntry, FoodDefinition, WeightEntry, ActivityEntry, ChatMessage, Attachment, ChangeEvent, ImportBatch, HealthSample y HealthSyncCursor. La política de agregación separa comidas, totales históricos y energía activa.
-
-## Orden de implementación
-
-| Orden | Tickets | Resultado |
+| Etapa | Tickets | Resultado |
 |---|---|---|
-| 1 — máxima prioridad | 01 | Historial real de Apple Health, disponible localmente |
-| 2 | 02 | Arquitectura, persistencia y acceso a servicios remotos |
-| 3 | 03–06 | Registro confiable, cierre, Hoy e importación de planilla |
-| 4 | 07–09 | Chat, correcciones y productos/recetas |
-| 5 | 10–12 | Fotos, consultas y progreso con Salud + manual |
-| 6 | 13–15 | Revisión, uso offline, TestFlight y recuperación |
+| 1 — máxima prioridad | 01 | Historial local de Apple Health y permisos reales |
+| 2 | 02, 03, 16, 17 | Backend común, identidad y herramientas MCP |
+| 3 | 08, 18, 19, 20 | Plugin conectado, registro desde ChatGPT, Salud consentida y lectura iOS |
+| 4 | 07, 05, 12 | Companion sin registro/chat propio, dashboards y gráficas |
+| 5 | 04, 06, 10, 11, 13 | Cierre, migración histórica, imágenes y consultas/revisión desde plugin |
+| 6 | 14, 15 | Distribución, recuperación y aceptación integral |
+| Posterior al MVP | 21 | Widgets con ChatGPT Extensions |
+| Diferido | 09 | Catálogo/recetas sin alcance activo |
 
-P0: base necesaria; P1: completar MVP. S/M/L son tallas relativas. Cada PR verifica los criterios del ticket. Los números #1–#15 e identificadores NUT se conservan para mantener referencias; la definición original #1 se integra en #2 y #1 pasa a Apple Health. Estados actuales: abiertos.
+P0 forma la base del nuevo producto; P1 completa y valida sus flujos; P2 no bloquea el MVP. Las dependencias de cada ticket determinan el orden dentro de una etapa. La aceptación del plugin requiere una conversación real de ChatGPT, además de pruebas de MCP Inspector; la de Salud requiere iPhone real.
 
 ## Tickets
 
-### [NUT-01 — Importar datos de Apple Health con HealthKit (primera prioridad)](https://github.com/peter7z/nutrition-tracker/issues/1)
+### [NUT-01 — Importar Apple Health con HealthKit (primera prioridad)](https://github.com/peter7z/nutrition-tracker/issues/1)
 
-P0 · L · Orden de implementación: 1 · Dependencias: ninguna después del scaffold iOS.
+P0 · ios,healthkit · Dependencias: ninguna.
 
-Objetivo: levantar primero el historial de salud y actividad del usuario en la app nativa. La integración mínima funciona localmente antes del chat, la planilla y los servicios remotos.
+La app importa datos existentes de Salud y permite consultarlos localmente. La lectura local no exige login ni backend.
 
-## Criterios de aceptación
+Criterios de aceptación:
 
-- [ ] Conectar Apple Health desde una pantalla SwiftUI mediante HealthKit; comprobar disponibilidad y solicitar únicamente permisos de lectura, por tipo, tras una explicación y acción explícita del usuario. Sin login ni backend como prerrequisito de esta primera entrega.
-- [ ] Permitir elegir tipos y rango histórico: peso (bodyMass), pasos, energía activa y basal, tiempo de ejercicio y entrenamientos; energía ingerida, proteína, carbohidratos, grasa total y saturada cuando existan. No inferir comidas a partir de totales nutricionales.
-- [ ] Importar el historial disponible con fecha/hora, unidad normalizada, UUID HealthKit, tipo y fuente/dispositivo; mostrar vista previa, cobertura temporal y última sincronización. Usar kg, kcal y gramos con conversiones verificadas y la zona horaria del perfil.
-- [ ] Persistir localmente y sincronizar incrementalmente al abrir la app y al actualizar manualmente. Usar consultas ancladas para altas, cambios representados como reemplazos y eliminaciones; guardar cursor y datos en una misma operación recuperable. Un reintento o reinstalación con reimportación no duplica muestras.
-- [ ] Para pasos y energía acumulada, usar estadísticas HealthKit con política documentada de agregación de fuentes; no sumar indiscriminadamente iPhone y Apple Watch. Energía de entrenamientos no se suma otra vez a la energía activa diaria. Conservar múltiples pesajes.
-- [ ] Separar datos de Apple Health, manuales y de planilla. No contabilizar dos veces un registro del mismo evento ni sumar totales diarios importados sobre comidas ya existentes; presentar conflictos para elección explícita. Nunca rellenar faltantes con cero.
-- [ ] No interpretar el éxito de requestAuthorization ni authorizationStatus como permiso de lectura concedido. HealthKit no revela una denegación de lectura: presentar “sin datos disponibles” cuando corresponda, manejar errores reales y permitir revisar permisos en Salud.
-- [ ] La app no escribe ni borra en Apple Health en esta entrega. Desconectar detiene futuras consultas y ofrece borrar la copia local; no modifica el origen. Datos de salud quedan en el dispositivo y fuera de logs; cualquier envío futuro a backend o IA requiere consentimiento explícito y alcance mínimo.
-- [ ] Verificar fixtures de conversiones, zona horaria, reintentos, fuentes superpuestas, borrados y falta de datos. Validar permisos e importación con datos reales en iPhone cuando se autorice esa prueba; el simulador no sustituye esa aceptación.
+- [ ] Permisos de lectura contextuales por tipo y rango: peso, pasos, energía activa/basal, ejercicio/entrenamientos y nutrientes disponibles; no crear comidas desde totales ni escribir/borrar en Apple Health.
+- [ ] Persistir muestras, procedencia, unidades normalizadas, zona horaria y cursores de forma atómica; importación incremental con altas/eliminaciones, reintentos idempotentes y cobertura/última sincronización visibles.
+- [ ] Usar agregaciones HealthKit para evitar doble conteo de iPhone/Watch y entrenamientos; conservar pesajes y distinguir desconocido de cero. No interpretar autorización completada como lectura concedida.
+- [ ] Desconectar detiene consultas y ofrece borrar la copia local sin alterar Salud. Validar conversiones, superposición, reimportación y permisos reales en iPhone. Compartir con backend requiere NUT-18 y consentimiento adicional.
 
-## Referencias
+### [NUT-02 — Arquitectura del monorepo: companion iOS + backend + plugin ChatGPT](https://github.com/peter7z/nutrition-tracker/issues/2)
 
-- [Autorización HealthKit](https://developer.apple.com/documentation/healthkit/authorizing-access-to-health-data)
-- [Consultas HealthKit](https://developer.apple.com/documentation/healthkit/queries)
-- [Descripción del permiso de lectura](https://developer.apple.com/documentation/bundleresources/information-property-list/nshealthshareusagedescription)
+P0 · ios,backend,plugin · Dependencias: NUT-01.
 
+Separar explícitamente las responsabilidades y migrar la arquitectura anterior sin perder historial.
 
-### [NUT-02 — Consolidar arquitectura iOS, acceso privado y backend de desarrollo](https://github.com/peter7z/nutrition-tracker/issues/2)
+Criterios de aceptación:
 
-P0 · M · Depende de: #1.
+- [ ] ios/ contiene HealthKit, caché, visualización y configuración; backend/ es la fuente persistente del tracking; plugin/ alojará manifiesto, instrucciones y futuras extensiones. El servidor MCP es una pieza del plugin.
+- [ ] iOS no crea/edita comidas, peso, actividad, metas ni cierres. Solo puede importar/sincronizar Salud y realizar operaciones técnicas de cuenta/consentimiento. El tracking se modifica desde ChatGPT mediante el plugin.
+- [ ] Conservar registros existentes, versiones, procedencia y recibos; migración recuperable, aislamiento por propietario y reconciliación sin duplicar resúmenes. Documentar cambios respecto de la implementación actual.
+- [ ] Contrato de datos compartido entre MCP, API de lectura iOS y futuras vistas del plugin; autenticación consistente, HTTPS, migraciones y entornos reproducibles. No incluir claves de IA en iOS ni exigir Responses API para el flujo principal.
 
-Objetivo: extender la base SwiftUI nativa para el registro nutricional y el chat. Las decisiones de arquitectura del antiguo NUT-01 se conservan aquí; el scaffold inicial no completa este ticket.
+### [NUT-03 — Persistencia y cálculo nutricional en el backend](https://github.com/peter7z/nutrition-tracker/issues/3)
 
-## Criterios de aceptación
+P0 · backend · Dependencias: NUT-02.
 
-- [ ] Monorepo con proyecto y fuentes Xcode en `ios/`, servidor futuro en `backend/` y documentación en `docs/`. Proyecto Xcode reproducible con esquema compartido, iOS 18 o superior, UI SwiftUI nativa y accesible, localización español/inglés y configuración Debug/Release. Wireframes de Hoy, Chat, Progreso y Ajustes con añadir, corregir y cerrar día.
-- [ ] Documentar persistencia local (SwiftData o alternativa justificada), migraciones, fuente nutricional, API, backend, hosting, autenticación y presupuesto de IA; servicios remotos solo para funciones que los requieren. HealthKit sigue funcionando sin servidor.
-- [ ] Definir contrato de datos y operaciones del asistente, objetivos versionados y diferencia entre planificación y consumo; separar datos HealthKit del tracking manual con procedencia y reconciliación explícita.
-- [ ] Login y logout nativos funcionan para los servicios remotos; credenciales en Keychain y transporte HTTPS. Todas las rutas de datos exigen identidad autenticada; ningún secreto de OpenAI se incluye en el binario.
-- [ ] Datos, fotos y consultas remotos se filtran por propietario; una prueba con dos identidades impide acceso cruzado. Logout separa o elimina la caché privada del usuario y evita mezcla de datos al cambiar de cuenta.
-- [ ] Backend arranca con configuración documentada, migraciones reproducibles y entornos separados; despliegue de desarrollo verificable. Registrar permisos y consentimiento necesarios antes de enviar datos de salud fuera del dispositivo.
+El backend conserva los registros creados desde ChatGPT y calcula los totales autoritativos.
 
-### [NUT-03 — Diario nutricional interno y cálculo](https://github.com/peter7z/nutrition-tracker/issues/3)
+Criterios de aceptación:
 
-P0 · M · Depende de: #2.
+- [ ] Persistir comida, cantidad/unidad, preparación, instante y día local, nutrientes estimados/etiqueta, supuestos, fuente, propietario y versión; ChatGPT estima macros sin catálogo ni carga manual de cada nutriente por el usuario.
+- [ ] Conversiones explícitas por 100 g/ml o porción; no asumir densidad ni equivalencia crudo/cocido. Calcular totales en código, mantener null para desconocidos y respetar kcal de etiqueta.
+- [ ] Mutaciones atómicas, idempotencia por operación, control de versión, auditoría y deshacer con conflictos visibles. Múltiples registros similares no se deduplican como si fueran la misma ingesta.
+- [ ] Pruebas de cantidades parciales, nutrientes faltantes, permisos de propietario, reintentos y correcciones; mismo snapshot/totales para plugin e iOS.
 
-Objetivo de MVP: mantener el diario nutricional interno usado por Hoy y Chat. El usuario registra comidas con Chat (#8); esta historia cubre el modelo, las conversiones, los totales y la persistencia, no una pantalla de macros manuales.
+### [NUT-04 — Cerrar, reabrir y corregir días desde el plugin](https://github.com/peter7z/nutrition-tracker/issues/4)
 
-## Criterios de aceptación
+P1 · backend,plugin · Dependencias: NUT-03, NUT-08.
 
-- [ ] Persistir propuestas de comida aceptadas desde Chat con cantidad consumida, unidad, estado crudo/cocido, fecha, nutrientes y procedencia; no requiere formulario manual de macros.
-- [ ] Conservar bases nutricionales por 100 g, 100 ml o porción y convertir explícitamente; nunca asumir densidad universal.
-- [ ] Calcular totales por comida y día en código; mostrar nutrientes faltantes como desconocidos.
-- [ ] Hacer los reintentos idempotentes y versionar correcciones confirmadas con posibilidad de deshacer.
-- [ ] Verificar porciones parciales, cambios de cantidad, grasas saturadas desconocidas y etiquetas cuyo valor energético no coincide exactamente con 4/4/9.
+Las acciones de cierre y corrección ocurren en ChatGPT; iOS refleja el estado.
 
-### [NUT-04 — Día abierto, cierre y correcciones históricas](https://github.com/peter7z/nutrition-tracker/issues/4)
+Criterios de aceptación:
 
-P0 · S · Depende de: #3.
+- [ ] Herramientas tipadas para cerrar/reabrir y consultar completitud; cierre explícito e idempotente, sin cierre automático a medianoche.
+- [ ] Corrección de día cerrado requiere reapertura explícita y conserva historial, totales y metas congeladas/versionadas.
+- [ ] Resolver hoy/ayer/fechas con zona horaria del usuario y devolver el día afectado; no asumir fecha de conversación como fecha de consumo.
+- [ ] iOS solo muestra estado/completitud y resumen actualizado, sin botones de cierre, reapertura o edición.
 
-## Criterios de aceptación
+### [NUT-05 — Pantalla Hoy de consulta: calorías, macros y Salud](https://github.com/peter7z/nutrition-tracker/issues/5)
 
-- [ ] Las entradas del día abierto sobreviven al cierre y relanzamiento de la app; cierre solo mediante botón u orden explícita.
-- [ ] Cerrar guarda un resumen versionado y estado de completitud; repetir cierre no duplica nada.
-- [ ] Corregir un día cerrado exige reabrirlo explícitamente y conserva historial de cambios.
-- [ ] “Hoy”, “ayer” y fecha explícita usan la zona horaria del usuario; pasar medianoche no cierra un día automáticamente.
+P0 · ios,healthkit · Dependencias: NUT-01, NUT-19.
 
-### [NUT-05 — Pantalla Hoy nativa con calorías, macros y datos de Salud](https://github.com/peter7z/nutrition-tracker/issues/5)
+Hoy es un dashboard, no una pantalla de registro.
 
-P0 · M · Depende de: #3, #4.
+Criterios de aceptación:
 
-## Criterios de aceptación
+- [ ] Mostrar kcal/macros, metas vigentes y diferencia, peso/actividad y procedencia; distinguir ingesta de energía activa y no aumentar automáticamente el presupuesto de comida.
+- [ ] Selección de fecha, detalle de registros de solo lectura y estados vacío/error/cargando/incompleto; ausencia de datos no se representa como cero.
+- [ ] Reflejar registros y correcciones del plugin tras actualización, con última sincronización y cobertura. Usar totales autoritativos del backend.
+- [ ] Dynamic Type, VoiceOver y localización español/inglés. Sin CTA de agregar comida, chat propio, micrófono, formularios de tracking ni metas editables.
 
-- [ ] Mostrar kcal, proteína, carbohidratos y grasas consumidas, objetivos y diferencia; saturadas como dato adicional cuando existan.
-- [ ] Actualizar al registrar o corregir; mostrar detalle por comida y procedencia de estimaciones.
-- [ ] Metas editables con fecha de vigencia; cambiar meta no altera registros anteriores.
-- [ ] Estados vacío, cargando, error y día incompleto; interfaz legible en pantalla de teléfono y con lector de pantalla.
-- [ ] Interfaz SwiftUI con Dynamic Type, VoiceOver y formatos locales; distinguir totales de ingesta de peso/actividad importados desde #1 y mostrar su fuente. Energía activa no aumenta automáticamente el presupuesto de comida.
+### [NUT-06 — Migrar la planilla histórica al backend mediante el plugin](https://github.com/peter7z/nutrition-tracker/issues/6)
 
+P1 · backend,plugin · Dependencias: NUT-03, NUT-16, NUT-20.
 
-### [NUT-06 — Importar historial de la planilla desde iOS sin inventar desglose](https://github.com/peter7z/nutrition-tracker/issues/6)
+Conservar la migración histórica, trasladándola fuera de iOS y sin hacerla requisito del primer flujo del plugin.
 
-P0 · M · Depende de: #3, #4.
+Criterios de aceptación:
 
-## Criterios de aceptación
+- [ ] Importación preparada mediante ChatGPT/plugin con mapeo y preview de fechas, kcal, proteína, peso, actividad y completitud; no usar file picker de iOS para registrar tracking.
+- [ ] Confirmación del lote antes de escribir, límites de tamaño/cantidad y errores visibles. Verificar mecanismo real de acceso a archivos del host; no asumir que MCP recibe adjuntos de ChatGPT automáticamente.
+- [ ] Resumen histórico conserva totales originales y procedencia sin fabricar comidas; omitir filas futuras vacías y nutrientes no explícitos. Reconciliar contra Salud sin sumar fuentes superpuestas.
+- [ ] Lotes idempotentes y reversibles sin borrar cambios posteriores; comparación por fecha y archivo original intacto. iOS solo visualiza el resultado.
 
-- [ ] Previsualizar mapeo de Registro diario y Resumen antes de confirmar importación.
-- [ ] Importar fechas, kcal, proteína, peso, actividad, notas y estado cerrado; filas futuras vacías se omiten.
-- [ ] Carbohidratos/grasas solo se extraen de totales explícitos en notas, conservando procedencia; conflictos se señalan para revisión.
-- [ ] Guardar los totales diarios originales como resumen histórico; no fabricar comidas ni volver a sumarlas sobre esos totales.
-- [ ] Importación idempotente por archivo/lote y fecha; deshacer lote sin borrar datos creados después.
-- [ ] Comparación por fecha contra fuente, informe de faltantes y registro de divergencias. No escribir en la planilla original.
-- [ ] Selección de archivo mediante fileImporter/document picker de iOS, acceso limitado al archivo elegido y procesamiento con errores visibles. La migración de planilla es independiente de la importación de Apple Health #1; reconciliar coincidencias de peso/actividad sin duplicar.
+### [NUT-07 — Convertir iOS en companion de consulta y sincronización](https://github.com/peter7z/nutrition-tracker/issues/7)
 
+P0 · ios · Dependencias: NUT-02, NUT-19.
 
-### [NUT-07 — Integrar chat de consultas con contexto persistente](https://github.com/peter7z/nutrition-tracker/issues/7)
+Retirar el flujo de registro y el chat integrado de la navegación de la app.
 
-P0 · M · Depende de: #2, #3, #5.
+Criterios de aceptación:
 
-## Criterios de aceptación
+- [ ] Eliminar de la UI Chat/historial de conversación, registro/corrección/borrado de comidas, formularios de peso/actividad, edición de metas y cierre/reapertura de días.
+- [ ] Retirar cámara/PhotosPicker para comida, revisión de propuestas de IA, catálogo/recetas y sus permisos cuando ya no se usen; no agregar voz ni llamadas propias a OpenAI.
+- [ ] Navegación nativa centrada en Hoy, Progreso, Datos y Ajustes/Salud; permitir seleccionar fecha/rango, sincronizar, configurar cuenta/consentimiento y consultar detalles.
+- [ ] Migrar sin borrar silenciosamente historial previo ni mezclar propietarios; explicar que el registro se hace en ChatGPT. Probar que no queda una ruta navegable para escribir tracking.
 
-- [ ] API de OpenAI consumida desde backend, con modelo configurable, límite de gasto, límites por usuario y manejo de timeout.
-- [ ] Contexto incluye objetivos, preferencias, día seleccionado y totales consultados desde la base; no depende de reenviar todo el historial.
-- [ ] Mensajes persisten; respuesta no inventa que guardó datos si no hubo operación exitosa.
-- [ ] Respuestas de tracking terminan con kcal y macros acumulados; consultas funcionan sin modificar ingesta.
-- [ ] Registrar latencia, tokens/costo estimado y errores sin exponer fotos o contenido sensible en logs.
-- [ ] Chat SwiftUI con historial y borrador persistentes, cancelación/reintento explícitos y estado de red. No enviar datos de HealthKit a la IA sin consentimiento específico; usar solo el contexto mínimo consentido.
+### [NUT-08 — Herramientas del plugin para registrar y corregir tracking](https://github.com/peter7z/nutrition-tracker/issues/8)
 
+P0 · backend,plugin,mcp · Dependencias: NUT-03, NUT-16, NUT-17.
 
-### [NUT-08 — Registrar y corregir comidas conversacionalmente](https://github.com/peter7z/nutrition-tracker/issues/8)
+ChatGPT interpreta el mensaje y estima nutrientes; las herramientas validan y persisten operaciones reales.
 
-P0 · L · Depende de: #7, #4.
+Criterios de aceptación:
 
-## Criterios de aceptación
-
-- [ ] Operaciones tipadas para añadir, actualizar, eliminar, consultar y cerrar; autorización y validación del lado servidor.
-- [ ] “Anotá 150 g de banana” crea una entrada; “eran 100 g” actualiza esa entrada sin sumar otra.
-- [ ] “¿Y si como una banana?” y “¿qué ceno?” no registran consumo.
-- [ ] Pregunta cuando haya varias entradas candidatas o una unidad materialmente ambigua; permite deshacer una acción.
-- [ ] Mensaje repetido, reintento de herramienta y desconexión durante respuesta no duplican registros; conflicto entre sesiones o dispositivos se detecta.
-- [ ] El chat y la pantalla Hoy muestran los mismos totales luego de cada operación.
-- [ ] Refrescar el estado observable de SwiftUI tras cada operación exitosa; deshacer y mostrar errores sin afirmar que una mutación fallida se guardó.
-
+- [ ] Tools tipadas de crear/actualizar/eliminar/deshacer comidas y registrar peso/actividad; validar nutrientes, cantidades, fecha, IDs y versión. Cambiar metas/cierres usa herramientas específicas, nunca argumentos arbitrarios.
+- [ ] «Anotá 150 g de banana» crea; «eran 100 g» corrige la entrada identificada sin duplicar. Preguntar cuando el destino o la unidad sean materialmente ambiguos; no pedir al usuario que cargue macros.
+- [ ] «¿Y si como una banana?» o «qué ceno» solo consulta/proyecta. Descripciones/annotations de lectura y escritura correctas; confirmar acciones sensibles y no afirmar guardado antes del recibo exitoso.
+- [ ] Idempotencia y versiones impiden duplicados por reintento del host; errores/conflictos visibles. Devolver ID, versión, datos efectivamente guardados y totales autoritativos para ChatGPT e iOS.
 
 ### [NUT-09 — Productos y recetas (diferido fuera del MVP)](https://github.com/peter7z/nutrition-tracker/issues/9)
 
-**Diferido fuera del MVP por decisión de producto.** No agregar botones de catálogo, guardado de producto o receta ni hacerlos requisito del flujo de comida. El alcance futuro se conserva abajo como referencia, sin contarse entre los criterios vigentes de MVP.
+P2 · backend,plugin,deferred · Dependencias: sin dependencia activa.
 
-### Alcance futuro (sin aceptación para este MVP)
+Mantener fuera del MVP la base de alimentos y recetas; no es requisito para estimar nutrientes en ChatGPT.
 
-- [ ] Guardar productos con nombre/marca, porción y nutrientes, y seleccionarlos al mencionarlos otra vez.
-- [ ] Priorizar etiqueta confirmada sobre estimación genérica; si la marca o versión es ambigua, pedir elección.
-- [ ] Receta con ingredientes, peso total final o porciones y cantidad consumida; sobrantes no se contabilizan como consumidos.
-- [ ] Editar producto cambia futuras entradas; aplicar a registros existentes requiere acción explícita.
+Criterios de aceptación:
 
-### [NUT-10 — Estimar comidas y leer etiquetas con cámara y PhotosPicker](https://github.com/peter7z/nutrition-tracker/issues/10)
+- [ ] No catálogo de alimentos, búsqueda de productos, carga manual de macros ni guardado de recetas en la app o el plugin del MVP.
+- [ ] Conservar registros históricos existentes sin exponer un nuevo flujo de catálogo; snapshots de comida no equivalen a una base de alimentos.
+- [ ] Cualquier alcance futuro de productos/recetas requiere una nueva decisión explícita de producto. Este ticket se mantiene diferido, no se marca completado.
 
-P1 · L · Depende de: #7, #8.
+### [NUT-10 — Fotos y etiquetas desde ChatGPT mediante el plugin](https://github.com/peter7z/nutrition-tracker/issues/10)
 
-## Criterios de aceptación
+P1 · plugin,backend · Dependencias: NUT-08, NUT-20.
 
-- [ ] Capturar con cámara nativa o elegir imágenes con PhotosPicker; permiso de cámara contextual y descripción localizada, sin solicitar acceso general a la fototeca para el picker. Validar tipo/tamaño y convertir HEIC u otros formatos soportados antes del análisis.
-- [ ] Devolver componentes editables, cantidad estimada, kcal/macros y supuestos; no presentar gramos deducidos visualmente como medición. Los nutrientes confirmados se guardan como snapshot de esa comida, sin crear un producto en catálogo.
-- [ ] Pedir peso o aclaración cuando sea necesario; estimación visual se confirma antes de registrar.
-- [ ] Etiqueta: distinguir porción de 100 g/ml, transcribir valores y señalar texto ilegible; usuario confirma antes de guardar el snapshot nutricional de la comida. Guardar productos queda diferido a NUT-09.
-- [ ] Adjuntos privados, metadatos de ubicación eliminados y acción de borrar foto; reintentar análisis no duplica comida.
+Usar las capacidades de imagen de ChatGPT para generar datos estructurados, sin cámara propia de iOS.
 
-### [NUT-11 — Recomendar comidas según el día y responder preguntas](https://github.com/peter7z/nutrition-tracker/issues/11)
+Criterios de aceptación:
 
-P1 · M · Depende de: #7.
+- [ ] El usuario comparte la imagen en ChatGPT; el asistente estima/transcribe y muestra supuestos. Verificar disponibilidad en el host real; no asumir acceso automático del MCP a la foto.
+- [ ] Cantidad visual se marca como estimación y se aclara cuando sea relevante; etiqueta distingue porción/100 g/ml y partes ilegibles. No crear catálogo ni guardar consumo solo por analizar una imagen.
+- [ ] Registrar únicamente al indicar/confirmar consumo mediante NUT-08; backend valida el snapshot, fechas/unidades y deduplicación por operación.
+- [ ] No almacenar fotos originales por defecto ni depender de upload/cámara/PhotosPicker de iOS; cualquier futura retención de imágenes requiere propósito, consentimiento y borrado definidos.
 
-## Criterios de aceptación
+### [NUT-11 — Instrucciones del plugin para consultas y estimaciones](https://github.com/peter7z/nutrition-tracker/issues/11)
 
-- [ ] “Tengo pollo y boniato, ¿qué ceno?” produce opciones con cantidades, kcal/macros estimados y total diario proyectado.
-- [ ] Usar objetivos, preferencias y comida ya registrada; distinguir proyección de acumulado real.
-- [ ] Registrar solo tras indicar qué se comió; permitir cambios como “usé menos aceite”.
-- [ ] Explicitar límites de estimaciones y no diagnosticar ni prescribir fármacos; afirmaciones clínicas requieren fuentes verificables o expresar incertidumbre.
+P1 · plugin · Dependencias: NUT-16, NUT-20.
 
-### [NUT-12 — Unificar peso y ejercicio de Apple Health y registros manuales](https://github.com/peter7z/nutrition-tracker/issues/12)
+La conversación y el razonamiento ocurren en ChatGPT, apoyados en herramientas y guías del plugin.
 
-P1 · M · Depende de: #1, #3, #5, #8.
+Criterios de aceptación:
 
-## Criterios de aceptación
+- [ ] Instrucciones/skills del plugin explican cuándo leer datos, estimar macros, aclarar supuestos y escribir; usar resultados actuales del backend, no memoria de conversación como fuente autoritativa.
+- [ ] Consultar objetivos, preferencias, registros y Salud consentida antes de responder sobre el día/progreso; contexto acotado por fechas y cobertura, sin reenviar todo el historial.
+- [ ] Propuestas de cena muestran cantidades y macros estimados y total proyectado separado del registrado; no registrar una planificación como consumo.
+- [ ] Manejar errores y datos insuficientes sin inventar guardado ni ceros. No implementar un segundo chat o motor de conversación Responses en el backend/iOS para este flujo.
 
-- [ ] Peso con fecha/hora y actividad con tipo, duración y calorías activas opcionales, por formulario y chat.
-- [ ] Múltiples pesajes al día conservados; regla visible para elegir el pesaje diario de la tendencia.
-- [ ] Media móvil de 7 días calculada sobre observaciones disponibles con número de muestras visible; no rellenar faltantes con cero.
-- [ ] Ejercicio se muestra separado y no aumenta automáticamente el presupuesto de comida.
-- [ ] Gráficos con selección de rango, historial editable y estados de datos insuficientes.
-- [ ] Swift Charts y listas accesibles con procedencia HealthKit/manual/planilla, cobertura y última sincronización. Las muestras de Salud se revisan en Salud; editar/borrar en la app no altera su origen. Reconciliar registros manuales y de planilla coincidentes antes de incluirlos en tendencias.
+### [NUT-12 — Gráficas de peso, actividad y nutrición de solo lectura](https://github.com/peter7z/nutrition-tracker/issues/12)
 
+P0 · ios,healthkit · Dependencias: NUT-01, NUT-19.
 
-### [NUT-13 — Revisión semanal y propuestas de ajuste](https://github.com/peter7z/nutrition-tracker/issues/13)
+Visualizar evolución con datos de Salud y registros creados desde el plugin.
 
-P1 · M · Depende de: #11, #12, #4.
+Criterios de aceptación:
 
-## Criterios de aceptación
+- [ ] Swift Charts con rangos y detalle: peso, media móvil de 7 días, kcal/macros y actividad; cantidad de muestras/cobertura visible y huecos sin inventar observaciones.
+- [ ] Conservar múltiples pesajes y documentar selección diaria; fuentes Salud/plugin/planilla identificadas y superposición reconciliada sin doble conteo.
+- [ ] Actividad separada de ingesta; las gráficas y listas no contienen controles para crear, corregir o borrar tracking.
+- [ ] Mismas series y reglas de agregación que herramientas del plugin/futuros widgets. Validar zonas horarias, valores desconocidos, iPhone pequeño/iPad, VoiceOver y Dynamic Type.
 
-- [ ] Resumen de ingesta, registro completo/incompleto, proteína, peso y actividad con cobertura de datos visible.
-- [ ] Antes de recomendar ajustes, revisar suficiencia de pesajes y días completos durante dos semanas; parámetros se definen y documentan, no se infieren de una fluctuación diaria.
-- [ ] Diferenciar observaciones calculadas de explicación del asistente; explicar datos usados y limitaciones.
-- [ ] Objetivos solo cambian tras aceptación; conservar versión previa. Revisión bajo demanda, sin notificaciones programadas en esta entrega.
-- [ ] La revisión usa los datos de Salud consentidos y distingue cobertura real de ausencia de datos; UI SwiftUI accesible para aceptar o rechazar cambios.
+### [NUT-13 — Revisión semanal en ChatGPT y metas versionadas por plugin](https://github.com/peter7z/nutrition-tracker/issues/13)
 
+P1 · backend,plugin · Dependencias: NUT-04, NUT-11, NUT-16.
 
-### [NUT-14 — Validar app iOS, uso sin conexión y distribución TestFlight](https://github.com/peter7z/nutrition-tracker/issues/14)
+ChatGPT interpreta una revisión calculada; las metas cambian mediante una operación del plugin.
 
-P1 · M · Depende de: #1, #5, #8, #10, #12.
+Criterios de aceptación:
 
-Objetivo: reemplazar instalación PWA y service worker por instalación y ciclo de vida nativos de iOS.
+- [ ] Tool de revisión devuelve ingesta, completitud, proteína, peso, actividad y cobertura real; solo datos de Salud autorizados y frescura visibles.
+- [ ] Política documentada de suficiencia durante dos semanas; no proponer ajustes de metas a partir de una fluctuación aislada.
+- [ ] Separar observaciones calculadas de explicación/propuesta del asistente; aceptación explícita y tool versionada con fecha de vigencia, conflicto y recibo.
+- [ ] iOS muestra la revisión/datos y metas resultantes como consulta, sin formulario ni botones de aceptar/rechazar cambios de metas.
 
-## Criterios de aceptación
+### [NUT-14 — Validar y distribuir el companion iOS de lectura](https://github.com/peter7z/nutrition-tracker/issues/14)
 
-- [ ] Icono de app, nombre, bundle ID y versiones definitivos; firma, capability HealthKit y perfiles de distribución verificados. Archivo Release y build TestFlight instalable; revisar descripciones de permisos, política de privacidad y declaraciones de datos/dependencias exigidas al distribuir.
-- [ ] Probar instalación, sesión persistente, permisos de Salud y cámara, PhotosPicker, teclado, safe areas, navegación del flujo principal Chat/propuestas, Dynamic Type, VoiceOver, modo claro/oscuro y tamaños iPhone; verificar layout iPad si se mantiene ese destino. La captura manual de macros y el catálogo no son requisitos de este flujo.
-- [ ] Sin red: indicador explícito, lectura de registros persistidos y borrador local; HealthKit local disponible según permisos. IA requiere conexión; registrar operaciones pendientes sin afirmar que fueron sincronizadas.
-- [ ] Al recuperar red, reenvío explícito e idempotente de borradores; logout elimina/separa caché privada y credenciales. Probar suspensión, terminación, relanzamiento y conflictos entre sesiones.
-- [ ] Actualizar la versión no pierde datos ni conversaciones; probar migración de persistencia local y recuperación tras fallo. Sincronizar Salud al volver a primer plano; la entrega en segundo plano no se promete en el MVP.
-- [ ] Validación rutinaria en Simulator; aceptación final de HealthKit con datos reales en iPhone y pruebas de distribución documentadas. No considerar firmado o publicado un build compilado con CODE_SIGNING_ALLOWED=NO.
+P1 · ios,healthkit · Dependencias: NUT-01, NUT-05, NUT-07, NUT-12, NUT-19.
 
-### [NUT-15 — Exportación, recuperación y validación del MVP](https://github.com/peter7z/nutrition-tracker/issues/15)
+Validar la nueva app, offline y TestFlight con su alcance reducido.
 
-P1 · M · Depende de: #1, #6, #8, #10, #11, #12, #13, #14.
+Criterios de aceptación:
 
-## Criterios de aceptación
+- [ ] Instalación, identidad, firma, HealthKit, privacidad y build TestFlight real; retirar permisos de cámara/micrófono/IA que no corresponden al nuevo producto.
+- [ ] Probar conexión HealthKit, consentimientos remotos, cuenta, sincronización, fechas/gráficas y detalles; ausencia de registro/chat propio verificada en navegación.
+- [ ] Offline: HealthKit local y última caché disponibles, pendientes técnicos de sync/frescura explícitos; no cola de registros ni borradores de chat en iOS.
+- [ ] Simulator iPhone SE/grande/iPad, claro/oscuro, Dynamic Type y VoiceOver; aceptación de HealthKit real en iPhone y documentación de distribución, sin confundir build unsigned con TestFlight.
 
-- [ ] Exportar datos estructurados a JSON/CSV con unidades, fechas, fuentes y notas; procedimiento de backup y restauración probado.
-- [ ] Borrado de cuenta/datos incluye adjuntos y explica retención de backups configurada.
-- [ ] Verificar flujo completo: conectar Apple Health e importar Salud y planilla, añadir y corregir comida mediante Chat, analizar foto, consultar cena, registrar peso/actividad, cerrar día y revisar progreso.
-- [ ] Evaluación con frases representativas y resultados esperados; errores críticos: duplicar, registrar hipótesis, confundir crudo/cocido, fechar mal o exponer otro usuario.
-- [ ] Revisar costos y latencias observados en uso personal antes de habilitar más usuarios.
-- [ ] Exportar mediante share sheet de iOS y restaurar mediante document picker. Exportación de copia HealthKit es explícita; borrado de la app/cuenta incluye la copia local y cursores, sin borrar datos originales de Salud. Restaurar y reimportar Salud no duplica registros.
+### [NUT-15 — Recuperación, privacidad y aceptación del sistema completo](https://github.com/peter7z/nutrition-tracker/issues/15)
 
+P1 · backend,plugin,ios · Dependencias: NUT-01, NUT-08, NUT-18, NUT-19, NUT-20.
 
-## Fuera de esta primera versión
+Validar ChatGPT/plugin ↔ backend ↔ iOS y recuperar datos existentes sin pérdida.
 
-Escritura en Apple Health, sincronización HealthKit garantizada en segundo plano, app Apple Watch, voz propia, códigos de barras, pagos, red social, administración multiusuario, IA offline y sincronización bidireccional con Excel. Apple Health **sí** integra el MVP y es la primera tarea.
+Criterios de aceptación:
+
+- [ ] Flujo completo: importar Salud, autorizar copia remota, consultar desde ChatGPT, registrar/corregir una comida por plugin y ver el resultado en iOS; mismo usuario y mismos totales.
+- [ ] Exportación JSON/CSV con fuentes/unidades/versiones y restauración administrativa o vía plugin; iOS puede compartir una exportación de lectura, pero no restaurar/crear tracking en el MVP.
+- [ ] Borrado de cuenta/copia remota y revocación de acceso cubren datos, tokens, cachés y backups según política; nunca borrar Apple Health como efecto secundario.
+- [ ] Migración de la app anterior preserva historial; pruebas de dos propietarios, reintentos, conflictos, caídas, hipótesis no registradas y Salud no autorizada; evidencia por componente, no aceptación inferida desde código existente.
+
+### [NUT-16 — Servidor MCP del plugin: lectura, esquemas y transporte](https://github.com/peter7z/nutrition-tracker/issues/16)
+
+P0 · backend,plugin,mcp · Dependencias: NUT-02, NUT-03.
+
+Exponer las capacidades del backend como herramientas MCP que forman parte del plugin de ChatGPT.
+
+Criterios de aceptación:
+
+- [ ] Endpoint /mcp con Streamable HTTP, inicialización, listado de herramientas y llamadas reales; SDK compatible con backend y versiones documentadas.
+- [ ] Tools de lectura para perfil/metas, registros por fecha, resumen diario, series de progreso, revisión y estado/cobertura de Salud; paginación, límites y formatos estructurados compartidos con iOS/widgets.
+- [ ] Separar lectura y escritura con esquemas/annotations; validar propietario desde identidad autenticada, no owner_id dado por el modelo. Ninguna consulta tiene efectos de tracking.
+- [ ] Inspector y pruebas de contrato, entradas inválidas, errores, fechas/timezone y resultados reproducibles; desplegar endpoint accesible al host elegido sin afirmar que localhost es una integración de ChatGPT.
+
+### [NUT-17 — Identidad compartida y OAuth del plugin ChatGPT](https://github.com/peter7z/nutrition-tracker/issues/17)
+
+P0 · backend,plugin,mcp · Dependencias: NUT-02.
+
+Vincular plugin e iOS a la misma cuenta y controlar qué datos/herramientas se autorizan.
+
+Criterios de aceptación:
+
+- [ ] OAuth 2.1/PKCE y discovery MCP de recurso protegido/servidor de autorización; registro/identificación de cliente compatible con el host real, redirecciones verificadas y secretos fuera del repo.
+- [ ] Scopes separados para leer tracking, escribir tracking y leer Salud autorizada; identidad por token validado, issuer/audience/expiry/scope y aislamiento estricto de propietarios.
+- [ ] Login iOS y vinculación ChatGPT resuelven el mismo propietario persistente sin asociar cuentas por texto del chat; revocación, expiración, logout y cambio de usuario probados.
+- [ ] No trasladar permisos HealthKit al OAuth automáticamente. Acceso a Salud remota depende además del consentimiento activo NUT-18; no secretos compartidos pegados en conversaciones.
+
+### [NUT-18 — Sincronizar Salud autorizada del iPhone al backend](https://github.com/peter7z/nutrition-tracker/issues/18)
+
+P0 · ios,backend,healthkit · Dependencias: NUT-01, NUT-02, NUT-17.
+
+Hacer consultables desde el plugin los datos seleccionados de Apple Health, con consentimiento explícito y trazabilidad.
+
+Criterios de aceptación:
+
+- [ ] Consentimiento separado de la lectura local: explicar envío, almacenamiento en backend y acceso desde ChatGPT; elegir tipos/rango, revisar payload y revocar sin impedir consulta local.
+- [ ] Enviar solo métricas/observaciones normalizadas necesarias y agregados con fuente/cobertura/timezone/frescura; no volcar toda HealthKit, metadatos de dispositivos ni contenido no seleccionado.
+- [ ] ID estable por observación y propietario, lotes/ack/cursor atómicos, incremental altas/correcciones/eliminaciones y reintentos offline; no doble conteo entre fuentes o totales. Sync en primer plano/manual, sin garantía de background.
+- [ ] El backend expone solo la copia autorizada a herramientas con scope de Salud; revocar detiene futuras cargas y accesos, con opción de borrar esa copia sin eliminar tracking ni originales en Apple Health.
+
+### [NUT-19 — API de consulta y caché iOS del tracking creado por el plugin](https://github.com/peter7z/nutrition-tracker/issues/19)
+
+P0 · ios,backend · Dependencias: NUT-02, NUT-03, NUT-17.
+
+Llevar a la app el mismo historial y totales que registra ChatGPT.
+
+Criterios de aceptación:
+
+- [ ] API autenticada de lectura de perfil/metas, días/comidas, peso/actividad, series y estados; contrato compartido con MCP, sin acceso iOS a mutaciones de tracking.
+- [ ] Actualizar al abrir/volver a primer plano y manualmente; cursores/versiones, paginación y borrados reflejados en caché de forma atómica sin editar estados remotos.
+- [ ] Última actualización, offline, vacío/error y procedencia visibles; detectar cambio de propietario y separar/eliminar caché privada según política.
+- [ ] Prueba plugin crea/corrige → backend devuelve recibo → iOS refresca y muestra una sola entrada/totales correctos; no depender de mensajes de conversación ni de operaciones locales de registro.
+
+### [NUT-20 — Empaquetar, conectar y probar el plugin de ChatGPT](https://github.com/peter7z/nutrition-tracker/issues/20)
+
+P0 · plugin,mcp · Dependencias: NUT-16, NUT-17, NUT-08.
+
+Entregar un plugin utilizable, no solamente un servidor MCP suelto.
+
+Criterios de aceptación:
+
+- [ ] Paquete del plugin con identidad/descripción, manifiestos y configuración MCP, instrucciones/skills, documentación de instalación y estructura plugin/ versionada en el monorepo.
+- [ ] Conectar e instalar de forma privada en ChatGPT con cuenta/host compatibles verificados; probar discovery, OAuth, lectura y escritura desde una conversación real. No confundir Inspector con aceptación del plugin.
+- [ ] Documentar surfaces/planes/permisos realmente probados (incluido móvil/voz si se pretende usarlos); no prometer compatibilidad ni publicación pública sin verificarla.
+- [ ] Preparar contratos/resultados structuredContent y organización para futuras ChatGPT Extensions NUT-21. Publicación en catálogo, revisión y widgets no son requisitos para el primer plugin privado.
+
+### [NUT-21 — Widgets del plugin con ChatGPT Extensions (fase posterior)](https://github.com/peter7z/nutrition-tracker/issues/21)
+
+P2 · plugin,roadmap · Dependencias: NUT-05, NUT-12, NUT-16, NUT-20.
+
+Renderizar calorías/macros, peso y evolución dentro de ChatGPT mediante extensiones/widgets del plugin.
+
+Criterios de aceptación:
+
+- [ ] Widgets de resumen diario kcal/macros/metas, peso con tendencia y progreso por rango; datos estructurados reales del backend con fuente, fecha, cobertura y última actualización.
+- [ ] Recursos UI y metadatos de herramientas usando la API de extensiones vigente al implementar; misma capa de consulta/contratos que iOS, sin base paralela ni cálculo contradictorio.
+- [ ] Renderizar o abrir un widget no registra consumo ni cambia metas; cualquier futura acción usa las herramientas autorizadas existentes y su política de confirmación.
+- [ ] Diseño accesible, claro/oscuro, responsive, vacío/error/datos insuficientes, CSP/aislamiento y pruebas en el host real; validar disponibilidad antes de prometer soporte. Este ticket es roadmap y no bloquea el MVP sin widgets.
+
+## Referencias técnicas
+
+- [Servidor MCP como pieza del plugin](https://developers.openai.com/plugins/build/mcp-server).
+- [Autenticación OAuth del plugin](https://developers.openai.com/plugins/build/auth).
+- [Conexión con ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).
+- [UI y extensiones dentro de ChatGPT](https://developers.openai.com/plugins/build/chatgpt-ui).
+
+Estas referencias guían los tickets; no prueban que la cuenta, el host móvil/voz, el deployment o los widgets estén disponibles/configurados. Verificar en la implementación real.

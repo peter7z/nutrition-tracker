@@ -1,5 +1,7 @@
 # Matriz de evidencia de aceptación
 
+> **Cambio de producto — 10 de octubre de 2026:** este documento conserva implementación/evidencia del enfoque anterior. El alcance vigente se define en [especificación de producto](product.md) y el backlog: companion iOS de consulta/Salud, registro desde el plugin de ChatGPT y widgets futuros con Extensions. Sus referencias a chat, registro o edición en iOS no son requisitos vigentes. La adaptación del código y de los contratos está pendiente.
+
 Estado de auditoría: 9 de octubre de 2026. Esta matriz relaciona **los 81 criterios de MVP vigentes** de [backlog.md](backlog.md) con código y pruebas observables; NUT-09 conserva cuatro criterios de referencia futura, diferidos y excluidos de esta cuenta. Los rótulos de la primera columna son resúmenes; cada ID apunta al criterio íntegro y con el mismo alcance que permanece en el backlog. “Implementado/test” significa que hay código y el XCTest pertinente está incluido en el último log integrado disponible; no significa aceptación del ticket. “Implementado” indica código revisado sin un test focalizado o una prueba de extremo a extremo. “Parcial” indica que falta una parte del comportamiento o una puerta de validación. Ninguna fila cierra un ticket.
 
 ## Evidencia global y límites

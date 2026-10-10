@@ -1,5 +1,7 @@
 # Hoy y Chat — interfaz nativa actual
 
+> **Cambio de producto — 10 de octubre de 2026:** este documento conserva implementación/evidencia del enfoque anterior. El alcance vigente se define en [especificación de producto](../product.md) y el backlog: companion iOS de consulta/Salud, registro desde el plugin de ChatGPT y widgets futuros con Extensions. Sus referencias a chat, registro o edición en iOS no son requisitos vigentes. La adaptación del código y de los contratos está pendiente.
+
 Actualizado el 9 de octubre de 2026. Las capturas actuales provienen de pruebas de render en español sobre la app SwiftUI; usan un estado vacío sintético y Apple Health está desconectado. No contienen el historial ni valores personales del usuario. Sirven para documentar la UI implementada, no prueban HealthKit real, servicio conectado, accesibilidad completa ni distribución.
 
 ## Flujo actual

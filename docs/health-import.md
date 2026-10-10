@@ -1,5 +1,7 @@
 # Apple Health — primera implementación
 
+> **Cambio de producto — 10 de octubre de 2026:** este documento conserva implementación/evidencia del enfoque anterior. El alcance vigente se define en [especificación de producto](product.md) y el backlog: companion iOS de consulta/Salud, registro desde el plugin de ChatGPT y widgets futuros con Extensions. Sus referencias a chat, registro o edición en iOS no son requisitos vigentes. La adaptación del código y de los contratos está pendiente.
+
 Entrega del 8 de octubre de 2026. NUT-01 sigue abierto hasta validar permisos, firma e importación del historial personal en iPhone real.
 
 ## Flujo disponible

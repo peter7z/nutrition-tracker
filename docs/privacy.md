@@ -1,5 +1,7 @@
 # Privacidad — Nutrition Tracker
 
+> **Cambio de producto — 10 de octubre de 2026:** este documento conserva implementación/evidencia del enfoque anterior. El alcance vigente se define en [especificación de producto](product.md) y el backlog: companion iOS de consulta/Salud, registro desde el plugin de ChatGPT y widgets futuros con Extensions. Sus referencias a chat, registro o edición en iOS no son requisitos vigentes. La adaptación del código y de los contratos está pendiente.
+
 Fecha: 9 de octubre de 2026. Texto de producto preparado para la versión de desarrollo del repositorio. Antes de publicar, el responsable de la app debe identificar su entidad/contacto, confirmar el hosting y los proveedores habilitados, y alojar esta política en una URL pública. El repositorio puede ser privado: su URL no constituye por sí sola una política accesible al público.
 
 ## Español

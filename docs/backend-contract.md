@@ -1,5 +1,7 @@
 # Backend HTTP v1
 
+> **Cambio de producto — 10 de octubre de 2026:** este documento conserva implementación/evidencia del enfoque anterior. El alcance vigente se define en [especificación de producto](product.md) y el backlog: companion iOS de consulta/Salud, registro desde el plugin de ChatGPT y widgets futuros con Extensions. Sus referencias a chat, registro o edición en iOS no son requisitos vigentes. La adaptación del código y de los contratos está pendiente.
+
 Fecha: 2026-10-08. SQLite y FastAPI. Todos los datos privados requieren `Authorization: Bearer <token>`. TLS en producción; HTTP solo loopback en desarrollo. OpenAPI disponible en `/docs` solo en desarrollo.
 
 ## Identidad
