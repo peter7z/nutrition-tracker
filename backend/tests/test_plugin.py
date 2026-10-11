@@ -197,8 +197,9 @@ def test_wrong_pkce_and_audience_never_issue_token(client):
         'password':'synthetic plugin password','action':'signup'},follow_redirects=False)
     code=parse_qs(urlsplit(result.headers['location']).query)['code'][0]
     form={'grant_type':'authorization_code','client_id':registered['client_id'],'code':code,
-        'redirect_uri':CALLBACK,'resource':RESOURCE,'code_verifier':'wrong'}
-    assert client.post('/token',data=form).status_code==400
+        'redirect_uri':CALLBACK,'resource':RESOURCE,'code_verifier':'w'*64}
+    assert client.post('/token',data=form|{'code_verifier':'short'}).json()['error']=='invalid_request'
+    assert client.post('/token',data=form).json()['error']=='invalid_grant'
     from app.plugin_auth import hashed
     with client.app.state.store.connect() as db:
         assert db.execute('SELECT COUNT(*) FROM oauth_tokens').fetchone()[0]==0

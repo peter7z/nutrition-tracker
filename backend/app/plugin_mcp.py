@@ -195,6 +195,10 @@ def install_plugin(app, store, settings, sync, password_hash, auth_limit):
                 body=await request.body()
                 if len(body)>16384: return JSONResponse({'error':'invalid_request'},status_code=400)
                 values=parse_qs(body.decode('utf-8',errors='replace'))
+                if values.get('grant_type')==['authorization_code']:
+                    verifier=values.get('code_verifier',[])
+                    if len(verifier)!=1 or not re.fullmatch(r'[A-Za-z0-9._~-]{43,128}',verifier[0]):
+                        return JSONResponse({'error':'invalid_request'},status_code=400)
                 if values.get('resource')!=[oauth.resource]:
                     return JSONResponse({'error':'invalid_target'},status_code=400)
             response=await call_next(request)
