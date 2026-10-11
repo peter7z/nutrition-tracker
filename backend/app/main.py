@@ -6,9 +6,11 @@ import secrets
 import time
 import uuid
 from collections import defaultdict,deque
-from datetime import datetime,timedelta,timezone
+from datetime import date,datetime,timedelta,timezone
+from pathlib import Path
 from fastapi import Depends,FastAPI,File,Request,UploadFile
-from fastapi.responses import JSONResponse,Response
+from fastapi.responses import FileResponse,JSONResponse,Response
+from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from PIL import Image,ImageOps,UnidentifiedImageError
 from pydantic import ValidationError
@@ -133,6 +135,29 @@ def create_app(settings=None,ai=None):
     @app.get('/v1/state')
     def get_state(owner=Depends(identity)):
         with store.connect() as db: return state(db,owner)
+
+    @app.get('/web',include_in_schema=False)
+    @app.get('/',include_in_schema=False)
+    def web_diary():
+        return FileResponse(Path(__file__).parent/'web'/'index.html',headers={
+            'Content-Security-Policy':"default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'",
+            'Referrer-Policy':'no-referrer'})
+
+    app.mount('/web/assets',StaticFiles(directory=Path(__file__).parent/'web'),name='web-assets')
+
+    @app.get('/v1/diary')
+    def get_diary(day:date | None=None,owner=Depends(identity)):
+        from zoneinfo import ZoneInfo
+        with store.connect() as db:
+            if day is None:
+                profile,_=context_for(db,owner,'1900-01-01')
+                day=now().astimezone(ZoneInfo(profile['time_zone'])).date()
+            context,_=context_for(db,owner,day.isoformat())
+            for entry in context['entries']:
+                draft=EntryDraft.model_validate(entry['draft'])
+                entry['totals']={key:getattr(draft.nutrition,key)*draft.multiplier() if getattr(draft.nutrition,key) is not None else None for key in NUTRIENTS}
+            revision=db.execute('SELECT revision FROM users WHERE id=?',(owner,)).fetchone()['revision']
+        return {'revision':revision,**context}
 
     def replay(db,owner,request_id,route,body):
         old=db.execute('SELECT * FROM requests WHERE user_id=? AND id=? AND route=?',(owner,request_id,route)).fetchone()
