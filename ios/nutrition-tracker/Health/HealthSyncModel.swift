@@ -121,16 +121,7 @@ import CoreFoundation
         } catch { errorKey = "Could not update the local data. Please try again." }
     }
 
-    func saveGoals(_ goals: NutritionGoals?) {
-        guard !isWorking, !storageNeedsRecovery, goals?.isValid ?? true else { return }
-        var candidate = snapshot
-        candidate.goals = goals
-        do {
-            try persistence.save(candidate)
-            snapshot = candidate
-            errorKey = nil
-        } catch { errorKey = "Could not save your goals. Please try again." }
-    }
+
 
     func validateRestoredSnapshot(_ value: HealthSnapshot) throws {
         guard value.schemaVersion == 1, value.goals?.isValid != false,
@@ -176,57 +167,6 @@ import CoreFoundation
         }
     }
 
-    @discardableResult func recordNutritionClosure(on date: Date, dayID: String, accountScope: String, goals: NutritionGoals?, closureID: UUID = UUID()) throws -> UUID {
-        guard !isWorking, !storageNeedsRecovery else { throw HealthOperationError.invalidConfiguration }
-        let calendar = snapshot.configuration?.calendar ?? Calendar(identifier: .gregorian)
-        let values = snapshot.dailyValues.filter { $0.metric.isNutrition && calendar.isDate($0.date, inSameDayAs: date) }
-        let scope = accountScope == "local" ? "local" : UUID(uuidString: accountScope)?.uuidString.lowercased() ?? accountScope
-        if snapshot.closedNutritionDays?.contains(where: { $0.id == closureID && $0.accountScope == scope && $0.dayID == dayID }) == true { return closureID }
-        let closure = HealthNutritionClosure(id: closureID, accountScope: scope, dayID: dayID, closedAt: now(), values: values, goals: goals)
-        var candidate = snapshot
-        if candidate.closedNutritionDays == nil { candidate.closedNutritionDays = [] }
-        candidate.closedNutritionDays!.append(closure)
-        try validateRestoredSnapshot(candidate)
-        try persistence.save(candidate)
-        snapshot = candidate; errorKey = nil
-        return closure.id
-    }
-
-    func removeClosure(id: UUID) throws {
-        guard !isWorking, !storageNeedsRecovery else { throw HealthOperationError.invalidConfiguration }
-        var candidate = snapshot
-        guard candidate.closedNutritionDays?.contains(where: { $0.id == id }) == true else { throw HealthOperationError.invalidData }
-        candidate.closedNutritionDays?.removeAll { $0.id == id }
-        if candidate.closedNutritionDays?.isEmpty == true { candidate.closedNutritionDays = nil }
-        try persistence.save(candidate); snapshot = candidate; errorKey = nil
-    }
-
-    func contextData(requestID: UUID, accountScope: String) -> Data? {
-        guard let key = contextKey(requestID: requestID, accountScope: accountScope) else { return nil }
-        return snapshot.pendingChatContexts?[key]
-    }
-
-    func savePendingChatContext(_ data: Data?, requestID: UUID, accountScope: String) throws {
-        guard !isWorking, !storageNeedsRecovery,
-              let key = contextKey(requestID: requestID, accountScope: accountScope) else { throw HealthOperationError.invalidConfiguration }
-        if let data { try validatePendingContext(data) }
-        var candidate = snapshot
-        if let data {
-            if candidate.pendingChatContexts == nil { candidate.pendingChatContexts = [:] }
-            candidate.pendingChatContexts?[key] = data
-        } else { candidate.pendingChatContexts?.removeValue(forKey: key) }
-        try validateRestoredSnapshot(candidate)
-        try persistence.save(candidate); snapshot = candidate; errorKey = nil
-    }
-
-    private func contextKey(requestID: UUID, accountScope: String) -> String? {
-        let scope: String
-        if accountScope == "local" { scope = "local" }
-        else if let id = UUID(uuidString: accountScope) { scope = id.uuidString.lowercased() }
-        else { return nil }
-        return scope + ":" + requestID.uuidString.lowercased()
-    }
-
     private func validatePendingContext(_ data: Data) throws {
         guard data.count <= 10_000, let object = try JSONSerialization.jsonObject(with: data) as? [String: Any],
               Set(object.keys) == Set(["consent", "purpose", "day", "metrics"]),
@@ -244,15 +184,7 @@ import CoreFoundation
         }
     }
 
-    func restoreSnapshot(_ value: HealthSnapshot) throws {
-        guard !isWorking else { throw HealthOperationError.invalidConfiguration }
-        try validateRestoredSnapshot(value)
-        var restored = value
-        // Restoring a backup never silently starts access to Health. The user reconnects explicitly.
-        restored.isConnected = false
-        try persistence.save(restored)
-        generation += 1; snapshot = restored; stagedImport = nil; errorKey = nil; storageNeedsRecovery = false
-    }
+
 
     private func collect(into initial: HealthSnapshot, operation: Int) async throws -> HealthSnapshot {
         guard let configuration = initial.configuration else { throw HealthOperationError.invalidConfiguration }

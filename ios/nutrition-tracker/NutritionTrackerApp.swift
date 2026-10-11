@@ -3,7 +3,7 @@ import Foundation
 
 @main struct NutritionTrackerApp: App {
     @State private var health: HealthSyncModel
-    @State private var remote: RemoteSession
+    private let history: LegacyHistory
     private let uiTesting: Bool
     init() {
         #if DEBUG
@@ -14,19 +14,21 @@ import Foundation
             try? FileManager.default.removeItem(at: testURL)
             try? FileManager.default.removeItem(at: testHealthURL)
         }
-        _remote = State(initialValue: RemoteSession(restoreCredentials: !uiTesting || ProcessInfo.processInfo.arguments.contains("--ui-testing-restore-session"), forceOffline: uiTesting && ProcessInfo.processInfo.arguments.contains("--ui-testing-offline"), credentialService: uiTesting ? "com.peter7z.NutritionTracker.ui-testing-session" : "com.peter7z.NutritionTracker.remote-session"))
+        if uiTesting && ProcessInfo.processInfo.arguments.contains("--seed-ui-testing") {
+            try? JSONEncoder().encode(CompanionTestFixture.history(on: .now)).write(to: testURL, options: .atomic)
+        }
+        history = uiTesting ? LegacyHistory(ownerID: nil) : .stored()
         _health = State(initialValue: uiTesting ? HealthSyncModel(persistence: HealthFileRepository(fileURL: testHealthURL)) : HealthSyncModel())
         #else
         uiTesting = false
-        _remote = State(initialValue: RemoteSession())
+        history = .stored()
         _health = State(initialValue: HealthSyncModel())
         #endif
     }
     var body: some Scene {
         WindowGroup {
-            AccountTrackingRoot(ownerID: remote.ownerID, uiTesting: uiTesting)
-                .id(remote.ownerID ?? "local")
-                .environment(health).environment(remote)
+            AccountTrackingRoot(history: history, uiTesting: uiTesting)
+                .environment(health).environment(\.legacyHistory, history)
                 .preferredColorScheme(testAppearance)
         }
     }
@@ -40,22 +42,12 @@ import Foundation
     }
 }
 
-/// Account identity creates both the store and the view tree together. Drafts,
-/// photos and in-flight UI state cannot survive a switch into another account.
+/// The existing account file remains selected without enabling tracking writes.
 private struct AccountTrackingRoot: View {
-    @Environment(HealthSyncModel.self) private var health
     @State private var nutrition: NutritionStore
-    let ownerID: String?
-    init(ownerID: String?, uiTesting: Bool) {
-        self.ownerID = ownerID
-        _nutrition = State(initialValue: uiTesting ? NutritionStore(persistence: NutritionFileRepository(fileURL: URL.temporaryDirectory.appendingPathComponent("nutrition-ui-testing.json"))) : NutritionStore.forOwner(ownerID))
+    init(history: LegacyHistory, uiTesting: Bool) {
+        let url = uiTesting ? URL.temporaryDirectory.appendingPathComponent("nutrition-ui-testing.json") : history.fileURL
+        _nutrition = State(initialValue: NutritionStore(persistence: NutritionFileRepository(fileURL: url)))
     }
-    var body: some View {
-        ContentView().environment(nutrition)
-            .task {
-                if ownerID == nil, nutrition.snapshot.goals.isEmpty, let legacy = health.snapshot.goals {
-                    try? nutrition.saveGoals(legacy, effectiveDate: .now)
-                }
-            }
-    }
+    var body: some View { ContentView().environment(nutrition) }
 }

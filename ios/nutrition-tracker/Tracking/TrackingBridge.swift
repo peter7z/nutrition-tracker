@@ -8,13 +8,6 @@ struct ResolvedDailyNutrition {
     var hasMissingNutrients: Bool
 }
 
-@MainActor final class PreparedNutritionPersistence: NutritionPersistence {
-    var value: NutritionSnapshot
-    init(_ value: NutritionSnapshot) { self.value = value }
-    func load() throws -> NutritionSnapshot { value }
-    func save(_ snapshot: NutritionSnapshot) throws { try NutritionBackup.validate(snapshot); value = snapshot }
-}
-
 enum TrackingBridge {
     static func nutrition(on date: Date, manual: NutritionSnapshot, health: HealthSnapshot, accountScope: String = "local") -> ResolvedDailyNutrition {
         let dayID = manual.profile.dayID(for: date)
@@ -54,26 +47,4 @@ enum TrackingBridge {
             hasMissingNutrients: choice == .manual ? !total.isComplete : [values.energy, values.protein, values.carbohydrates, values.fat].contains(where: { $0 == nil }))
     }
 
-    @MainActor static func preparedClosure(on date: Date, store: NutritionStore, health: HealthSnapshot, accountScope: String, completeness: DayCompleteness, operationID: UUID = UUID()) throws -> NutritionSnapshot {
-        let staged = NutritionStore(persistence: PreparedNutritionPersistence(store.snapshot))
-        guard staged.day(on: date)?.isClosed != true else { return store.snapshot }
-        let resolved = nutrition(on: date, manual: store.snapshot, health: health, accountScope: accountScope)
-        guard !resolved.hasConflict else { throw NutritionError.conflict }
-        if let selection = resolved.selection { try staged.resolveIntake(on: date, selection: selection) }
-        try staged.closeDay(date, completeness: completeness, operationID: operationID)
-        return staged.snapshot
-    }
-
-    @MainActor static func closeDay(on date: Date, store: NutritionStore, health: HealthSyncModel, accountScope: String, completeness: DayCompleteness) throws {
-        let before = store.snapshot
-        let candidate = try preparedClosure(on: date, store: store, health: health.snapshot, accountScope: accountScope, completeness: completeness)
-        guard candidate != before else { return }
-        let summary = candidate.days.first { $0.id == store.dayID(for: date) }?.summaries.last
-        var archiveID: UUID?
-        if let summary, summary.intakeSource == .health {
-            archiveID = try health.recordNutritionClosure(on: date, dayID: store.dayID(for: date), accountScope: accountScope, goals: store.goals(on: date), closureID: summary.id)
-        }
-        do { try store.publishPreparedSnapshot(candidate, expectedSnapshot: before) }
-        catch { if let archiveID { try? health.removeClosure(id: archiveID) }; throw error }
-    }
 }

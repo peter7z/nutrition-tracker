@@ -2,7 +2,7 @@
 
 Decisión de producto: **10 de octubre de 2026**. Repositorio: `peter7z/nutrition-tracker`.
 
-Este documento define el nuevo enfoque y reemplaza el diseño de una app iOS con chat y registro propio. Describe el producto objetivo: **el código actual todavía necesita adaptarse**. Los tickets y criterios de aceptación están en [backlog.md](backlog.md).
+Este documento define el nuevo enfoque y reemplaza el diseño de una app iOS con chat y registro propio. Describe el producto objetivo. La limpieza de iOS retira el registro propio; las integraciones de backend/plugin siguen pendientes. Los tickets y criterios de aceptación están en [backlog.md](backlog.md).
 
 ## Qué estamos construyendo
 
@@ -108,4 +108,4 @@ Primero Apple Health; luego backend/identidad/plugin y herramientas; después si
 
 Quedan fuera del MVP: registro propio en iOS, chat o motor IA integrado en iOS, catálogo de alimentos/recetas, escritura en Apple Health, app Apple Watch, IA offline y garantía de background sync. La importación histórica de planilla se mantiene como tarea del backend/plugin, no como registro desde iOS.
 
-La implementación existente conserva lógica, pantallas y pruebas del enfoque anterior. Debe migrarse sin borrar historial silenciosamente; el backlog reformulado no significa que ya se haya retirado el chat de la app, publicado el plugin, desplegado el backend ni entregado TestFlight. La planificación anterior está archivada para conservar decisiones y evidencia.
+La limpieza elimina las pantallas y clientes de registro del enfoque anterior, conservando esquemas y archivos para consultar el historial sin reescribirlo ni reproducir pendientes. Apple Health local sigue funcionando. El plugin, la API de lectura, la sincronización autorizada de Salud al servidor y TestFlight no están entregados. El peso medido en Apple Health forma parte explícita de esa futura sincronización al servidor (NUT-18). La planificación anterior está archivada para conservar decisiones y evidencia.

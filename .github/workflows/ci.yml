@@ -48,28 +48,6 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.11'
-      - name: Start the isolated HTTP service for conversational UI tests
-        run: |
-          python -m venv "$RUNNER_TEMP/nutrition-ui-server"
-          "$RUNNER_TEMP/nutrition-ui-server/bin/pip" install -r backend/requirements-lock.txt
-          cd backend
-          "$RUNNER_TEMP/nutrition-ui-server/bin/python" -m tests.ui_server --port 8766 > "$RUNNER_TEMP/nutrition-ui-server.log" 2>&1 &
-          echo $! > "$RUNNER_TEMP/nutrition-ui-server.pid"
-          python - <<'PY'
-          import time, urllib.request
-          for _ in range(30):
-              try:
-                  with urllib.request.urlopen('http://127.0.0.1:8766/healthz', timeout=1) as response:
-                      if response.status == 200:
-                          break
-              except OSError:
-                  time.sleep(0.5)
-          else:
-              raise SystemExit('The isolated conversational test service did not start')
-          PY
       - name: Select an installed Xcode with Swift 6.2 support
         run: |
           python3 - <<'PY'
@@ -119,18 +97,6 @@ jobs:
             CODE_SIGNING_ALLOWED=NO build
       - name: Validate the bundled privacy manifest
         run: plutil -lint "$RUNNER_TEMP/NutritionTrackerRelease/Build/Products/Release-iphoneos/nutrition-tracker.app/PrivacyInfo.xcprivacy"
-      - name: Stop the isolated test service
-        if: always()
-        run: |
-          python - <<'PY'
-          import os, pathlib, signal
-          path = pathlib.Path(os.environ['RUNNER_TEMP']) / 'nutrition-ui-server.pid'
-          if path.exists():
-              try:
-                  os.kill(int(path.read_text()), signal.SIGTERM)
-              except ProcessLookupError:
-                  pass
-          PY
       - uses: actions/upload-artifact@v7
         if: always()
         with:

@@ -8,7 +8,7 @@ Monorepo de un companion iOS para Apple Health y visualización de progreso, un 
 
 La decisión completa, los flujos y límites están en [especificación de producto](docs/product.md); los tickets vigentes están en [backlog](docs/backlog.md).
 
-**Estado del código:** la implementación actual todavía corresponde parcialmente al enfoque anterior (chat/registro dentro de iOS y backend FastAPI local). Los nuevos tickets incluyen su migración y retirada de esos flujos, preservando el historial. No se afirma que el plugin, sincronización remota de Salud, widgets, endpoint público o TestFlight ya estén entregados. Las pruebas anteriores no acreditan este nuevo producto.
+**Estado del código:** iOS se reduce a consulta de datos existentes, gráficas y conexión/sincronización local con Salud. Se retiran chat, registro/edición, cámara, catálogo, importación/restauración y el cliente antiguo de mutaciones. Los esquemas y archivos previos se conservan para consulta. Backend FastAPI conserva la implementación de desarrollo anterior; plugin, lectura remota iOS y sincronización de Salud al servidor siguen pendientes. **El peso importado de Apple Health sí debe enviarse al servidor (NUT-18)**. No se afirma que el plugin, widgets, endpoint público o TestFlight estén entregados.
 
 ## Estructura del monorepo
 
@@ -59,6 +59,6 @@ Para que el plugin consulte Salud, el nuevo alcance agrega consentimiento de sin
 
 ## Backlog y antecedentes
 
-[Backlog vigente](docs/backlog.md). Se conservan NUT-01 a NUT-15 reformulados y se agregan tickets de servidor MCP, OAuth, sincronización de Salud, caché de consulta iOS, entrega del plugin y widgets. Las tareas permanecen abiertas hasta aceptar el nuevo alcance.
+[Backlog vigente](docs/backlog.md). Se conservan NUT-01 a NUT-15 reformulados y se agregan tickets de servidor MCP, OAuth, sincronización de Salud, caché de consulta iOS, entrega del plugin y widgets. NUT-09 se retira como no planificado. Las tareas de integración permanecen abiertas hasta aceptar el nuevo alcance.
 
 El enfoque anterior se conserva en [backlog iOS con chat](docs/archive/backlog-ios-chat-2026-10-09.md) y [snapshot de issues](docs/archive/issues-ios-chat-2026-10-10.json), además del [backlog PWA original](docs/archive/backlog-pwa-2026-10-05.md). La migración preserva historial y datos existentes.

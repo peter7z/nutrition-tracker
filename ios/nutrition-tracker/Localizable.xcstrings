@@ -11,16 +11,6 @@
         }
       }
     },
-    "·": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "·"
-          }
-        }
-      }
-    },
     "%@": {
       "extractionState": "stale",
       "localizations": {
@@ -428,17 +418,6 @@
         }
       }
     },
-    "3 entries": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3 registros"
-          }
-        }
-      }
-    },
     "7-day mean": {
       "localizations": {
         "es": {
@@ -455,17 +434,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Promedio móvil de 7 días"
-          }
-        }
-      }
-    },
-    "10 days": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "10 días"
           }
         }
       }
@@ -502,16 +470,6 @@
         }
       }
     },
-    "A blank target keeps its current value. If no current value exists for a blank target, the proposal cannot be accepted.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Un objetivo en blanco conserva su valor actual. Si no existe un valor actual, no se puede aceptar la propuesta."
-          }
-        }
-      }
-    },
     "A goal review needs at least 10 of 14 complete nutrition days and 6 weight days, with at least 3 weight days in each 7-day week.": {
       "localizations": {
         "es": {
@@ -522,123 +480,12 @@
         }
       }
     },
-    "A goal review requires at least 10 complete nutrition days and 6 weight days, including 3 weight days in each week.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Para revisar los objetivos se necesitan al menos 10 días completos de nutrición y 6 días con peso, con 3 días con peso en cada semana."
-          }
-        }
-      }
-    },
-    "A more complete picture of your day": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Una visión más completa de tu día"
-          }
-        }
-      }
-    },
-    "A recipe is a preparation, not a meal record. Log only the amount you actually consumed; leftovers remain uncounted.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Una receta es una preparación. Registrá por separado solo la cantidad que realmente comiste; los sobrantes no se contabilizan."
-          }
-        }
-      }
-    },
-    "A serving size or measured density is required when recording this product with a different unit.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Para registrar este producto con otra unidad, necesitás indicar el tamaño de la porción o la densidad medida."
-          }
-        }
-      }
-    },
-    "A valid quantity and explicit unit conversion are required.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Se necesita una cantidad válida y una conversión de unidades explícita."
-          }
-        }
-      }
-    },
-    "Accept proposed goals": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aceptar objetivos propuestos"
-          }
-        }
-      }
-    },
-    "Account": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cuenta"
-          }
-        }
-      }
-    },
-    "Actions for manual activity": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Acciones para la actividad manual"
-          }
-        }
-      }
-    },
-    "Actions for manual weight": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Acciones para el peso manual"
-          }
-        }
-      }
-    },
     "Active energy": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Energía activa"
-          }
-        }
-      }
-    },
-    "Active energy (kcal, optional)": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Energía activa (kcal, opcional)"
-          }
-        }
-      }
-    },
-    "Active energy (kcal)": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Energía activa (kcal)"
           }
         }
       }
@@ -673,16 +520,6 @@
         }
       }
     },
-    "Activity days": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Días con actividad"
-          }
-        }
-      }
-    },
     "Activity does not increase your food budget.": {
       "localizations": {
         "es": {
@@ -703,139 +540,6 @@
         }
       }
     },
-    "Activity record": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Registro de actividad"
-          }
-        }
-      }
-    },
-    "Activity type": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tipo de actividad"
-          }
-        }
-      }
-    },
-    "Actual daily totals": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Totales diarios registrados"
-          }
-        }
-      }
-    },
-    "Add a manual activity or connect Apple Health to view daily exercise and active energy.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agregá una actividad manual o conectá Apple Health para ver el ejercicio diario y la energía activa."
-          }
-        }
-      }
-    },
-    "Add a manual measurement or review imported Apple Health records.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agregá una medición manual o revisá los registros importados de Apple Health."
-          }
-        }
-      }
-    },
-    "Add activity": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agregar actividad"
-          }
-        }
-      }
-    },
-    "Add food manually": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agregá un alimento manualmente"
-          }
-        }
-      }
-    },
-    "Add ingredient": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agregar ingrediente"
-          }
-        }
-      }
-    },
-    "Add ingredients and a valid final weight or serving count to calculate the recipe.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agregá ingredientes y un peso final o número de porciones válido para calcular la receta."
-          }
-        }
-      }
-    },
-    "Add progress record": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agregar registro de progreso"
-          }
-        }
-      }
-    },
-    "Add weight": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agregar peso"
-          }
-        }
-      }
-    },
-    "Afternoon snack": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Merienda"
-          }
-        }
-      }
-    },
-    "AI is unavailable. Check the server configuration and try again.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La IA no está disponible. Revisá la configuración del servidor e intentá de nuevo."
-          }
-        }
-      }
-    },
     "All available history": {
       "extractionState": "stale",
       "localizations": {
@@ -843,47 +547,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Todo el historial disponible"
-          }
-        }
-      }
-    },
-    "Amount": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cantidad"
-          }
-        }
-      }
-    },
-    "Amount consumed": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cantidad consumida"
-          }
-        }
-      }
-    },
-    "Analysis sends this photo to the private server and AI. Review estimates before recording anything.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "El análisis envía esta foto al servidor privado y a la IA. Revisá las estimaciones antes de registrar cualquier dato."
-          }
-        }
-      }
-    },
-    "Analyze photo": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Analizar foto"
           }
         }
       }
@@ -929,16 +592,6 @@
         }
       }
     },
-    "Apple Health measurements are read-only here. Editing or deleting a local record never changes its original source.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Acá las mediciones de Apple Health son de solo lectura. Editar o borrar un registro local nunca cambia el registro original."
-          }
-        }
-      }
-    },
     "Apple Health records": {
       "localizations": {
         "es": {
@@ -949,73 +602,12 @@
         }
       }
     },
-    "Apply product version": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aplicar versión del producto"
-          }
-        }
-      }
-    },
-    "Apply to an existing record": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aplicar a un registro existente"
-          }
-        }
-      }
-    },
-    "Ask or describe what you ate": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Preguntá o describí qué comiste"
-          }
-        }
-      }
-    },
-    "Assistant": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Asistente"
-          }
-        }
-      }
-    },
-    "Assistant explanation": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Explicación del asistente"
-          }
-        }
-      }
-    },
     "Available history": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Historial disponible"
-          }
-        }
-      }
-    },
-    "Available nutrition data": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Datos de nutrición disponibles"
           }
         }
       }
@@ -1036,38 +628,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Promedio de proteína"
-          }
-        }
-      }
-    },
-    "Backup source: local history": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Origen del respaldo: historial local"
-          }
-        }
-      }
-    },
-    "Backup source: your signed-in account": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Origen del respaldo: tu cuenta actual"
-          }
-        }
-      }
-    },
-    "Brand": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Marca"
           }
         }
       }
@@ -1093,17 +653,6 @@
         }
       }
     },
-    "Calories": {},
-    "Calories and protein averages use only days with those recorded values. No missing day is filled with zero. Activity does not count toward nutrition completeness.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Los promedios de calorías y proteínas usan solo los días con valores registrados. Ningún día faltante se completa con cero. La actividad no cuenta para completar la nutrición."
-          }
-        }
-      }
-    },
     "Calories consumed": {
       "localizations": {
         "es": {
@@ -1124,44 +673,12 @@
         }
       }
     },
-    "Cancel request": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancelar solicitud"
-          }
-        }
-      }
-    },
-    "Cancelled": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancelado"
-          }
-        }
-      }
-    },
-    "Carbohydrates": {},
     "Carbs": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Carbohidratos"
-          }
-        }
-      }
-    },
-    "Carbs (g)": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Carbohidratos (g)"
           }
         }
       }
@@ -1176,16 +693,6 @@
         }
       }
     },
-    "Change import settings": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cambiar configuración de importación"
-          }
-        }
-      }
-    },
     "Change selection": {
       "localizations": {
         "es": {
@@ -1196,127 +703,12 @@
         }
       }
     },
-    "Change undone": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cambio deshecho"
-          }
-        }
-      }
-    },
-    "Changes conflict with another session. Refresh and review before retrying.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hay cambios en conflicto con otra sesión. Actualizá y revisá antes de volver a intentarlo."
-          }
-        }
-      }
-    },
-    "Chat": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chat"
-          }
-        }
-      }
-    },
-    "Chat and meal logging are coming next. Your Health import is available now.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "El chat y el registro de comidas son la próxima etapa. Ya podés importar tus datos de Salud."
-          }
-        }
-      }
-    },
     "Check access in the Health app and whether records exist for this range.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Revisá el acceso en Salud y si hay registros para este rango."
-          }
-        }
-      }
-    },
-    "Check both the daily log and summary mappings. Historical totals are saved as summaries, without inventing meals.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisá las asignaciones de columnas del registro diario y del resumen. Los totales históricos se guardan como resúmenes, sin inventar comidas."
-          }
-        }
-      }
-    },
-    "Check that every meal is recorded before closing your day. You can reopen it later to make corrections.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisá que estén todas las comidas antes de cerrar el día. Podés reabrirlo después para hacer correcciones."
-          }
-        }
-      }
-    },
-    "Check the values and required fields.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisá los valores y los campos obligatorios."
-          }
-        }
-      }
-    },
-    "Chicken, rice and vegetables": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pollo, arroz y verduras"
-          }
-        }
-      }
-    },
-    "Choose a source": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elegir un origen"
-          }
-        }
-      }
-    },
-    "Choose a version": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elegí una versión"
-          }
-        }
-      }
-    },
-    "Choose activity source": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elegir origen de actividad"
           }
         }
       }
@@ -1332,263 +724,12 @@
         }
       }
     },
-    "Choose one nutrition source for each overlap. Totals from different sources are never added.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En cada superposición, elegí un solo origen de nutrición. Los totales de distintos orígenes nunca se suman."
-          }
-        }
-      }
-    },
-    "Choose one source record or exclude this match. Until you choose, this group is left out of the trend.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elegí uno de los registros o excluí esta coincidencia. Hasta que elijas, el grupo queda fuera de la tendencia."
-          }
-        }
-      }
-    },
-    "Choose photo": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elegir foto"
-          }
-        }
-      }
-    },
-    "Choose source": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elegir origen"
-          }
-        }
-      }
-    },
-    "Choose spreadsheet": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elegir planilla"
-          }
-        }
-      }
-    },
-    "Choose the exact brand and version. Confirmed labels appear before estimates. Editing a product only changes future records.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elegí la marca y versión exactas. Las etiquetas confirmadas aparecen antes que las estimaciones. Editar un producto solo cambia los registros futuros."
-          }
-        }
-      }
-    },
-    "Choose the nutrition source for this day": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elegí el origen nutricional para este día"
-          }
-        }
-      }
-    },
-    "Choose the record to update": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elegí el registro que querés actualizar"
-          }
-        }
-      }
-    },
     "Choose which data to read from Apple Health. Nothing is sent to a server or AI.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Elegí qué datos leer de Apple Health. No se envían a un servidor ni a una IA."
-          }
-        }
-      }
-    },
-    "Choose which version to keep for each conflicting record. Other pending changes are preserved.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elegí qué versión conservar para cada registro en conflicto. Los demás cambios pendientes se mantienen."
-          }
-        }
-      }
-    },
-    "Choose your own targets.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Definí tus propias metas."
-          }
-        }
-      }
-    },
-    "Choose your XLSX or CSV file. This import reads the selected file and never edits it.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elegí tu archivo XLSX o CSV. La importación lee el archivo seleccionado y nunca lo modifica."
-          }
-        }
-      }
-    },
-    "Clarify which record to delete before requesting deletion again.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aclarame qué registro querés borrar antes de volver a pedirlo."
-          }
-        }
-      }
-    },
-    "Close as complete": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cerrar como completo"
-          }
-        }
-      }
-    },
-    "Close as incomplete": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cerrar como incompleto"
-          }
-        }
-      }
-    },
-    "Close day": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cerrar día"
-          }
-        }
-      }
-    },
-    "Close this day?": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "¿Cerrar este día?"
-          }
-        }
-      }
-    },
-    "Close your day when you have finished logging your meals.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cerrá el día cuando termines de registrar tus comidas."
-          }
-        }
-      }
-    },
-    "Closed day": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Día cerrado"
-          }
-        }
-      }
-    },
-    "Closed-day Health summaries and consented pending requests are preserved separately. They are not sent through tracking sync.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Los resúmenes de Salud de días cerrados y las solicitudes pendientes que autorizaste se conservan por separado. No se envían mediante la sincronización del seguimiento."
-          }
-        }
-      }
-    },
-    "Closed-day Health summaries and consented pending requests stay on this device when you change the import selection. Delete the local Health copy to erase them.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Los resúmenes de Salud de días cerrados y las solicitudes pendientes que autorizaste permanecen en este dispositivo cuando cambiás la selección de importación. Borrá la copia local de Salud para eliminarlos."
-          }
-        }
-      }
-    },
-    "Closing saves a versioned summary. Reopen the day explicitly before making corrections.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "El cierre guarda un resumen con versión. Reabrí el día explícitamente antes de hacer correcciones."
-          }
-        }
-      }
-    },
-    "Compare with summary sheet": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Comparar con la hoja de resumen"
-          }
-        }
-      }
-    },
-    "Comparison report": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Informe de comparación"
-          }
-        }
-      }
-    },
-    "Complete": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Completo"
-          }
-        }
-      }
-    },
-    "Complete days by week": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Días completos por semana"
           }
         }
       }
@@ -1609,76 +750,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Días de nutrición completos"
-          }
-        }
-      }
-    },
-    "Confirm choices": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Confirmar elecciones"
-          }
-        }
-      }
-    },
-    "Confirm consumed food": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Confirmar alimento consumido"
-          }
-        }
-      }
-    },
-    "Confirm deletion": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Confirmar eliminación"
-          }
-        }
-      }
-    },
-    "Confirm import": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Confirmar importación"
-          }
-        }
-      }
-    },
-    "Confirm measurement": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Confirmar medición"
-          }
-        }
-      }
-    },
-    "Confirmation pending. Sync records to verify the original change before editing another proposal.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hay una confirmación pendiente. Sincronizá los registros para verificar el cambio original antes de editar otra propuesta."
-          }
-        }
-      }
-    },
-    "Confirmed and saved": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Confirmado y guardado"
           }
         }
       }
@@ -1743,36 +814,6 @@
         }
       }
     },
-    "Connect to the internet to request a goal review.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Conectate a internet para solicitar una revisión de objetivos."
-          }
-        }
-      }
-    },
-    "Consumed at": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fecha y hora de consumo"
-          }
-        }
-      }
-    },
-    "Consumed nutrition preview": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vista previa de los nutrientes consumidos"
-          }
-        }
-      }
-    },
     "Contiguous days": {
       "localizations": {
         "es": {
@@ -1804,50 +845,6 @@
         }
       }
     },
-    "Could not delete the photo. Please try again.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo borrar la foto. Intentá de nuevo."
-          }
-        }
-      }
-    },
-    "Could not prepare this photo. Choose a supported image under 20 MB.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo preparar la foto. Elegí una imagen compatible de menos de 20 MB."
-          }
-        }
-      }
-    },
-    "Could not read the spreadsheet. Check its format and size; your saved data is unchanged.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo leer la planilla. Revisá el formato y el tamaño; tus datos guardados no cambiaron."
-          }
-        }
-      }
-    },
-    "Could not read this backup. Your saved data is unchanged.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo leer este respaldo. Tus datos guardados no cambiaron."
-          }
-        }
-      }
-    },
     "Could not read your nutrition history. The saved file was preserved.": {
       "extractionState": "stale",
       "localizations": {
@@ -1859,17 +856,6 @@
         }
       }
     },
-    "Could not save the import. Your saved data is unchanged.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo guardar la importación. Tus datos guardados no cambiaron."
-          }
-        }
-      }
-    },
     "Could not save the imported data. Your previous data is unchanged.": {
       "extractionState": "stale",
       "localizations": {
@@ -1877,72 +863,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "No se pudieron guardar los datos importados. Tus datos anteriores no se modificaron."
-          }
-        }
-      }
-    },
-    "Could not save the record. Your saved data is unchanged.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo guardar el registro. Tus datos guardados no cambiaron."
-          }
-        }
-      }
-    },
-    "Could not save your draft. Please try again.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo guardar el borrador. Intentá de nuevo."
-          }
-        }
-      }
-    },
-    "Could not save your goals. Please try again.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudieron guardar tus objetivos. Volvé a intentar."
-          }
-        }
-      }
-    },
-    "Could not save your message. Please try again.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo guardar el mensaje. Intentá de nuevo."
-          }
-        }
-      }
-    },
-    "Could not save your nutrition history. Please try again.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo guardar tu historial nutricional. Intentá de nuevo."
-          }
-        }
-      }
-    },
-    "Could not securely save your session.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo guardar la sesión de forma segura."
           }
         }
       }
@@ -1969,26 +889,6 @@
         }
       }
     },
-    "Create a new account": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Crear una cuenta nueva"
-          }
-        }
-      }
-    },
-    "Create account": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Crear cuenta"
-          }
-        }
-      }
-    },
     "Custom start date": {
       "extractionState": "stale",
       "localizations": {
@@ -2006,16 +906,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Objetivo diario"
-          }
-        }
-      }
-    },
-    "Daily goals": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Objetivos diarios"
           }
         }
       }
@@ -2080,185 +970,12 @@
         }
       }
     },
-    "Day not marked closed": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Día no marcado como cerrado"
-          }
-        }
-      }
-    },
-    "Day open": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Día abierto"
-          }
-        }
-      }
-    },
-    "Day open · saved automatically": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Día abierto · guardado automáticamente"
-          }
-        }
-      }
-    },
-    "Delete": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Borrar"
-          }
-        }
-      }
-    },
-    "Delete account and its data": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Borrar la cuenta y sus datos"
-          }
-        }
-      }
-    },
-    "Delete attached photo": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eliminar foto adjunta"
-          }
-        }
-      }
-    },
     "Delete local Health copy": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Eliminar copia local de Salud"
-          }
-        }
-      }
-    },
-    "Delete local tracking and Health copy": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Borrar seguimiento local y copia de Salud"
-          }
-        }
-      }
-    },
-    "Delete local tracking data": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Borrar datos locales de seguimiento"
-          }
-        }
-      }
-    },
-    "Delete photo": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eliminar foto"
-          }
-        }
-      }
-    },
-    "Delete remote account too": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Borrar también la cuenta remota"
-          }
-        }
-      }
-    },
-    "Delete this manual record?": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "¿Borrar este registro manual?"
-          }
-        }
-      }
-    },
-    "Delete this photo from this device and the private server?": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "¿Eliminar esta foto de este dispositivo y del servidor privado?"
-          }
-        }
-      }
-    },
-    "Delete your data?": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "¿Borrar tus datos?"
-          }
-        }
-      }
-    },
-    "Deleted": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eliminado"
-          }
-        }
-      }
-    },
-    "Delivered": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Entregado"
-          }
-        }
-      }
-    },
-    "Density (g/ml)": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Densidad (g/ml)"
-          }
-        }
-      }
-    },
-    "Design preview. Nothing is saved or imported.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vista previa del diseño. No se guardan ni importan datos."
           }
         }
       }
@@ -2270,26 +987,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Energía ingerida"
-          }
-        }
-      }
-    },
-    "Differences are shown for review. The selected daily sheet supplies the imported values.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Las diferencias se muestran para que las revises. La hoja diaria seleccionada aporta los valores que se importan."
-          }
-        }
-      }
-    },
-    "Disconnect": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Desconectar"
           }
         }
       }
@@ -2324,32 +1021,12 @@
         }
       }
     },
-    "Divergence · review source": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Diferencia · revisá el origen"
-          }
-        }
-      }
-    },
     "Done": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Listo"
-          }
-        }
-      }
-    },
-    "Duration (minutes)": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Duración (minutos)"
           }
         }
       }
@@ -2364,112 +1041,12 @@
         }
       }
     },
-    "Edit": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Editar"
-          }
-        }
-      }
-    },
-    "Edit activity": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Editar actividad"
-          }
-        }
-      }
-    },
-    "Edit food": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Editar alimento"
-          }
-        }
-      }
-    },
-    "Edit product": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Editar producto"
-          }
-        }
-      }
-    },
-    "Edit recipe": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Editar receta"
-          }
-        }
-      }
-    },
-    "Edit this ingredient": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Editar este ingrediente"
-          }
-        }
-      }
-    },
-    "Effective day": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Día de vigencia"
-          }
-        }
-      }
-    },
-    "Effective from": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vigente desde"
-          }
-        }
-      }
-    },
-    "Email": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Correo electrónico"
-          }
-        }
-      }
-    },
     "Energy": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Energía"
-          }
-        }
-      }
-    },
-    "Energy (kcal)": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Energía (kcal)"
           }
         }
       }
@@ -2484,53 +1061,12 @@
         }
       }
     },
-    "Enter a valid HTTPS server address.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ingresá una dirección HTTPS válida para el servidor."
-          }
-        }
-      }
-    },
-    "Enter the amount actually consumed. The full prepared batch and leftovers are never added to today's intake automatically.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ingresá la cantidad que realmente comiste. La preparación completa y los sobrantes no se agregan automáticamente a la ingesta de hoy."
-          }
-        }
-      }
-    },
     "Estimate": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Estimación"
-          }
-        }
-      }
-    },
-    "Estimate the components of this meal photo for review. Do not record consumption.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Estimá los componentes de esta foto de comida para que los revise. No registres consumo."
-          }
-        }
-      }
-    },
-    "Exclude this match": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Excluir esta coincidencia"
           }
         }
       }
@@ -2545,114 +1081,12 @@
         }
       }
     },
-    "Exercise time (min)": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Duración del ejercicio (min)"
-          }
-        }
-      }
-    },
-    "Export a backup first if you want to keep a copy. Apple Health originals are never deleted.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Exportá una copia de seguridad antes si querés conservarla. Los registros originales de Apple Health nunca se borran."
-          }
-        }
-      }
-    },
-    "Export daily CSV": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Exportar CSV diario"
-          }
-        }
-      }
-    },
-    "Export JSON backup": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Exportar copia JSON"
-          }
-        }
-      }
-    },
-    "Export records CSV": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Exportar registros CSV"
-          }
-        }
-      }
-    },
-    "Failed · retry explicitly": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Falló · reintento manual"
-          }
-        }
-      }
-    },
     "Fat": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Grasas"
-          }
-        }
-      }
-    },
-    "Fat (g)": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Grasas (g)"
-          }
-        }
-      }
-    },
-    "Food library": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Productos y recetas"
-          }
-        }
-      }
-    },
-    "Food name": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nombre del alimento"
-          }
-        }
-      }
-    },
-    "Food preferences and restrictions": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Preferencias y restricciones alimentarias"
           }
         }
       }
@@ -2677,26 +1111,6 @@
         }
       }
     },
-    "Goal changes create a version. Earlier days keep their previous goals.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cada cambio de objetivos crea una nueva versión. Los días anteriores conservan sus objetivos previos."
-          }
-        }
-      }
-    },
-    "Goal review": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisión de objetivos"
-          }
-        }
-      }
-    },
     "Grams": {
       "extractionState": "stale",
       "localizations": {
@@ -2704,16 +1118,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Gramos"
-          }
-        }
-      }
-    },
-    "Grams per serving": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gramos por porción"
           }
         }
       }
@@ -2728,33 +1132,12 @@
         }
       }
     },
-    "Health import and manual tracking work without an account. Chat and photo analysis use the private server.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La importación de Salud y el registro manual funcionan sin una cuenta. El chat y el análisis de fotos usan el servidor privado."
-          }
-        }
-      }
-    },
     "Health nutrition is imported as nutrients, without inventing meals. Active energy does not increase your food budget.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "La nutrición de Salud se importa como nutrientes, sin inventar comidas. La energía activa no aumenta tu presupuesto de comida."
-          }
-        }
-      }
-    },
-    "Health nutrition is imported as nutrients, without inventing meals. Meal logging is coming next.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La nutrición de Salud se importa como nutrientes, sin inventar comidas. El registro de comidas es la próxima etapa."
           }
         }
       }
@@ -2769,63 +1152,12 @@
         }
       }
     },
-    "History and backup": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Historial y copia de seguridad"
-          }
-        }
-      }
-    },
-    "How would you like to log it?": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "¿Cómo querés registrarla?"
-          }
-        }
-      }
-    },
-    "HTTPS server address": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dirección HTTPS del servidor"
-          }
-        }
-      }
-    },
-    "If an ingredient's nutrient is unknown, that nutrient stays unknown for the recipe. Only a confirmed consumed portion is recorded.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Si desconocés un nutriente de algún ingrediente, ese nutriente queda como desconocido en la receta. Solo se registra una porción consumida y confirmada."
-          }
-        }
-      }
-    },
     "Import": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Importar"
-          }
-        }
-      }
-    },
-    "Import preview": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vista previa de importación"
           }
         }
       }
@@ -2840,87 +1172,6 @@
         }
       }
     },
-    "Import saved": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Importación guardada"
-          }
-        }
-      }
-    },
-    "Import sheet": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hoja para importar"
-          }
-        }
-      }
-    },
-    "Import spreadsheet": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Importar planilla"
-          }
-        }
-      }
-    },
-    "Imported activity": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Actividad importada"
-          }
-        }
-      }
-    },
-    "Imported data changed. Export a backup before choosing a version.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Los datos importados cambiaron. Exportá un respaldo antes de elegir una versión."
-          }
-        }
-      }
-    },
-    "Include Apple Health in this export": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Incluir Apple Health en esta exportación"
-          }
-        }
-      }
-    },
-    "Include this row": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Incluir esta fila"
-          }
-        }
-      }
-    },
-    "Incomplete": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Incompleto"
-          }
-        }
-      }
-    },
     "Incomplete nutrition days": {
       "localizations": {
         "es": {
@@ -2931,32 +1182,12 @@
         }
       }
     },
-    "Ingredients": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ingredientes"
-          }
-        }
-      }
-    },
     "Ingredients: %lld": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Ingredientes: %lld"
-          }
-        }
-      }
-    },
-    "Invalid date": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fecha no válida"
           }
         }
       }
@@ -2998,16 +1229,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "kcal restantes"
-          }
-        }
-      }
-    },
-    "Keep this version": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Conservar esta versión"
           }
         }
       }
@@ -3095,52 +1316,12 @@
         }
       }
     },
-    "Leave active energy blank when it is unknown. A new manual activity needs a duration; existing records can keep duration unknown.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dejá la energía activa en blanco si la desconocés. Una actividad manual nueva requiere duración; los registros existentes pueden conservarla como desconocida."
-          }
-        }
-      }
-    },
-    "Leave unknown nutrients blank. Calories use the confirmed value; they are not replaced with a 4/4/9 calculation.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dejá en blanco los nutrientes desconocidos. Se usa el valor confirmado de calorías; no se reemplaza por un cálculo 4/4/9."
-          }
-        }
-      }
-    },
-    "Leave unknown values blank. Exercise stays separate from your food budget.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dejá en blanco los valores desconocidos. El ejercicio se mantiene separado de tu presupuesto de comida."
-          }
-        }
-      }
-    },
     "Load more": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Cargar más"
-          }
-        }
-      }
-    },
-    "Loading records…": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cargando registros…"
           }
         }
       }
@@ -3155,16 +1336,6 @@
         }
       }
     },
-    "Local copy retained. Automatic syncing is off.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Se conserva la copia local. La sincronización automática está desactivada."
-          }
-        }
-      }
-    },
     "Local data could not be read. The existing file has not been changed.": {
       "extractionState": "stale",
       "localizations": {
@@ -3172,39 +1343,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "No se pudieron leer los datos locales. El archivo existente no se modificó."
-          }
-        }
-      }
-    },
-    "Log a meal": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Registrar comida"
-          }
-        }
-      }
-    },
-    "Log a meal, adjust a portion or ask what to eat next.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Registrá una comida, corregí una porción o consultá qué comer."
-          }
-        }
-      }
-    },
-    "Lunch": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Almuerzo"
           }
         }
       }
@@ -3230,26 +1368,6 @@
         }
       }
     },
-    "Map the required date column and check column names.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Asigná la columna de fecha obligatoria y revisá los nombres de las columnas."
-          }
-        }
-      }
-    },
-    "Matches": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Coincide"
-          }
-        }
-      }
-    },
     "Meal": {
       "localizations": {
         "es": {
@@ -3260,32 +1378,12 @@
         }
       }
     },
-    "Meal name": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nombre de la comida"
-          }
-        }
-      }
-    },
     "Mean observed weight": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Peso medio observado"
-          }
-        }
-      }
-    },
-    "Measured final weight (g)": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Peso final medido (g)"
           }
         }
       }
@@ -3312,32 +1410,12 @@
         }
       }
     },
-    "Milliliters per serving": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mililitros por porción"
-          }
-        }
-      }
-    },
     "Missing data is not zero intake.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "La falta de datos no significa una ingesta de cero."
-          }
-        }
-      }
-    },
-    "Missing in summary": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No aparece en el resumen"
           }
         }
       }
@@ -3352,62 +1430,12 @@
         }
       }
     },
-    "My products and recipes": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mis productos y recetas"
-          }
-        }
-      }
-    },
-    "Needs your choice": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Falta elegir"
-          }
-        }
-      }
-    },
-    "New product": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nuevo producto"
-          }
-        }
-      }
-    },
-    "New recipe": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nueva receta"
-          }
-        }
-      }
-    },
     "No activity data": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "No hay datos de actividad"
-          }
-        }
-      }
-    },
-    "No Apple Health daily summaries are selected in this period.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay resúmenes diarios de Apple Health seleccionados en este período."
           }
         }
       }
@@ -3422,27 +1450,6 @@
         }
       }
     },
-    "No conflicting records remain. Sync records again.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ya no quedan registros en conflicto. Volvé a sincronizar los registros."
-          }
-        }
-      }
-    },
-    "No connection. Your draft and records remain on this device.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay conexión. Tu borrador y tus registros siguen en este dispositivo."
-          }
-        }
-      }
-    },
     "No data available": {
       "localizations": {
         "es": {
@@ -3453,42 +1460,12 @@
         }
       }
     },
-    "No goal change was proposed for this review. Your goals were not changed.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Esta revisión no propuso cambios en tus objetivos. Tus objetivos no cambiaron."
-          }
-        }
-      }
-    },
     "No goal set": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Sin objetivo"
-          }
-        }
-      }
-    },
-    "No goals": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sin objetivos"
-          }
-        }
-      }
-    },
-    "No meal records yet.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Todavía no hay comidas registradas."
           }
         }
       }
@@ -3534,36 +1511,6 @@
         }
       }
     },
-    "None": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ninguno"
-          }
-        }
-      }
-    },
-    "Not mapped": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sin asignar"
-          }
-        }
-      }
-    },
-    "Not provided": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No indicado"
-          }
-        }
-      }
-    },
     "Not specified": {
       "extractionState": "stale",
       "localizations": {
@@ -3571,77 +1518,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sin especificar"
-          }
-        }
-      }
-    },
-    "Notes": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Notas"
-          }
-        }
-      }
-    },
-    "Notes and assumptions": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Notas y suposiciones"
-          }
-        }
-      }
-    },
-    "Number of servings": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Número de porciones"
-          }
-        }
-      }
-    },
-    "Nutrition basis": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Base nutricional"
-          }
-        }
-      }
-    },
-    "Nutrition information": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Información nutricional"
-          }
-        }
-      }
-    },
-    "Nutrition label": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Etiqueta nutricional"
-          }
-        }
-      }
-    },
-    "Nutrition Tracker": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nutrition Tracker"
           }
         }
       }
@@ -3667,16 +1543,6 @@
         }
       }
     },
-    "Offline · draft saved locally": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sin conexión · borrador guardado en este dispositivo"
-          }
-        }
-      }
-    },
     "Only confirm when you are ready to save this copy on your device.": {
       "localizations": {
         "es": {
@@ -3687,103 +1553,12 @@
         }
       }
     },
-    "Only recorded observations are summarized. Missing values stay unknown; activity is kept separate from food intake.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "El resumen usa solo observaciones registradas. Los valores faltantes siguen como desconocidos y la actividad se mantiene separada de la ingesta."
-          }
-        }
-      }
-    },
-    "Only the record you choose will change, after you review and save it. Reopen a closed day from Today before correcting its records.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Solo cambiará el registro que elijas, después de revisarlo y guardarlo. Reabrí un día cerrado desde Hoy antes de corregir sus registros."
-          }
-        }
-      }
-    },
-    "Only the selected account's local tracking is replaced. A Health copy is restored only if the backup includes it. Original Apple Health records stay unchanged.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Solo se reemplaza el historial local de la cuenta seleccionada. La copia de Salud se restaura únicamente si está incluida en la copia de seguridad. Los registros originales de Apple Health no cambian."
-          }
-        }
-      }
-    },
-    "Only the selected manual record will be deleted. Imported records stay in their original sources.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Solo se borrará el registro manual seleccionado. Los registros importados permanecen en sus orígenes."
-          }
-        }
-      }
-    },
-    "Only this account's local tracking is replaced. Backups from another account require signing in to that account. Local-only chat stays local. A Health copy is restored only if included. Apple Health originals stay unchanged.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Solo se reemplaza el seguimiento local de esta cuenta. Para restaurar respaldos de otra cuenta, iniciá sesión en esa cuenta. El chat que solo está en el dispositivo permanece ahí. La copia de Salud se restaura únicamente si está incluida. Los datos originales de Apple Health no cambian."
-          }
-        }
-      }
-    },
-    "Only weight, activity and nutrition totals for the selected day are shared. No raw observations or device details.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Solo se comparten los totales de peso, actividad y nutrición del día seleccionado. No se comparten observaciones originales ni datos del dispositivo."
-          }
-        }
-      }
-    },
-    "Optional Apple Health sharing": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Compartir datos de Apple Health (opcional)"
-          }
-        }
-      }
-    },
     "Original observations, not summed totals. Multiple sources can overlap; daily activity uses HealthKit's merged statistics.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Observaciones originales, sin sumarlas. Varias fuentes pueden superponerse; la actividad diaria usa las estadísticas combinadas de HealthKit."
-          }
-        }
-      }
-    },
-    "Overlapping days": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Días superpuestos"
-          }
-        }
-      }
-    },
-    "Overlapping sources are kept separate. Choose which daily summary to use.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Los orígenes superpuestos se mantienen separados. Elegí qué resumen diario usar."
           }
         }
       }
@@ -3804,27 +1579,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Totales parciales · faltan datos de algunos nutrientes."
-          }
-        }
-      }
-    },
-    "Password": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Contraseña"
-          }
-        }
-      }
-    },
-    "Pending · not sent": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pendiente · no enviado"
           }
         }
       }
@@ -3862,144 +1616,12 @@
         }
       }
     },
-    "Photo deleted. Send a new message to request another analysis.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Foto eliminada. Enviá un mensaje nuevo para pedir otro análisis."
-          }
-        }
-      }
-    },
-    "Photo deletion failed and its local copy could not be recovered. Keep your backup.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo eliminar la foto ni recuperar su copia local. Conservá tu respaldo."
-          }
-        }
-      }
-    },
-    "Portions and units": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Porciones y unidades"
-          }
-        }
-      }
-    },
     "Possible duplicate weight readings": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Posibles mediciones de peso duplicadas"
-          }
-        }
-      }
-    },
-    "Preferences": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Preferencias"
-          }
-        }
-      }
-    },
-    "Preparation": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Preparación"
-          }
-        }
-      }
-    },
-    "Preview · sample data": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Diseño · datos de ejemplo"
-          }
-        }
-      }
-    },
-    "Previously confirmed": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ya confirmado"
-          }
-        }
-      }
-    },
-    "Private account": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cuenta privada"
-          }
-        }
-      }
-    },
-    "Private server": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Servidor privado"
-          }
-        }
-      }
-    },
-    "Product": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Producto"
-          }
-        }
-      }
-    },
-    "Product unavailable": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Producto no disponible"
-          }
-        }
-      }
-    },
-    "Products": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Productos"
-          }
-        }
-      }
-    },
-    "Products and recipes": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Productos y recetas"
           }
         }
       }
@@ -4014,62 +1636,12 @@
         }
       }
     },
-    "Projections and estimates are separate from these recorded totals.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Las proyecciones y estimaciones se muestran por separado de estos totales registrados."
-          }
-        }
-      }
-    },
-    "Proposal rejected. Your goals were not changed.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Propuesta rechazada. Tus objetivos no cambiaron."
-          }
-        }
-      }
-    },
-    "Proposed change · not recorded yet": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cambio propuesto · todavía no registrado"
-          }
-        }
-      }
-    },
-    "Proposed goals": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Objetivos propuestos"
-          }
-        }
-      }
-    },
     "Protein": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Proteína"
-          }
-        }
-      }
-    },
-    "Protein (g)": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Proteína (g)"
           }
         }
       }
@@ -4105,16 +1677,6 @@
         }
       }
     },
-    "Read this nutrition label and propose a product. Do not record consumption.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Leé esta etiqueta nutricional y proponé un producto. No registres consumo."
-          }
-        }
-      }
-    },
     "Read-only access. You choose permissions in Apple's Health dialog. Your original Health data stays unchanged.": {
       "localizations": {
         "es": {
@@ -4125,162 +1687,12 @@
         }
       }
     },
-    "Read-only imported record": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Registro importado de solo lectura"
-          }
-        }
-      }
-    },
-    "Reading spreadsheet…": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Leyendo la planilla…"
-          }
-        }
-      }
-    },
     "Recipe": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Receta"
-          }
-        }
-      }
-    },
-    "Recipe ingredients": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ingredientes de la receta"
-          }
-        }
-      }
-    },
-    "Recipe name": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nombre de la receta"
-          }
-        }
-      }
-    },
-    "Recipe unavailable": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Receta no disponible"
-          }
-        }
-      }
-    },
-    "Recipe yield": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rendimiento de la receta"
-          }
-        }
-      }
-    },
-    "Recipes": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recetas"
-          }
-        }
-      }
-    },
-    "Record all ingredients used in the preparation, with their raw or cooked state and confirmed nutrition. These ingredients are not added to your day's meals.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ingresá todos los ingredientes usados, su estado crudo o cocido y su información nutricional confirmada. Estos ingredientes no se agregan a tus comidas del día."
-          }
-        }
-      }
-    },
-    "Record food": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Registrar alimento"
-          }
-        }
-      }
-    },
-    "Record this product": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Registrar este producto"
-          }
-        }
-      }
-    },
-    "Record this recipe": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Registrar esta receta"
-          }
-        }
-      }
-    },
-    "Record what you ate. Health and spreadsheet totals remain historical summaries.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Registrá lo que comiste. Salud y planilla quedan como resúmenes históricos."
-          }
-        }
-      }
-    },
-    "Recorded at": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fecha y hora del registro"
-          }
-        }
-      }
-    },
-    "Recorded coverage": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cobertura de los registros"
-          }
-        }
-      }
-    },
-    "Recorded foods and the analysis text are kept. The image is deleted.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Se conservan los alimentos registrados y el texto del análisis. La imagen se elimina."
           }
         }
       }
@@ -4305,156 +1717,12 @@
         }
       }
     },
-    "Reject proposal": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rechazar propuesta"
-          }
-        }
-      }
-    },
-    "Reload conflict review": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volver a cargar conflictos"
-          }
-        }
-      }
-    },
-    "Remove photo": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quitar foto"
-          }
-        }
-      }
-    },
-    "Reopen day": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reabrir día"
-          }
-        }
-      }
-    },
-    "Reopen this day before changing its records.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reabrí este día antes de modificar sus registros."
-          }
-        }
-      }
-    },
-    "Replace local history with this backup?": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "¿Reemplazar el historial local con esta copia de seguridad?"
-          }
-        }
-      }
-    },
-    "Request weekly review": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Solicitar revisión semanal"
-          }
-        }
-      }
-    },
     "Resting energy": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Energía en reposo"
-          }
-        }
-      }
-    },
-    "Restore": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restaurar"
-          }
-        }
-      }
-    },
-    "Restore backup": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restaurar copia de seguridad"
-          }
-        }
-      }
-    },
-    "Restore destination: local history": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Destino de la restauración: historial local"
-          }
-        }
-      }
-    },
-    "Restore destination: your signed-in account": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Destino de la restauración: tu cuenta actual"
-          }
-        }
-      }
-    },
-    "Restore failed and some saved files could not be recovered. Keep your backup and try restoring it again.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La restauración falló y no se pudieron recuperar algunos archivos guardados. Conservá el respaldo e intentá restaurarlo de nuevo."
-          }
-        }
-      }
-    },
-    "Retry explicitly": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reintentar explícitamente"
-          }
-        }
-      }
-    },
-    "Retry original confirmation": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reintentar la confirmación original"
           }
         }
       }
@@ -4469,123 +1737,12 @@
         }
       }
     },
-    "Retry saving proposed goals": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volver a intentar guardar los objetivos propuestos"
-          }
-        }
-      }
-    },
-    "Review activity": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisar actividad"
-          }
-        }
-      }
-    },
-    "Review and edit": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisar y editar"
-          }
-        }
-      }
-    },
-    "Review day closure": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisar cierre del día"
-          }
-        }
-      }
-    },
-    "Review goals in Settings": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisar objetivos en Configuración"
-          }
-        }
-      }
-    },
     "Review import": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Revisar importación"
-          }
-        }
-      }
-    },
-    "Review my recorded progress for the last 14 days. Summarize the observations and explain the coverage before suggesting any goal changes.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisá mis registros de los últimos 14 días. Resumí las observaciones y explicá la cobertura antes de sugerir cambios en mis objetivos."
-          }
-        }
-      }
-    },
-    "Review response": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisar respuesta"
-          }
-        }
-      }
-    },
-    "Review sync conflicts": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisar conflictos de sincronización"
-          }
-        }
-      }
-    },
-    "Review the measurement and date before confirming. These values are not recorded yet.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisá la medición y la fecha antes de confirmar. Estos valores todavía no se registraron."
-          }
-        }
-      }
-    },
-    "Review the quantity, units and assumptions before confirming.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisá la cantidad, las unidades y las suposiciones antes de confirmar."
-          }
-        }
-      }
-    },
-    "Review weight": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisar peso"
           }
         }
       }
@@ -4600,76 +1757,6 @@
         }
       }
     },
-    "Saturated fat (g)": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Grasas saturadas (g)"
-          }
-        }
-      }
-    },
-    "Save": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guardar"
-          }
-        }
-      }
-    },
-    "Save a product from its confirmed label or a clearly marked estimate.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guardá un producto a partir de su etiqueta confirmada o de una estimación claramente identificada."
-          }
-        }
-      }
-    },
-    "Save a recipe with its ingredients and measured final weight or number of servings.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guardá una receta con sus ingredientes y su peso final medido o número de porciones."
-          }
-        }
-      }
-    },
-    "Save as confirmed product": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guardar como producto confirmado"
-          }
-        }
-      }
-    },
-    "Saving creates a new product version. Previously recorded meals keep their original nutrition.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guardar crea una nueva versión del producto. Las comidas anteriores conservan su información nutricional original."
-          }
-        }
-      }
-    },
-    "Saving creates a new recipe version. Previously consumed portions keep their original snapshot.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guardar crea una nueva versión de la receta. Las porciones ya consumidas conservan sus valores originales."
-          }
-        }
-      }
-    },
     "Selected day": {
       "localizations": {
         "es": {
@@ -4680,53 +1767,12 @@
         }
       }
     },
-    "Selected photo": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Foto seleccionada"
-          }
-        }
-      }
-    },
-    "Send": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enviar"
-          }
-        }
-      }
-    },
-    "Sending…": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enviando…"
-          }
-        }
-      }
-    },
     "Series": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Serie"
-          }
-        }
-      }
-    },
-    "Server coverage check": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Control de cobertura del servidor"
           }
         }
       }
@@ -4742,26 +1788,6 @@
         }
       }
     },
-    "Set goals": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Definir objetivos"
-          }
-        }
-      }
-    },
-    "Set your own goals. Exercise calories are kept separate from your food budget.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Definí tus propios objetivos. Las calorías del ejercicio se mantienen separadas de tu presupuesto de comida."
-          }
-        }
-      }
-    },
     "Settings": {
       "localizations": {
         "es": {
@@ -4772,175 +1798,12 @@
         }
       }
     },
-    "Share Apple Health daily summaries": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Compartir resúmenes diarios de Apple Health"
-          }
-        }
-      }
-    },
-    "Share exported file": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Compartir archivo exportado"
-          }
-        }
-      }
-    },
-    "Share Health totals for this request": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Compartir los totales de Salud en esta solicitud"
-          }
-        }
-      }
-    },
-    "Sheets and columns": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hojas y columnas"
-          }
-        }
-      }
-    },
-    "Sign in": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Iniciar sesión"
-          }
-        }
-      }
-    },
-    "Sign in again or check your email and password.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volvé a iniciar sesión o revisá tu correo y contraseña."
-          }
-        }
-      }
-    },
-    "Sign in or create account": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Iniciar sesión o crear cuenta"
-          }
-        }
-      }
-    },
-    "Sign in to request a goal review.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Iniciá sesión para solicitar una revisión de objetivos."
-          }
-        }
-      }
-    },
-    "Sign in to use the assistant": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Iniciá sesión para usar el asistente"
-          }
-        }
-      }
-    },
-    "Sign out": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cerrar sesión"
-          }
-        }
-      }
-    },
-    "Source": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Origen"
-          }
-        }
-      }
-    },
-    "Source and notes": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Origen y notas"
-          }
-        }
-      }
-    },
-    "Source: Apple Health": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fuente: Apple Health"
-          }
-        }
-      }
-    },
     "Sources": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Fuentes"
-          }
-        }
-      }
-    },
-    "Specify the measured weight after preparation or the number of servings. Providing both lets you log grams or servings. Leave a value blank when it is unknown.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Indicá el peso medido después de preparar la receta o el número de porciones. Si indicás ambos, podés registrar gramos o porciones. Dejá en blanco los valores desconocidos."
-          }
-        }
-      }
-    },
-    "Specify the serving size or density to convert these units.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Indicá el tamaño de la porción o la densidad para convertir estas unidades."
-          }
-        }
-      }
-    },
-    "Specify unit conversion": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Especificar conversión de unidades"
           }
         }
       }
@@ -4976,33 +1839,12 @@
         }
       }
     },
-    "Start weekly goal review": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Iniciar revisión semanal de objetivos"
-          }
-        }
-      }
-    },
     "Steps": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Pasos"
-          }
-        }
-      }
-    },
-    "Steps, activity and workouts": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pasos, actividad y entrenamientos"
           }
         }
       }
@@ -5027,32 +1869,12 @@
         }
       }
     },
-    "Sync records": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sincronizar registros"
-          }
-        }
-      }
-    },
     "Syncing Apple Health…": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Sincronizando Apple Health…"
-          }
-        }
-      }
-    },
-    "Syncing stops. Original Apple Health records stay unchanged.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Se detiene la sincronización. Los registros originales de Apple Health no cambian."
           }
         }
       }
@@ -5067,117 +1889,12 @@
         }
       }
     },
-    "Take or choose a photo": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sacá o elegí una foto"
-          }
-        }
-      }
-    },
-    "Take photo": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sacar foto"
-          }
-        }
-      }
-    },
-    "Tell the chat what you ate": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Contale al chat qué comiste"
-          }
-        }
-      }
-    },
-    "The assistant may explain the recorded pattern. It cannot change your goals automatically.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "El asistente puede explicar el patrón de los registros. No puede cambiar tus objetivos automáticamente."
-          }
-        }
-      }
-    },
     "The daily point uses the latest valid reading that day. The moving average uses only available daily readings in the prior seven calendar days.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "El dato diario usa la última medición válida de ese día. El promedio móvil usa solo las mediciones diarias disponibles de los siete días calendario anteriores."
-          }
-        }
-      }
-    },
-    "The export can contain personal data. Choose where to share or save it.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La exportación puede incluir datos personales. Elegí dónde compartirla o guardarla."
-          }
-        }
-      }
-    },
-    "The proposed goals are incomplete or invalid. Your saved goals were not changed.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Los objetivos propuestos están incompletos o no son válidos. Tus objetivos guardados no cambiaron."
-          }
-        }
-      }
-    },
-    "The record keeps a copy of this version's nutrition. Editing the product later does not rewrite previous meals.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "El registro conserva una copia de la información nutricional de esta versión. Editar después el producto no modifica comidas anteriores."
-          }
-        }
-      }
-    },
-    "The request failed. Your saved records are unchanged.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La solicitud falló. Tus registros guardados no cambiaron."
-          }
-        }
-      }
-    },
-    "The request limit was reached. Try again later.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Se alcanzó el límite de solicitudes. Intentá más tarde."
-          }
-        }
-      }
-    },
-    "The server returned an unexpected response. Try again.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "El servidor devolvió una respuesta inesperada. Intentá de nuevo."
           }
         }
       }
@@ -5192,16 +1909,6 @@
         }
       }
     },
-    "These are proposals for you to review. Accepting saves a new version; previous goal versions are preserved.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Estas son propuestas para que las revises. Si las aceptás, se guarda una versión nueva y se conservan las versiones anteriores."
-          }
-        }
-      }
-    },
     "These are summaries of recorded observations. They do not explain why weight changed. Unknown values remain missing, and activity is separate from food intake.": {
       "localizations": {
         "es": {
@@ -5212,107 +1919,12 @@
         }
       }
     },
-    "This account has its own history. Signing out returns to your local history.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Esta cuenta tiene su propio historial. Al cerrar sesión, volvés a tu historial local."
-          }
-        }
-      }
-    },
-    "This backup belongs to another account. Sign in to that account before restoring it.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Este respaldo pertenece a otra cuenta. Iniciá sesión en esa cuenta antes de restaurarlo."
-          }
-        }
-      }
-    },
-    "This day is excluded from the activity summary until you choose a source.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Este día queda fuera del resumen de actividad hasta que elijas un origen."
-          }
-        }
-      }
-    },
-    "This device": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Este dispositivo"
-          }
-        }
-      }
-    },
-    "This item is no longer available on the server.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Este elemento ya no está disponible en el servidor."
-          }
-        }
-      }
-    },
-    "This record changed. Refresh it before trying again.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Este registro cambió. Actualizalo antes de volver a intentarlo."
-          }
-        }
-      }
-    },
-    "This record is no longer available.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Este registro ya no está disponible."
-          }
-        }
-      }
-    },
-    "This row has missing or conflicting values. Correct the source mapping or exclude it before importing.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A esta fila le faltan datos o tiene valores en conflicto. Corregí la asignación de columnas o excluíla antes de importar."
-          }
-        }
-      }
-    },
     "To": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Hasta"
-          }
-        }
-      }
-    },
-    "Toast and a protein shake": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tostadas y batido de proteína"
           }
         }
       }
@@ -5333,56 +1945,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nutrición de hoy"
-          }
-        }
-      }
-    },
-    "Transcribe the exact basis printed on the label. Leave unreadable or unknown nutrients blank.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copiá la base exacta indicada en la etiqueta. Dejá en blanco los nutrientes ilegibles o desconocidos."
-          }
-        }
-      }
-    },
-    "Undo last change": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deshacer el último cambio"
-          }
-        }
-      }
-    },
-    "Undo this change": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deshacer este cambio"
-          }
-        }
-      }
-    },
-    "Undo this import": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deshacer esta importación"
-          }
-        }
-      }
-    },
-    "Unit": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unidad"
           }
         }
       }
@@ -5427,56 +1989,6 @@
         }
       }
     },
-    "Use a measured serving size or density when converting units. Only the amount consumed is recorded; leftovers are excluded.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Usá el tamaño medido de una porción o la densidad para convertir unidades. Se registra solo la cantidad consumida; los sobrantes se excluyen."
-          }
-        }
-      }
-    },
-    "Use at least 12 characters.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Usá al menos 12 caracteres."
-          }
-        }
-      }
-    },
-    "Use daily goals": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Usar objetivos diarios"
-          }
-        }
-      }
-    },
-    "Use reviewed values": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Usar valores revisados"
-          }
-        }
-      }
-    },
-    "Version": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Versión"
-          }
-        }
-      }
-    },
     "View original Apple Health records": {
       "localizations": {
         "es": {
@@ -5487,43 +1999,12 @@
         }
       }
     },
-    "Weekly goal review": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revisión semanal de objetivos"
-          }
-        }
-      }
-    },
     "Weight": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
             "value": "Peso"
-          }
-        }
-      }
-    },
-    "Weight (kg)": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Peso (kg)"
-          }
-        }
-      }
-    },
-    "Weight and weight history": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Peso e historial de pesajes"
           }
         }
       }
@@ -5548,46 +2029,6 @@
         }
       }
     },
-    "Weight days by week": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Días con peso por semana"
-          }
-        }
-      }
-    },
-    "Weight record": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Registro de peso"
-          }
-        }
-      }
-    },
-    "What you ate": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Qué comiste"
-          }
-        }
-      }
-    },
-    "When enabled, this review sends only selected daily totals for weight, nutrition, and activity from these 14 days. It does not send Health record IDs, source names, devices, or individual readings.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Si lo activás, esta revisión envía solo los totales diarios seleccionados de peso, nutrición y actividad de estos 14 días. No envía identificadores de registros de Salud, nombres de fuentes, dispositivos ni mediciones individuales."
-          }
-        }
-      }
-    },
     "Workouts": {
       "extractionState": "stale",
       "localizations": {
@@ -5595,48 +2036,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Entrenamientos"
-          }
-        }
-      }
-    },
-    "Yogurt, oats and banana": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yogur, avena y banana"
-          }
-        }
-      }
-    },
-    "You": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vos"
-          }
-        }
-      }
-    },
-    "You choose which data to share. Your original Health data stays unchanged.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vos elegís qué datos compartir. Los datos originales de Salud no se modifican."
-          }
-        }
-      }
-    },
-    "Your active goals changed during this review. Request a new review before accepting.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tus objetivos activos cambiaron durante esta revisión. Solicitá otra revisión antes de aceptar."
           }
         }
       }
@@ -5661,111 +2060,6 @@
         }
       }
     },
-    "Your new goal version was confirmed by the server.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "El servidor confirmó la nueva versión de tus objetivos."
-          }
-        }
-      }
-    },
-    "Your nutrition assistant": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tu asistente de nutrición"
-          }
-        }
-      }
-    },
-    "Your nutrition history and progress. Apple Health import is the first feature planned.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tu historial y progreso nutricional. La importación de Apple Health es la primera función prevista."
-          }
-        }
-      }
-    },
-    "Your nutrition history was recovered, but the Health copy could not be restored. Keep the backup and retry the Health restore.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Se recuperó tu historial de nutrición, pero no se pudo restaurar la copia de Salud. Conservá el respaldo e intentá restaurar Salud de nuevo."
-          }
-        }
-      }
-    },
-    "Your progress, over time": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tu progreso, día a día"
-          }
-        }
-      }
-    },
-    "Your weight and activity, together.": {
-      "extractionState": "stale",
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tu peso y actividad, en un solo lugar."
-          }
-        }
-      }
-    },
-    "Adjust quantity": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajustar cantidad"
-          }
-        }
-      }
-    },
-    "Clarify the food and amount in chat before recording it.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aclarale por el chat qué alimento y qué cantidad antes de registrarlo."
-          }
-        }
-      }
-    },
-    "Correct in chat": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Corregir en el chat"
-          }
-        }
-      }
-    },
-    "Estimated nutrition": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nutrición estimada"
-          }
-        }
-      }
-    },
     "I want to correct %@.": {
       "localizations": {
         "es": {
@@ -5776,95 +2070,122 @@
         }
       }
     },
-    "Log a meal in chat": {
+    "Nutrition sources": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Registrar comida en el chat"
+            "value": "Fuentes de nutrición"
           }
         }
       }
     },
-    "Nutrition is calculated by the assistant. Estimates are shown for review.": {
+    "Overlapping data is excluded until its source is resolved.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "El asistente calcula los nutrientes. Vas a poder revisar las estimaciones."
+            "value": "Los datos superpuestos se excluyen hasta resolver su fuente."
           }
         }
       }
     },
-    "Nutrition scales with the amount you consumed. Clarify assumptions in chat.": {
+    "Apple Health totals are shown without creating meal records.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Los nutrientes cambian según la cantidad consumida. Aclarale tus suposiciones al asistente por el chat."
+            "value": "Los totales de Apple Health se muestran sin crear registros de comidas."
           }
         }
       }
     },
-    "Review consumed amount": {
+    "Connect Apple Health or review your saved readings.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Revisar cantidad consumida"
+            "value": "Conectá Apple Health o revisá tus mediciones guardadas."
           }
         }
       }
     },
-    "Tell the assistant how much you ate to record consumption.": {
+    "Connect Apple Health to view daily exercise and active energy.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para registrar lo que consumiste, decile al asistente cuánto comiste."
+            "value": "Conectá Apple Health para ver el ejercicio diario y la energía activa."
           }
         }
       }
     },
-    "Your weight and nutrition trends will appear here.": {
-      "extractionState": "stale",
+    "All saved measurements are read-only here.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Acá vas a ver la evolución de tu peso y nutrición."
+            "value": "Todas las mediciones guardadas son de solo lectura."
           }
         }
       }
     },
-    "Use this quantity": {
+    "Overlapping sources": {
       "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Use this quantity"
-          }
-        },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Usar esta cantidad"
+            "value": "Fuentes superpuestas"
           }
         }
       }
     },
-    "Read this nutrition label and estimate its nutrients. Do not record consumption.": {
+    "Overlapping activity sources": {
       "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Read this nutrition label and estimate its nutrients. Do not record consumption."
-          }
-        },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Leé esta etiqueta nutricional y estimá sus nutrientes. No registres consumo."
+            "value": "Fuentes de actividad superpuestas"
+          }
+        }
+      }
+    },
+    "Read-only record": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registro de solo lectura"
+          }
+        }
+      }
+    },
+    "Read-only access. Your original Health data stays unchanged.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acceso de solo lectura. Tus datos originales de Salud no se modifican."
+          }
+        }
+      }
+    },
+    "Saved historical Health summaries stay on this device when you change the import selection. Delete the local Health copy to erase them.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los resúmenes históricos de Salud quedan en este dispositivo al cambiar la selección. Borrá la copia local de Salud para eliminarlos."
+          }
+        }
+      }
+    },
+    "Saved historical Health summaries are preserved separately on this device.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los resúmenes históricos de Salud se conservan por separado en este dispositivo."
           }
         }
       }

@@ -1,34 +1,6 @@
 import Charts
 import SwiftUI
 
-private enum ProgressSheet: Identifiable {
-    case addWeight
-    case editWeight(ManualWeightEntry)
-    case addActivity
-    case editActivity(ManualActivityEntry)
-
-    var id: String {
-        switch self {
-        case .addWeight: "add-weight"
-        case let .editWeight(value): "edit-weight-\(value.id.uuidString)"
-        case .addActivity: "add-activity"
-        case let .editActivity(value): "edit-activity-\(value.id.uuidString)"
-        }
-    }
-}
-
-private enum ProgressDeleteRequest: Identifiable {
-    case weight(UUID)
-    case activity(UUID)
-
-    var id: String {
-        switch self {
-        case let .weight(id): "weight-\(id.uuidString)"
-        case let .activity(id): "activity-\(id.uuidString)"
-        }
-    }
-}
-
 private enum ProgressWeightRange: Int, CaseIterable, Identifiable {
     case days30 = 30
     case days90 = 90
@@ -83,13 +55,9 @@ private struct SegmentedWeightAverage: Identifiable {
 struct TrackingProgressView: View {
     @Environment(NutritionStore.self) private var nutrition
     @Environment(HealthSyncModel.self) private var health
-    @Environment(RemoteSession.self) private var remote
+    @Environment(\.legacyHistory) private var history
     @Environment(\.locale) private var locale
     @State private var selectedRange: ProgressWeightRange = .days90
-    @State private var activeSheet: ProgressSheet?
-    @State private var showWeeklyGoalReview = false
-    @State private var deleteRequest: ProgressDeleteRequest?
-    @State private var actionError: String?
 
     private var calendar: Calendar { nutrition.snapshot.profile.calendar }
     private var now: Date { .now }
@@ -236,7 +204,7 @@ struct TrackingProgressView: View {
             let dayID = nutrition.dayID(for: date)
             let day = nutrition.snapshot.days.first { $0.id == dayID }
             let closedSummary = day?.summaries.last
-            let bridge = TrackingBridge.nutrition(on: date, manual: nutrition.snapshot, health: health.snapshot, accountScope: remote.ownerID ?? "local")
+            let bridge = TrackingBridge.nutrition(on: date, manual: nutrition.snapshot, health: health.snapshot, accountScope: history.accountScope)
             let historical = nutrition.snapshot.historicalSummaries.filter { $0.dayID == dayID }
             let historicalIsComplete: Bool = {
                 guard (day == nil || day?.isClosed == true), closedSummary == nil, bridge.selection == .historical,
@@ -283,45 +251,7 @@ struct TrackingProgressView: View {
         )
     }
 
-    private var weeklyHealthReviewContext: WeeklyHealthReviewContext {
-        let dateFormatter = DateFormatter()
-        dateFormatter.calendar = calendar
-        dateFormatter.timeZone = calendar.timeZone
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = "yyyy-MM-dd"
 
-        let healthWeights = weightResolution.dailyWeights.compactMap { daily -> WeeklyHealthWeightDay? in
-            guard daily.date >= weeklyReview.startDate, daily.date <= weeklyReview.endDate,
-                  daily.observation.source.hasPrefix("health:") else { return nil }
-            return WeeklyHealthWeightDay(day: dateFormatter.string(from: daily.date), kilograms: daily.observation.kg)
-        }
-        let healthNutrition = weeklyIntakes.compactMap { intake -> WeeklyHealthNutritionDay? in
-            let resolved = TrackingBridge.nutrition(on: intake.date, manual: nutrition.snapshot, health: health.snapshot, accountScope: remote.ownerID ?? "local")
-            guard resolved.selection == .health else { return nil }
-            return WeeklyHealthNutritionDay(
-                day: dateFormatter.string(from: intake.date),
-                energy: resolved.values.energy,
-                protein: resolved.values.protein,
-                carbohydrates: resolved.values.carbohydrates,
-                fat: resolved.values.fat
-            )
-        }
-        let healthActivity = resolvedActivityDays.compactMap { day -> WeeklyHealthActivityDay? in
-            guard day.selected?.source == "health" else { return nil }
-            return WeeklyHealthActivityDay(
-                day: nutrition.dayID(for: day.date),
-                exerciseMinutes: day.selected?.durationMinutes,
-                activeKcal: day.selected?.activeEnergyKcal
-            )
-        }
-        return WeeklyHealthReviewContext(
-            startDay: dateFormatter.string(from: weeklyReview.startDate),
-            endDay: dateFormatter.string(from: weeklyReview.endDate),
-            weights: healthWeights,
-            dailyNutrition: healthNutrition,
-            dailyActivity: healthActivity
-        )
-    }
 
     private var selectedActivitySummary: (duration: Double?, durationDays: Int, durationSamples: Int, energy: Double?, energyDays: Int, energySamples: Int, unresolvedDays: Int) {
         let selected = resolvedActivityDays.compactMap(\.selected)
@@ -343,7 +273,6 @@ struct TrackingProgressView: View {
     var body: some View {
         NavigationStack {
             List {
-                if let actionError { Section { OperationErrorView(key: actionError) } }
                 if let errorKey = nutrition.errorKey { Section { OperationErrorView(key: errorKey) } }
                 if let errorKey = health.errorKey { Section { OperationErrorView(key: errorKey) } }
 
@@ -355,33 +284,6 @@ struct TrackingProgressView: View {
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Progress")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Button("Add weight") { activeSheet = .addWeight }
-                        Button("Add activity") { activeSheet = .addActivity }
-                    } label: { Image(systemName: "plus") }
-                    .accessibilityLabel("Add progress record")
-                }
-            }
-            .sheet(item: $activeSheet, content: sheetContent)
-            .sheet(isPresented: $showWeeklyGoalReview) {
-                WeeklyGoalReviewView(
-                    summary: weeklyReview,
-                    reviewedAt: now,
-                    capturedGoalVersionID: nutrition.goalVersion(on: now)?.id,
-                    healthReviewContext: weeklyHealthReviewContext
-                )
-                .environment(nutrition)
-            }
-            .confirmationDialog("Delete this manual record?", isPresented: Binding(
-                get: { deleteRequest != nil }, set: { if !$0 { deleteRequest = nil } }
-            ), titleVisibility: .visible) {
-                Button("Delete", role: .destructive) { performDelete() }
-                Button("Cancel", role: .cancel) { deleteRequest = nil }
-            } message: {
-                Text("Only the selected manual record will be deleted. Imported records stay in their original sources.")
-            }
         }
     }
 
@@ -395,7 +297,7 @@ struct TrackingProgressView: View {
             if rangedWeights.isEmpty {
                 progressEmptyState(
                     title: "No weight data in this range",
-                    description: "Add a manual measurement or review imported Apple Health records.",
+                    description: "Connect Apple Health or review your saved readings.",
                     systemImage: "scalemass"
                 )
             } else {
@@ -446,7 +348,7 @@ struct TrackingProgressView: View {
             }
             NavigationLink("View original Apple Health records") { HealthHistoryView() }
         } header: { Text("Weight") } footer: {
-            Text("Apple Health measurements are read-only here. Editing or deleting a local record never changes its original source.")
+            Text("All saved measurements are read-only here.")
         }
     }
 
@@ -456,12 +358,10 @@ struct TrackingProgressView: View {
                 ForEach(rangedWeightConflicts) { group in
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Possible duplicate weight readings").font(.headline)
-                        Text("Choose one source record or exclude this match. Until you choose, this group is left out of the trend.")
+                        Text("Overlapping data is excluded until its source is resolved.")
                             .font(.footnote).foregroundStyle(.secondary)
                         ForEach(group.observations) { observation in
-                            Button {
-                                perform { try nutrition.resolveWeightConflict(groupID: group.id, observationID: observation.id) }
-                            } label: {
+                            Group {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 3) {
                                         Text(weightSourceName(for: observation.id))
@@ -470,18 +370,14 @@ struct TrackingProgressView: View {
                                     }
                                     Spacer()
                                     Text("\(observation.kg.formatted(.number.precision(.fractionLength(1)).locale(locale))) kg")
-                                    Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
                                 }
                             }
-                            .buttonStyle(.plain)
                         }
-                        Button("Exclude this match", role: .destructive) {
-                            perform { try nutrition.resolveWeightConflict(groupID: group.id, observationID: nil) }
-                        }
+
                     }
                     .padding(.vertical, 5)
                 }
-            } header: { Text("Needs your choice") }
+            } header: { Text("Overlapping sources") }
         }
     }
 
@@ -490,7 +386,7 @@ struct TrackingProgressView: View {
             if resolvedActivityDays.isEmpty {
                 progressEmptyState(
                     title: "No activity data",
-                    description: "Add a manual activity or connect Apple Health to view daily exercise and active energy.",
+                    description: "Connect Apple Health to view daily exercise and active energy.",
                     systemImage: "figure.walk"
                 )
             } else {
@@ -505,7 +401,7 @@ struct TrackingProgressView: View {
                     } else { Text("Unknown").foregroundStyle(.secondary) }
                 }
                 if selectedActivitySummary.unresolvedDays > 0 {
-                    Text("\(selectedActivitySummary.unresolvedDays) days have overlapping activity sources awaiting your choice.")
+                    Text("\(selectedActivitySummary.unresolvedDays) days have unresolved overlapping activity sources.")
                         .font(.footnote).foregroundStyle(.orange)
                 }
                 Text("Activity is shown separately. It does not increase the food budget. Missing duration or energy stays unknown.")
@@ -542,16 +438,14 @@ struct TrackingProgressView: View {
     @ViewBuilder private var activityConflictSection: some View {
         let conflicts = resolvedActivityDays.filter(\.isUnresolved)
         if !conflicts.isEmpty {
-            Section("Choose activity source") {
+            Section("Overlapping activity sources") {
                 ForEach(conflicts) { day in
                     VStack(alignment: .leading, spacing: 8) {
                         Text(day.date, format: .dateTime.weekday(.wide).day().month().year()).font(.headline)
-                        Text("Overlapping sources are kept separate. Choose which daily summary to use.")
+                        Text("Overlapping data is excluded until its source is resolved.")
                             .font(.footnote).foregroundStyle(.secondary)
                         ForEach(day.candidates) { candidate in
-                            Button {
-                                perform { try nutrition.resolveActivitySource(on: day.date, source: candidate.source) }
-                            } label: {
+                            Group {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 3) {
                                         Text(candidate.title)
@@ -559,10 +453,8 @@ struct TrackingProgressView: View {
                                     }
                                     Spacer()
                                     Text(activityCandidateValue(candidate)).font(.caption).foregroundStyle(.secondary)
-                                    Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
                                 }
                             }
-                            .buttonStyle(.plain)
                         }
                     }
                     .padding(.vertical, 5)
@@ -603,11 +495,6 @@ struct TrackingProgressView: View {
             if weeklyReview.isEligibleForGoalReview {
                 Text("There is enough recorded coverage to review your goals. No goal change is proposed automatically.")
                     .font(.subheadline)
-                Button {
-                    showWeeklyGoalReview = true
-                } label: {
-                    Label("Start weekly goal review", systemImage: "sparkles")
-                }
             } else {
                 Label("More complete records are needed before a goal review.", systemImage: "info.circle")
                     .font(.footnote).foregroundStyle(.secondary)
@@ -640,16 +527,8 @@ struct TrackingProgressView: View {
                 }
             }
             Spacer(minLength: 8)
-            if case let .local(value)? = weightReferences[observation.id], value.source == .manual {
-                Menu {
-                    Button("Edit") { activeSheet = .editWeight(value) }
-                    Button("Delete", role: .destructive) { deleteRequest = .weight(value.id) }
-                } label: { Image(systemName: "ellipsis.circle").imageScale(.large) }
-                .accessibilityLabel("Actions for manual weight")
-            } else {
-                Image(systemName: "lock.fill").font(.caption).foregroundStyle(.secondary)
-                    .accessibilityLabel("Read-only imported record")
-            }
+            Image(systemName: "lock.fill").font(.caption).foregroundStyle(.secondary)
+                .accessibilityLabel("Read-only record")
         }
         .padding(.vertical, 3)
     }
@@ -660,11 +539,11 @@ struct TrackingProgressView: View {
                 Text(day.date, format: .dateTime.weekday(.abbreviated).day().month())
                     .font(.subheadline.weight(.semibold))
                 Spacer()
-                if day.isUnresolved { Text("Choose source").font(.caption).foregroundStyle(.orange) }
+                if day.isUnresolved { Text("Overlapping sources").font(.caption).foregroundStyle(.orange) }
                 else if let selected = day.selected { Text(selected.title).font(.caption).foregroundStyle(.secondary) }
             }
             if day.isUnresolved {
-                Text("This day is excluded from the activity summary until you choose a source.")
+                Text("Overlapping data is excluded until its source is resolved.")
                     .font(.footnote).foregroundStyle(.secondary)
             } else if let selected = day.selected {
                 HStack(spacing: 12) {
@@ -703,45 +582,13 @@ struct TrackingProgressView: View {
                 }
             }
             Spacer()
-            if entry.source == .manual {
-                Menu {
-                    Button("Edit") { activeSheet = .editActivity(entry) }
-                    Button("Delete", role: .destructive) { deleteRequest = .activity(entry.id) }
-                } label: { Image(systemName: "ellipsis.circle").imageScale(.large) }
-                .accessibilityLabel("Actions for manual activity")
-            } else {
-                Image(systemName: "lock.fill").font(.caption).foregroundStyle(.secondary)
-                    .accessibilityLabel("Read-only imported record")
-            }
+            Image(systemName: "lock.fill").font(.caption).foregroundStyle(.secondary)
+                .accessibilityLabel("Read-only record")
         }
         .padding(.leading, 8).padding(.top, 4)
     }
 
-    @ViewBuilder private func sheetContent(_ sheet: ProgressSheet) -> some View {
-        switch sheet {
-        case .addWeight:
-            ProgressWeightEditor { kg, date, notes in
-                _ = try nutrition.addWeight(kilograms: kg, recordedAt: date, notes: notes)
-            }
-        case let .editWeight(entry):
-            ProgressWeightEditor(entry: entry) { kg, date, notes in
-                var updated = entry; updated.kilograms = kg; updated.recordedAt = date; updated.notes = notes
-                try nutrition.updateWeight(updated)
-            }
-        case .addActivity:
-            ProgressActivityEditor { kind, duration, energy, date, notes in
-                guard let duration else { throw NutritionError.invalidData }
-                _ = try nutrition.addActivity(kind: kind, durationMinutes: duration, activeEnergy: energy, recordedAt: date, notes: notes)
-            }
-        case let .editActivity(entry):
-            ProgressActivityEditor(entry: entry) { kind, duration, energy, date, notes in
-                var updated = entry
-                updated.kind = kind; updated.durationMinutes = duration; updated.activeEnergy = energy
-                updated.recordedAt = date; updated.notes = notes
-                try nutrition.updateActivity(updated)
-            }
-        }
-    }
+
 
     private func activityCandidateValue(_ candidate: ResolvedActivityCandidate) -> String {
         var values = [String]()
@@ -770,129 +617,4 @@ struct TrackingProgressView: View {
             && (value.activeEnergy.map { $0.isFinite && $0 >= 0 } ?? true)
     }
 
-    private func perform(_ action: () throws -> Void) {
-        do { try action(); actionError = nil }
-        catch { actionError = (error as? NutritionError)?.userFacingKey ?? "Could not save the record. Your saved data is unchanged." }
-    }
-
-    private func performDelete() {
-        guard let deleteRequest else { return }
-        perform {
-            switch deleteRequest {
-            case let .weight(id):
-                guard nutrition.snapshot.weights.contains(where: { $0.id == id && $0.source == .manual }) else { throw NutritionError.notFound }
-                try nutrition.deleteWeight(id: id)
-            case let .activity(id):
-                guard nutrition.snapshot.activities.contains(where: { $0.id == id && $0.source == .manual }) else { throw NutritionError.notFound }
-                try nutrition.deleteActivity(id: id)
-            }
-        }
-        self.deleteRequest = nil
-    }
-}
-
-private struct ProgressWeightEditor: View {
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.locale) private var locale
-    @State private var kilograms: Double
-    @State private var recordedAt: Date
-    @State private var notes: String
-    @State private var errorKey: String?
-    let onSave: (Double, Date, String) throws -> Void
-
-    init(entry: ManualWeightEntry? = nil, onSave: @escaping (Double, Date, String) throws -> Void) {
-        _kilograms = State(initialValue: entry?.kilograms ?? 0)
-        _recordedAt = State(initialValue: entry?.recordedAt ?? .now)
-        _notes = State(initialValue: entry?.notes ?? "")
-        self.onSave = onSave
-    }
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section("Weight record") {
-                    RequiredNumberField(title: "Weight (kg)", value: $kilograms)
-                    DatePicker("Recorded at", selection: $recordedAt)
-                    TextField("Notes", text: $notes, axis: .vertical)
-                }
-                if let errorKey { Section { OperationErrorView(key: errorKey) } }
-            }
-            .navigationTitle("Weight")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        do { try onSave(kilograms, recordedAt, notes); dismiss() }
-                        catch { errorKey = (error as? NutritionError)?.userFacingKey ?? "Could not save the record. Your saved data is unchanged." }
-                    }
-                    .disabled(!kilograms.isFinite || kilograms <= 0)
-                }
-            }
-        }
-    }
-}
-
-private struct ProgressActivityEditor: View {
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.locale) private var locale
-    @State private var kind: String
-    @State private var durationText: String
-    @State private var energyText: String
-    @State private var recordedAt: Date
-    @State private var notes: String
-    @State private var errorKey: String?
-    let isEditing: Bool
-    let onSave: (String, Double?, Double?, Date, String) throws -> Void
-
-    init(entry: ManualActivityEntry? = nil, onSave: @escaping (String, Double?, Double?, Date, String) throws -> Void) {
-        _kind = State(initialValue: entry?.kind ?? "")
-        _durationText = State(initialValue: entry?.durationMinutes.map { String($0) } ?? "")
-        _energyText = State(initialValue: entry?.activeEnergy.map { String($0) } ?? "")
-        _recordedAt = State(initialValue: entry?.recordedAt ?? .now)
-        _notes = State(initialValue: entry?.notes ?? "")
-        self.isEditing = entry != nil
-        self.onSave = onSave
-    }
-
-    private var duration: Double? { parseOptionalNumber(durationText) }
-    private var energy: Double? { parseOptionalNumber(energyText) }
-    private var hasValidOptionalNumbers: Bool {
-        (durationText.trimmingCharacters(in: .whitespaces).isEmpty || duration != nil && duration! >= 0)
-            && (energyText.trimmingCharacters(in: .whitespaces).isEmpty || energy != nil && energy! >= 0)
-    }
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    TextField("Activity", text: $kind)
-                    TextField("Duration (minutes)", text: $durationText).keyboardType(.decimalPad)
-                    TextField("Active energy (kcal, optional)", text: $energyText).keyboardType(.decimalPad)
-                    DatePicker("Recorded at", selection: $recordedAt)
-                    TextField("Notes", text: $notes, axis: .vertical)
-                } header: { Text("Activity record") } footer: {
-                    Text("Leave active energy blank when it is unknown. A new manual activity needs a duration; existing records can keep duration unknown.")
-                }
-                if let errorKey { Section { OperationErrorView(key: errorKey) } }
-            }
-            .navigationTitle(isEditing ? "Edit activity" : "Add activity")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        do { try onSave(kind, duration, energy, recordedAt, notes); dismiss() }
-                        catch { errorKey = (error as? NutritionError)?.userFacingKey ?? "Could not save the record. Your saved data is unchanged." }
-                    }
-                    .disabled(kind.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !hasValidOptionalNumbers || (!isEditing && duration == nil))
-                }
-            }
-        }
-    }
-
-    private func parseOptionalNumber(_ text: String) -> Double? {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return nil }
-        let formatter = NumberFormatter(); formatter.locale = locale; formatter.numberStyle = .decimal
-        return formatter.number(from: trimmed)?.doubleValue ?? Double(trimmed.replacingOccurrences(of: ",", with: "."))
-    }
 }

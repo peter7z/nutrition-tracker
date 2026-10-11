@@ -17,10 +17,8 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            TodayView(selectedDate: $selectedDate, openChat: { selectedTab = 1 }).tabItem { Label("Today", systemImage: "circle.grid.2x2.fill") }.tag(0)
-            AssistantChatView(selectedDate: $selectedDate)
-            .tabItem { Label("Chat", systemImage: "bubble.left.and.bubble.right.fill") }.tag(1)
-            TrackingProgressView().tabItem { Label("Progress", systemImage: "chart.xyaxis.line") }.tag(2)
+            TodayView(selectedDate: $selectedDate).tabItem { Label("Today", systemImage: "circle.grid.2x2.fill") }.tag(0)
+            TrackingProgressView().tabItem { Label("Progress", systemImage: "chart.xyaxis.line") }.tag(1)
         }
         .tint(HomeStyle.green)
         .environment(\.timeZone, nutrition.snapshot.profile.calendar.timeZone)
@@ -34,18 +32,18 @@ struct ContentView: View {
 private struct TodayView: View {
     @Environment(HealthSyncModel.self) private var model
     @Environment(NutritionStore.self) private var nutrition
-    @Environment(RemoteSession.self) private var remote
+    @Environment(\.legacyHistory) private var history
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @ScaledMetric(relativeTo: .largeTitle) private var ringSize = 138
     @State private var showHealth = false
     @State private var showSettings = false
     @Binding var selectedDate: Date
-    let openChat: () -> Void
-    @State private var showClose = false
-    @State private var actionError: String?
-    private var resolved: ResolvedDailyNutrition { TrackingBridge.nutrition(on: selectedDate, manual: nutrition.snapshot, health: model.snapshot, accountScope: remote.ownerID ?? "local") }
-    private var dailyGoals: NutritionGoals? { nutrition.goals(on: selectedDate) }
+    private var resolved: ResolvedDailyNutrition { TrackingBridge.nutrition(on: selectedDate, manual: nutrition.snapshot, health: model.snapshot, accountScope: history.accountScope) }
+    private var dailyGoals: NutritionGoals? {
+        if history.ownerID == nil && nutrition.snapshot.goals.isEmpty && !isClosed { return model.snapshot.goals }
+        return nutrition.goals(on: selectedDate)
+    }
     private var consumed: Double? { resolved.values.energy }
     private var goal: Double? { dailyGoals?.energy }
     private var dayID: String { nutrition.snapshot.profile.dayID(for: selectedDate) }
@@ -62,7 +60,6 @@ private struct TodayView: View {
                     VStack(alignment: .leading, spacing: 20) {
                         dayHeader
                         SelectedDayPicker(selection: $selectedDate).accessibilityIdentifier("today.selectedDay")
-                        if let actionError { OperationErrorView(key: actionError) }
                         if let error = nutrition.errorKey { OperationErrorView(key: error) }
                         if let key = model.errorKey {
                             OperationErrorView(key: key)
@@ -71,19 +68,16 @@ private struct TodayView: View {
                         nutritionCard
                         if resolved.hasConflict || resolved.candidates.count > 1 {
                             VStack(alignment: .leading, spacing: 12) {
-                                Text("Choose the nutrition source for this day").font(.headline)
+                                Text("Nutrition sources").font(.headline)
                                 Text("Overlapping sources are never added together.").font(.footnote).foregroundStyle(.secondary)
+                                if resolved.hasConflict {
+                                    Text("Overlapping data is excluded until its source is resolved.").font(.footnote).foregroundStyle(.orange)
+                                }
                                 ForEach(resolved.candidates, id: \.self) { source in
-                                    Button { perform { try nutrition.resolveIntake(on: selectedDate, selection: source) } } label: {
-                                        Label(LocalizedStringKey(source.titleKey), systemImage: resolved.selection == source ? "checkmark.circle.fill" : "circle")
-                                    }
+                                    Label(LocalizedStringKey(source.titleKey), systemImage: resolved.selection == source ? "checkmark.circle.fill" : "circle")
                                 }
                             }.padding(20).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 22))
                         }
-                        Button(action: openChat) {
-                            Label("Log a meal in chat", systemImage: "bubble.left.and.bubble.right.fill")
-                                .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 8)
-                        }.buttonStyle(.borderedProminent).tint(HomeStyle.buttonGreen).controlSize(.large).accessibilityIdentifier("today.openChat")
                         Button {
                             if model.snapshot.isConnected { Task { await model.refreshIfConnected() } }
                             else { showHealth = true }
@@ -95,9 +89,6 @@ private struct TodayView: View {
                         .disabled(model.isWorking || model.storageNeedsRecovery)
                         if model.snapshot.configuration != nil { healthCard; activityCard }
                         mealsSection
-                        Button(isClosed ? "Reopen day" : "Close day") {
-                            if isClosed { perform { try nutrition.reopenDay(selectedDate) } } else { showClose = true }
-                        }.buttonStyle(.bordered).frame(maxWidth: .infinity).disabled(model.isWorking || nutrition.storageNeedsRecovery).accessibilityIdentifier(isClosed ? "today.reopenDay" : "today.closeDay")
                     }
                     .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 24)
                     .frame(maxWidth: 600).frame(maxWidth: .infinity)
@@ -111,18 +102,13 @@ private struct TodayView: View {
             } }
             .sheet(isPresented: $showHealth) { HealthConnectionView() }
             .sheet(isPresented: $showSettings) { AppSettingsView() }
-            .confirmationDialog("Close this day?", isPresented: $showClose, titleVisibility: .visible) {
-                Button("Close as complete") { perform { try TrackingBridge.closeDay(on: selectedDate, store: nutrition, health: model, accountScope: remote.ownerID ?? "local", completeness: .complete) } }
-                Button("Close as incomplete") { perform { try TrackingBridge.closeDay(on: selectedDate, store: nutrition, health: model, accountScope: remote.ownerID ?? "local", completeness: .incomplete) } }
-                Button("Cancel", role: .cancel) {}
-            } message: { Text("Closing saves a versioned summary. Reopen the day explicitly before making corrections.") }
         }
     }
 
     private var dayHeader: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(selectedDate, format: .dateTime.weekday(.wide).day().month(.wide).locale(locale)).font(.subheadline).foregroundStyle(.secondary)
-            Label(isClosed ? "Day closed" : "Day open · saved automatically", systemImage: isClosed ? "checkmark.circle" : "circle.dashed").font(.caption)
+            if isClosed { Label("Day closed", systemImage: "checkmark.circle").font(.caption) }
             if model.isWorking {
                 HStack { ProgressView(); Text("Syncing Apple Health…").font(.caption) }
             } else if let selection = resolved.selection {
@@ -205,8 +191,7 @@ private struct TodayView: View {
                 Text("\(goal.formatted(.number.precision(.fractionLength(0)).locale(locale))) kcal").font(.subheadline.weight(.semibold))
             } else {
                 Text("Your daily goals").font(.subheadline.weight(.semibold))
-                Text("Choose your own targets.").font(.caption).foregroundStyle(.secondary)
-                Button("Set goals") { showSettings = true }.font(.subheadline.weight(.semibold)).padding(.top, 8)
+                Text("No goal set").font(.caption).foregroundStyle(.secondary)
             }
         }
         .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : nil, alignment: .leading)
@@ -287,36 +272,19 @@ private struct TodayView: View {
             Text("Your meals").font(.title3.weight(.bold))
             let entries = nutrition.entries(on: selectedDate)
             if entries.isEmpty {
-                ContentUnavailableView("No meals recorded", systemImage: "fork.knife", description: Text("Record what you ate. Health and spreadsheet totals remain historical summaries."))
+                ContentUnavailableView("No meals recorded", systemImage: "fork.knife", description: Text("Apple Health totals are shown without creating meal records."))
             }
             ForEach(entries) { entry in
                 VStack(alignment: .leading, spacing: 10) {
                     HStack { Text(verbatim: entry.draft.name).font(.headline); Spacer(); Text(entry.draft.amount, format: .number); Text(LocalizedStringKey(entry.draft.unit.titleKey)).font(.caption) }
                     HStack { Text(verbatim: entry.draft.mealName); Text(LocalizedStringKey(entry.draft.preparation.titleKey)); Text(LocalizedStringKey(entry.draft.source.titleKey)) }.font(.caption).foregroundStyle(.secondary)
                     NutrientValuesRows(values: entry.values).font(.caption)
-                    HStack {
-                        Button("Correct in chat") {
-                            perform {
-                                try nutrition.setChatDraft(String(localized: "I want to correct \(entry.draft.name)."))
-                                openChat()
-                            }
-                        }.disabled(isClosed)
-                        Spacer()
-                        Button("Delete", role: .destructive) { perform { try nutrition.deleteEntry(id: entry.id, expectedVersion: entry.version) } }.disabled(isClosed)
-                    }
                 }.padding(18).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20))
-            }
-            if let event = nutrition.snapshot.changes.last(where: { $0.undoneBy == nil && $0.kind != .undo }) {
-                Button("Undo last change") { perform { try nutrition.undo(eventID: event.id) } }
             }
         }
     }
 
-    private func perform(_ action: () throws -> Void) {
-        do { try action(); actionError = nil }
-        catch let error as NutritionError { actionError = error.userFacingKey }
-        catch { actionError = "Could not save the record. Your saved data is unchanged." }
-    }
+
 
     @ViewBuilder private func amount(_ value: Double?, decimalPlaces: Int = 0) -> some View {
         if let value { Text(value, format: .number.precision(.fractionLength(0...decimalPlaces))) }
@@ -326,6 +294,6 @@ private struct TodayView: View {
 
 #Preview("Today · empty") {
     ContentView().environment(HealthSyncModel(persistence: HealthFileRepository(fileURL: URL.temporaryDirectory.appendingPathComponent(UUID().uuidString))))
-        .environment(NutritionStore()).environment(RemoteSession())
+        .environment(NutritionStore()).environment(\.legacyHistory, LegacyHistory(ownerID: nil))
         .environment(\.locale, Locale(identifier: "es_UY"))
 }

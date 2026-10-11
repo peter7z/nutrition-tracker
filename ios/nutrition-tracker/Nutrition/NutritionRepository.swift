@@ -2,15 +2,9 @@ import Foundation
 
 @MainActor protocol NutritionPersistence {
     func load() throws -> NutritionSnapshot
-    func save(_ snapshot: NutritionSnapshot) throws
 }
 
-@MainActor protocol NutritionCheckpointPersistence: NutritionPersistence {
-    func captureRawCheckpoint() throws -> Data?
-    func restoreRawCheckpoint(_ data: Data?) throws
-}
-
-@MainActor final class NutritionFileRepository: NutritionCheckpointPersistence {
+@MainActor final class NutritionFileRepository: NutritionPersistence {
     let fileURL: URL
     init(fileURL: URL? = nil) {
         self.fileURL = fileURL ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
@@ -19,32 +13,6 @@ import Foundation
     func load() throws -> NutritionSnapshot {
         guard FileManager.default.fileExists(atPath: fileURL.path) else { return NutritionSnapshot() }
         return try NutritionBackup.decode(Data(contentsOf: fileURL), datesISO8601: false)
-    }
-    func captureRawCheckpoint() throws -> Data? {
-        guard FileManager.default.fileExists(atPath: fileURL.path) else { return nil }
-        guard let size = try fileURL.resourceValues(forKeys: [.fileSizeKey]).fileSize, size <= 100_000_000 else { throw NutritionError.invalidData }
-        return try Data(contentsOf: fileURL)
-    }
-    func restoreRawCheckpoint(_ data: Data?) throws {
-        guard let data else {
-            if FileManager.default.fileExists(atPath: fileURL.path) { try FileManager.default.removeItem(at: fileURL) }
-            return
-        }
-        let directory = fileURL.deletingLastPathComponent()
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        var protected = directory; var values = URLResourceValues(); values.isExcludedFromBackup = true
-        try protected.setResourceValues(values)
-        // A checkpoint can intentionally contain an unreadable original. Preserve its exact bytes.
-        try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
-    }
-    func save(_ snapshot: NutritionSnapshot) throws {
-        try NutritionBackup.validate(snapshot)
-        let directory = fileURL.deletingLastPathComponent()
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        var url = directory
-        var resource = URLResourceValues(); resource.isExcludedFromBackup = true
-        try url.setResourceValues(resource)
-        try JSONEncoder().encode(snapshot).write(to: fileURL, options: [.atomic, .completeFileProtection])
     }
 }
 

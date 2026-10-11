@@ -1,0 +1,578 @@
+[
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P2. Área: plugin,roadmap. Dependencias: NUT-05, NUT-12, NUT-16, NUT-20.\n\n## Objetivo\n\nRenderizar calorías/macros, peso y evolución dentro de ChatGPT mediante extensiones/widgets del plugin.\n\n## Criterios de aceptación\n\n- [ ] Widgets de resumen diario kcal/macros/metas, peso con tendencia y progreso por rango; datos estructurados reales del backend con fuente, fecha, cobertura y última actualización.\n- [ ] Recursos UI y metadatos de herramientas usando la API de extensiones vigente al implementar; misma capa de consulta/contratos que iOS, sin base paralela ni cálculo contradictorio.\n- [ ] Renderizar o abrir un widget no registra consumo ni cambia metas; cualquier futura acción usa las herramientas autorizadas existentes y su política de confirmación.\n- [ ] Diseño accesible, claro/oscuro, responsive, vacío/error/datos insuficientes, CSP/aislamiento y pruebas en el host real; validar disponibilidad antes de prometer soporte. Este ticket es roadmap y no bloquea el MVP sin widgets.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNfw",
+        "name": "plugin",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "7057FF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFOOQ",
+        "name": "P2",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "FBCA04"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFOwA",
+        "name": "roadmap",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "C2E0C6"
+      }
+    ],
+    "number": 21,
+    "state": "OPEN",
+    "title": "NUT-21 — Widgets del plugin con ChatGPT Extensions (fase posterior)"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P0. Área: plugin,mcp. Dependencias: NUT-16, NUT-17, NUT-08.\n\n## Objetivo\n\nEntregar un plugin utilizable, no solamente un servidor MCP suelto.\n\n## Criterios de aceptación\n\n- [ ] Paquete del plugin con identidad/descripción, manifiestos y configuración MCP, instrucciones/skills, documentación de instalación y estructura plugin/ versionada en el monorepo.\n- [ ] Conectar e instalar de forma privada en ChatGPT con cuenta/host compatibles verificados; probar discovery, OAuth, lectura y escritura desde una conversación real. No confundir Inspector con aceptación del plugin.\n- [ ] Documentar surfaces/planes/permisos realmente probados (incluido móvil/voz si se pretende usarlos); no prometer compatibilidad ni publicación pública sin verificarla.\n- [ ] Preparar contratos/resultados structuredContent y organización para futuras ChatGPT Extensions NUT-21. Publicación en catálogo, revisión y widgets no son requisitos para el primer plugin privado.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmCw",
+        "name": "P0",
+        "description": "Base necesaria del MVP",
+        "color": "B60205"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNfw",
+        "name": "plugin",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "7057FF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFN5g",
+        "name": "mcp",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "5319E7"
+      }
+    ],
+    "number": 20,
+    "state": "OPEN",
+    "title": "NUT-20 — Empaquetar, conectar y probar el plugin de ChatGPT"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P0. Área: ios,backend. Dependencias: NUT-02, NUT-03, NUT-17.\n\n## Objetivo\n\nLlevar a la app el mismo historial y totales que registra ChatGPT.\n\n## Criterios de aceptación\n\n- [ ] API autenticada de lectura de perfil/metas, días/comidas, peso/actividad, series y estados; contrato compartido con MCP, sin acceso iOS a mutaciones de tracking.\n- [ ] Actualizar al abrir/volver a primer plano y manualmente; cursores/versiones, paginación y borrados reflejados en caché de forma atómica sin editar estados remotos.\n- [ ] Última actualización, offline, vacío/error y procedencia visibles; detectar cambio de propietario y separar/eliminar caché privada según política.\n- [ ] Prueba plugin crea/corrige → backend devuelve recibo → iOS refresca y muestra una sola entrada/totales correctos; no depender de mensajes de conversación ni de operaciones locales de registro.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDkhg",
+        "name": "ios",
+        "description": "App nativa iOS / SwiftUI",
+        "color": "007AFF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmCw",
+        "name": "P0",
+        "description": "Base necesaria del MVP",
+        "color": "B60205"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNMw",
+        "name": "backend",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "1D76DB"
+      }
+    ],
+    "number": 19,
+    "state": "OPEN",
+    "title": "NUT-19 — API de consulta y caché iOS del tracking creado por el plugin"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P0. Área: ios,backend,healthkit. Dependencias: NUT-01, NUT-02, NUT-17.\n\n## Objetivo\n\nHacer consultables desde el plugin los datos seleccionados de Apple Health, con consentimiento explícito y trazabilidad.\n\n## Criterios de aceptación\n\n- [ ] Consentimiento separado de la lectura local: explicar envío, almacenamiento en backend y acceso desde ChatGPT; elegir tipos/rango, revisar payload y revocar sin impedir consulta local.\n- [ ] Enviar solo métricas/observaciones normalizadas necesarias y agregados con fuente/cobertura/timezone/frescura; no volcar toda HealthKit, metadatos de dispositivos ni contenido no seleccionado.\n- [ ] ID estable por observación y propietario, lotes/ack/cursor atómicos, incremental altas/correcciones/eliminaciones y reintentos offline; no doble conteo entre fuentes o totales. Sync en primer plano/manual, sin garantía de background.\n- [ ] El backend expone solo la copia autorizada a herramientas con scope de Salud; revocar detiene futuras cargas y accesos, con opción de borrar esa copia sin eliminar tracking ni originales en Apple Health.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDkhg",
+        "name": "ios",
+        "description": "App nativa iOS / SwiftUI",
+        "color": "007AFF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDlYQ",
+        "name": "healthkit",
+        "description": "Lectura e integración de Apple Health",
+        "color": "D73A49"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmCw",
+        "name": "P0",
+        "description": "Base necesaria del MVP",
+        "color": "B60205"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNMw",
+        "name": "backend",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "1D76DB"
+      }
+    ],
+    "number": 18,
+    "state": "OPEN",
+    "title": "NUT-18 — Sincronizar Salud autorizada del iPhone al backend"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P0. Área: backend,plugin,mcp. Dependencias: NUT-02.\n\n## Objetivo\n\nVincular plugin e iOS a la misma cuenta y controlar qué datos/herramientas se autorizan.\n\n## Criterios de aceptación\n\n- [ ] OAuth 2.1/PKCE y discovery MCP de recurso protegido/servidor de autorización; registro/identificación de cliente compatible con el host real, redirecciones verificadas y secretos fuera del repo.\n- [ ] Scopes separados para leer tracking, escribir tracking y leer Salud autorizada; identidad por token validado, issuer/audience/expiry/scope y aislamiento estricto de propietarios.\n- [ ] Login iOS y vinculación ChatGPT resuelven el mismo propietario persistente sin asociar cuentas por texto del chat; revocación, expiración, logout y cambio de usuario probados.\n- [ ] No trasladar permisos HealthKit al OAuth automáticamente. Acceso a Salud remota depende además del consentimiento activo NUT-18; no secretos compartidos pegados en conversaciones.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmCw",
+        "name": "P0",
+        "description": "Base necesaria del MVP",
+        "color": "B60205"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNMw",
+        "name": "backend",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "1D76DB"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNfw",
+        "name": "plugin",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "7057FF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFN5g",
+        "name": "mcp",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "5319E7"
+      }
+    ],
+    "number": 17,
+    "state": "OPEN",
+    "title": "NUT-17 — Identidad compartida y OAuth del plugin ChatGPT"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P0. Área: backend,plugin,mcp. Dependencias: NUT-02, NUT-03.\n\n## Objetivo\n\nExponer las capacidades del backend como herramientas MCP que forman parte del plugin de ChatGPT.\n\n## Criterios de aceptación\n\n- [ ] Endpoint /mcp con Streamable HTTP, inicialización, listado de herramientas y llamadas reales; SDK compatible con backend y versiones documentadas.\n- [ ] Tools de lectura para perfil/metas, registros por fecha, resumen diario, series de progreso, revisión y estado/cobertura de Salud; paginación, límites y formatos estructurados compartidos con iOS/widgets.\n- [ ] Separar lectura y escritura con esquemas/annotations; validar propietario desde identidad autenticada, no owner_id dado por el modelo. Ninguna consulta tiene efectos de tracking.\n- [ ] Inspector y pruebas de contrato, entradas inválidas, errores, fechas/timezone y resultados reproducibles; desplegar endpoint accesible al host elegido sin afirmar que localhost es una integración de ChatGPT.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmCw",
+        "name": "P0",
+        "description": "Base necesaria del MVP",
+        "color": "B60205"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNMw",
+        "name": "backend",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "1D76DB"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNfw",
+        "name": "plugin",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "7057FF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFN5g",
+        "name": "mcp",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "5319E7"
+      }
+    ],
+    "number": 16,
+    "state": "OPEN",
+    "title": "NUT-16 — Servidor MCP del plugin: lectura, esquemas y transporte"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P1. Área: backend,plugin,ios. Dependencias: NUT-01, NUT-08, NUT-18, NUT-19, NUT-20.\n\n## Objetivo\n\nValidar ChatGPT/plugin ↔ backend ↔ iOS y recuperar datos existentes sin pérdida.\n\n## Criterios de aceptación\n\n- [ ] Flujo completo: importar Salud, autorizar copia remota, consultar desde ChatGPT, registrar/corregir una comida por plugin y ver el resultado en iOS; mismo usuario y mismos totales.\n- [ ] Exportación JSON/CSV con fuentes/unidades/versiones y restauración administrativa o vía plugin; iOS puede compartir una exportación de lectura, pero no restaurar/crear tracking en el MVP.\n- [ ] Borrado de cuenta/copia remota y revocación de acceso cubren datos, tokens, cachés y backups según política; nunca borrar Apple Health como efecto secundario.\n- [ ] Migración de la app anterior preserva historial; pruebas de dos propietarios, reintentos, conflictos, caídas, hipótesis no registradas y Salud no autorizada; evidencia por componente, no aceptación inferida desde código existente.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDkhg",
+        "name": "ios",
+        "description": "App nativa iOS / SwiftUI",
+        "color": "007AFF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmww",
+        "name": "P1",
+        "description": "Completar la experiencia del MVP",
+        "color": "FBCA04"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNMw",
+        "name": "backend",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "1D76DB"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNfw",
+        "name": "plugin",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "7057FF"
+      }
+    ],
+    "number": 15,
+    "state": "OPEN",
+    "title": "NUT-15 — Recuperación, privacidad y aceptación del sistema completo"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P1. Área: ios,healthkit. Dependencias: NUT-01, NUT-05, NUT-07, NUT-12, NUT-19.\n\n## Objetivo\n\nValidar la nueva app, offline y TestFlight con su alcance reducido.\n\n## Criterios de aceptación\n\n- [ ] Instalación, identidad, firma, HealthKit, privacidad y build TestFlight real; retirar permisos de cámara/micrófono/IA que no corresponden al nuevo producto.\n- [ ] Probar conexión HealthKit, consentimientos remotos, cuenta, sincronización, fechas/gráficas y detalles; ausencia de registro/chat propio verificada en navegación.\n- [ ] Offline: HealthKit local y última caché disponibles, pendientes técnicos de sync/frescura explícitos; no cola de registros ni borradores de chat en iOS.\n- [ ] Simulator iPhone SE/grande/iPad, claro/oscuro, Dynamic Type y VoiceOver; aceptación de HealthKit real en iPhone y documentación de distribución, sin confundir build unsigned con TestFlight.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDkhg",
+        "name": "ios",
+        "description": "App nativa iOS / SwiftUI",
+        "color": "007AFF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDlYQ",
+        "name": "healthkit",
+        "description": "Lectura e integración de Apple Health",
+        "color": "D73A49"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmww",
+        "name": "P1",
+        "description": "Completar la experiencia del MVP",
+        "color": "FBCA04"
+      }
+    ],
+    "number": 14,
+    "state": "OPEN",
+    "title": "NUT-14 — Validar y distribuir el companion iOS de lectura"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P1. Área: backend,plugin. Dependencias: NUT-04, NUT-11, NUT-16.\n\n## Objetivo\n\nChatGPT interpreta una revisión calculada; las metas cambian mediante una operación del plugin.\n\n## Criterios de aceptación\n\n- [ ] Tool de revisión devuelve ingesta, completitud, proteína, peso, actividad y cobertura real; solo datos de Salud autorizados y frescura visibles.\n- [ ] Política documentada de suficiencia durante dos semanas; no proponer ajustes de metas a partir de una fluctuación aislada.\n- [ ] Separar observaciones calculadas de explicación/propuesta del asistente; aceptación explícita y tool versionada con fecha de vigencia, conflicto y recibo.\n- [ ] iOS muestra la revisión/datos y metas resultantes como consulta, sin formulario ni botones de aceptar/rechazar cambios de metas.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmww",
+        "name": "P1",
+        "description": "Completar la experiencia del MVP",
+        "color": "FBCA04"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNMw",
+        "name": "backend",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "1D76DB"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNfw",
+        "name": "plugin",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "7057FF"
+      }
+    ],
+    "number": 13,
+    "state": "OPEN",
+    "title": "NUT-13 — Revisión semanal en ChatGPT y metas versionadas por plugin"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P0. Área: ios,healthkit. Dependencias: NUT-01, NUT-19.\n\n## Objetivo\n\nVisualizar evolución con datos de Salud y registros creados desde el plugin.\n\n## Criterios de aceptación\n\n- [ ] Swift Charts con rangos y detalle: peso, media móvil de 7 días, kcal/macros y actividad; cantidad de muestras/cobertura visible y huecos sin inventar observaciones.\n- [ ] Conservar múltiples pesajes y documentar selección diaria; fuentes Salud/plugin/planilla identificadas y superposición reconciliada sin doble conteo.\n- [ ] Actividad separada de ingesta; las gráficas y listas no contienen controles para crear, corregir o borrar tracking.\n- [ ] Mismas series y reglas de agregación que herramientas del plugin/futuros widgets. Validar zonas horarias, valores desconocidos, iPhone pequeño/iPad, VoiceOver y Dynamic Type.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDkhg",
+        "name": "ios",
+        "description": "App nativa iOS / SwiftUI",
+        "color": "007AFF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDlYQ",
+        "name": "healthkit",
+        "description": "Lectura e integración de Apple Health",
+        "color": "D73A49"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmCw",
+        "name": "P0",
+        "description": "Base necesaria del MVP",
+        "color": "B60205"
+      }
+    ],
+    "number": 12,
+    "state": "OPEN",
+    "title": "NUT-12 — Gráficas de peso, actividad y nutrición de solo lectura"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P1. Área: plugin. Dependencias: NUT-16, NUT-20.\n\n## Objetivo\n\nLa conversación y el razonamiento ocurren en ChatGPT, apoyados en herramientas y guías del plugin.\n\n## Criterios de aceptación\n\n- [ ] Instrucciones/skills del plugin explican cuándo leer datos, estimar macros, aclarar supuestos y escribir; usar resultados actuales del backend, no memoria de conversación como fuente autoritativa.\n- [ ] Consultar objetivos, preferencias, registros y Salud consentida antes de responder sobre el día/progreso; contexto acotado por fechas y cobertura, sin reenviar todo el historial.\n- [ ] Propuestas de cena muestran cantidades y macros estimados y total proyectado separado del registrado; no registrar una planificación como consumo.\n- [ ] Manejar errores y datos insuficientes sin inventar guardado ni ceros. No implementar un segundo chat o motor de conversación Responses en el backend/iOS para este flujo.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmww",
+        "name": "P1",
+        "description": "Completar la experiencia del MVP",
+        "color": "FBCA04"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNfw",
+        "name": "plugin",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "7057FF"
+      }
+    ],
+    "number": 11,
+    "state": "OPEN",
+    "title": "NUT-11 — Instrucciones del plugin para consultas y estimaciones"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P1. Área: plugin,backend. Dependencias: NUT-08, NUT-20.\n\n## Objetivo\n\nUsar las capacidades de imagen de ChatGPT para generar datos estructurados, sin cámara propia de iOS.\n\n## Criterios de aceptación\n\n- [ ] El usuario comparte la imagen en ChatGPT; el asistente estima/transcribe y muestra supuestos. Verificar disponibilidad en el host real; no asumir acceso automático del MCP a la foto.\n- [ ] Cantidad visual se marca como estimación y se aclara cuando sea relevante; etiqueta distingue porción/100 g/ml y partes ilegibles. No crear catálogo ni guardar consumo solo por analizar una imagen.\n- [ ] Registrar únicamente al indicar/confirmar consumo mediante NUT-08; backend valida el snapshot, fechas/unidades y deduplicación por operación.\n- [ ] No almacenar fotos originales por defecto ni depender de upload/cámara/PhotosPicker de iOS; cualquier futura retención de imágenes requiere propósito, consentimiento y borrado definidos.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmww",
+        "name": "P1",
+        "description": "Completar la experiencia del MVP",
+        "color": "FBCA04"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNMw",
+        "name": "backend",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "1D76DB"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNfw",
+        "name": "plugin",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "7057FF"
+      }
+    ],
+    "number": 10,
+    "state": "OPEN",
+    "title": "NUT-10 — Fotos y etiquetas desde ChatGPT mediante el plugin"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P2. Área: backend,plugin,deferred. Dependencias: sin dependencia activa.\n\n## Objetivo\n\nMantener fuera del MVP la base de alimentos y recetas; no es requisito para estimar nutrientes en ChatGPT.\n\n## Criterios de aceptación\n\n- [ ] No catálogo de alimentos, búsqueda de productos, carga manual de macros ni guardado de recetas en la app o el plugin del MVP.\n- [ ] Conservar registros históricos existentes sin exponer un nuevo flujo de catálogo; snapshots de comida no equivalen a una base de alimentos.\n- [ ] Cualquier alcance futuro de productos/recetas requiere una nueva decisión explícita de producto. Este ticket se mantiene diferido, no se marca completado.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNMw",
+        "name": "backend",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "1D76DB"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNfw",
+        "name": "plugin",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "7057FF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFOOQ",
+        "name": "P2",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "FBCA04"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFOaQ",
+        "name": "deferred",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "D4C5F9"
+      }
+    ],
+    "number": 9,
+    "state": "OPEN",
+    "title": "NUT-09 — Productos y recetas (diferido fuera del MVP)"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P0. Área: backend,plugin,mcp. Dependencias: NUT-03, NUT-16, NUT-17.\n\n## Objetivo\n\nChatGPT interpreta el mensaje y estima nutrientes; las herramientas validan y persisten operaciones reales.\n\n## Criterios de aceptación\n\n- [ ] Tools tipadas de crear/actualizar/eliminar/deshacer comidas y registrar peso/actividad; validar nutrientes, cantidades, fecha, IDs y versión. Cambiar metas/cierres usa herramientas específicas, nunca argumentos arbitrarios.\n- [ ] «Anotá 150 g de banana» crea; «eran 100 g» corrige la entrada identificada sin duplicar. Preguntar cuando el destino o la unidad sean materialmente ambiguos; no pedir al usuario que cargue macros.\n- [ ] «¿Y si como una banana?» o «qué ceno» solo consulta/proyecta. Descripciones/annotations de lectura y escritura correctas; confirmar acciones sensibles y no afirmar guardado antes del recibo exitoso.\n- [ ] Idempotencia y versiones impiden duplicados por reintento del host; errores/conflictos visibles. Devolver ID, versión, datos efectivamente guardados y totales autoritativos para ChatGPT e iOS.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmCw",
+        "name": "P0",
+        "description": "Base necesaria del MVP",
+        "color": "B60205"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNMw",
+        "name": "backend",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "1D76DB"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNfw",
+        "name": "plugin",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "7057FF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFN5g",
+        "name": "mcp",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "5319E7"
+      }
+    ],
+    "number": 8,
+    "state": "OPEN",
+    "title": "NUT-08 — Herramientas del plugin para registrar y corregir tracking"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P0. Área: ios. Dependencias: NUT-02, NUT-19.\n\n## Objetivo\n\nRetirar el flujo de registro y el chat integrado de la navegación de la app.\n\n## Criterios de aceptación\n\n- [ ] Eliminar de la UI Chat/historial de conversación, registro/corrección/borrado de comidas, formularios de peso/actividad, edición de metas y cierre/reapertura de días.\n- [ ] Retirar cámara/PhotosPicker para comida, revisión de propuestas de IA, catálogo/recetas y sus permisos cuando ya no se usen; no agregar voz ni llamadas propias a OpenAI.\n- [ ] Navegación nativa centrada en Hoy, Progreso, Datos y Ajustes/Salud; permitir seleccionar fecha/rango, sincronizar, configurar cuenta/consentimiento y consultar detalles.\n- [ ] Migrar sin borrar silenciosamente historial previo ni mezclar propietarios; explicar que el registro se hace en ChatGPT. Probar que no queda una ruta navegable para escribir tracking.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDkhg",
+        "name": "ios",
+        "description": "App nativa iOS / SwiftUI",
+        "color": "007AFF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmCw",
+        "name": "P0",
+        "description": "Base necesaria del MVP",
+        "color": "B60205"
+      }
+    ],
+    "number": 7,
+    "state": "OPEN",
+    "title": "NUT-07 — Convertir iOS en companion de consulta y sincronización"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P1. Área: backend,plugin. Dependencias: NUT-03, NUT-16, NUT-20.\n\n## Objetivo\n\nConservar la migración histórica, trasladándola fuera de iOS y sin hacerla requisito del primer flujo del plugin.\n\n## Criterios de aceptación\n\n- [ ] Importación preparada mediante ChatGPT/plugin con mapeo y preview de fechas, kcal, proteína, peso, actividad y completitud; no usar file picker de iOS para registrar tracking.\n- [ ] Confirmación del lote antes de escribir, límites de tamaño/cantidad y errores visibles. Verificar mecanismo real de acceso a archivos del host; no asumir que MCP recibe adjuntos de ChatGPT automáticamente.\n- [ ] Resumen histórico conserva totales originales y procedencia sin fabricar comidas; omitir filas futuras vacías y nutrientes no explícitos. Reconciliar contra Salud sin sumar fuentes superpuestas.\n- [ ] Lotes idempotentes y reversibles sin borrar cambios posteriores; comparación por fecha y archivo original intacto. iOS solo visualiza el resultado.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmww",
+        "name": "P1",
+        "description": "Completar la experiencia del MVP",
+        "color": "FBCA04"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNMw",
+        "name": "backend",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "1D76DB"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNfw",
+        "name": "plugin",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "7057FF"
+      }
+    ],
+    "number": 6,
+    "state": "OPEN",
+    "title": "NUT-06 — Migrar la planilla histórica al backend mediante el plugin"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P0. Área: ios,healthkit. Dependencias: NUT-01, NUT-19.\n\n## Objetivo\n\nHoy es un dashboard, no una pantalla de registro.\n\n## Criterios de aceptación\n\n- [ ] Mostrar kcal/macros, metas vigentes y diferencia, peso/actividad y procedencia; distinguir ingesta de energía activa y no aumentar automáticamente el presupuesto de comida.\n- [ ] Selección de fecha, detalle de registros de solo lectura y estados vacío/error/cargando/incompleto; ausencia de datos no se representa como cero.\n- [ ] Reflejar registros y correcciones del plugin tras actualización, con última sincronización y cobertura. Usar totales autoritativos del backend.\n- [ ] Dynamic Type, VoiceOver y localización español/inglés. Sin CTA de agregar comida, chat propio, micrófono, formularios de tracking ni metas editables.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDkhg",
+        "name": "ios",
+        "description": "App nativa iOS / SwiftUI",
+        "color": "007AFF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDlYQ",
+        "name": "healthkit",
+        "description": "Lectura e integración de Apple Health",
+        "color": "D73A49"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmCw",
+        "name": "P0",
+        "description": "Base necesaria del MVP",
+        "color": "B60205"
+      }
+    ],
+    "number": 5,
+    "state": "OPEN",
+    "title": "NUT-05 — Pantalla Hoy de consulta: calorías, macros y Salud"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P1. Área: backend,plugin. Dependencias: NUT-03, NUT-08.\n\n## Objetivo\n\nLas acciones de cierre y corrección ocurren en ChatGPT; iOS refleja el estado.\n\n## Criterios de aceptación\n\n- [ ] Herramientas tipadas para cerrar/reabrir y consultar completitud; cierre explícito e idempotente, sin cierre automático a medianoche.\n- [ ] Corrección de día cerrado requiere reapertura explícita y conserva historial, totales y metas congeladas/versionadas.\n- [ ] Resolver hoy/ayer/fechas con zona horaria del usuario y devolver el día afectado; no asumir fecha de conversación como fecha de consumo.\n- [ ] iOS solo muestra estado/completitud y resumen actualizado, sin botones de cierre, reapertura o edición.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmww",
+        "name": "P1",
+        "description": "Completar la experiencia del MVP",
+        "color": "FBCA04"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNMw",
+        "name": "backend",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "1D76DB"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNfw",
+        "name": "plugin",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "7057FF"
+      }
+    ],
+    "number": 4,
+    "state": "OPEN",
+    "title": "NUT-04 — Cerrar, reabrir y corregir días desde el plugin"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P0. Área: backend. Dependencias: NUT-02.\n\n## Objetivo\n\nEl backend conserva los registros creados desde ChatGPT y calcula los totales autoritativos.\n\n## Criterios de aceptación\n\n- [ ] Persistir comida, cantidad/unidad, preparación, instante y día local, nutrientes estimados/etiqueta, supuestos, fuente, propietario y versión; ChatGPT estima macros sin catálogo ni carga manual de cada nutriente por el usuario.\n- [ ] Conversiones explícitas por 100 g/ml o porción; no asumir densidad ni equivalencia crudo/cocido. Calcular totales en código, mantener null para desconocidos y respetar kcal de etiqueta.\n- [ ] Mutaciones atómicas, idempotencia por operación, control de versión, auditoría y deshacer con conflictos visibles. Múltiples registros similares no se deduplican como si fueran la misma ingesta.\n- [ ] Pruebas de cantidades parciales, nutrientes faltantes, permisos de propietario, reintentos y correcciones; mismo snapshot/totales para plugin e iOS.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmCw",
+        "name": "P0",
+        "description": "Base necesaria del MVP",
+        "color": "B60205"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNMw",
+        "name": "backend",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "1D76DB"
+      }
+    ],
+    "number": 3,
+    "state": "OPEN",
+    "title": "NUT-03 — Persistencia y cálculo nutricional en el backend"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P0. Área: ios,backend,plugin. Dependencias: NUT-01.\n\n## Objetivo\n\nSeparar explícitamente las responsabilidades y migrar la arquitectura anterior sin perder historial.\n\n## Criterios de aceptación\n\n- [ ] ios/ contiene HealthKit, caché, visualización y configuración; backend/ es la fuente persistente del tracking; plugin/ alojará manifiesto, instrucciones y futuras extensiones. El servidor MCP es una pieza del plugin.\n- [ ] iOS no crea/edita comidas, peso, actividad, metas ni cierres. Solo puede importar/sincronizar Salud y realizar operaciones técnicas de cuenta/consentimiento. El tracking se modifica desde ChatGPT mediante el plugin.\n- [ ] Conservar registros existentes, versiones, procedencia y recibos; migración recuperable, aislamiento por propietario y reconciliación sin duplicar resúmenes. Documentar cambios respecto de la implementación actual.\n- [ ] Contrato de datos compartido entre MCP, API de lectura iOS y futuras vistas del plugin; autenticación consistente, HTTPS, migraciones y entornos reproducibles. No incluir claves de IA en iOS ni exigir Responses API para el flujo principal.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDkhg",
+        "name": "ios",
+        "description": "App nativa iOS / SwiftUI",
+        "color": "007AFF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmCw",
+        "name": "P0",
+        "description": "Base necesaria del MVP",
+        "color": "B60205"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNMw",
+        "name": "backend",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "1D76DB"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC8PFNfw",
+        "name": "plugin",
+        "description": "Clasificación del enfoque companion iOS + plugin ChatGPT",
+        "color": "7057FF"
+      }
+    ],
+    "number": 2,
+    "state": "OPEN",
+    "title": "NUT-02 — Arquitectura del monorepo: companion iOS + backend + plugin ChatGPT"
+  },
+  {
+    "body": "**Cambio de producto — 10 de octubre de 2026.** iOS es un companion de consulta y sincronización de Apple Health; el registro ocurre en ChatGPT mediante un plugin. MCP es una pieza del plugin; los widgets mediante ChatGPT Extensions son una fase posterior.\n\nPrioridad: P0. Área: ios,healthkit. Dependencias: ninguna.\n\n## Objetivo\n\nLa app importa datos existentes de Salud y permite consultarlos localmente. La lectura local no exige login ni backend.\n\n## Criterios de aceptación\n\n- [ ] Permisos de lectura contextuales por tipo y rango: peso, pasos, energía activa/basal, ejercicio/entrenamientos y nutrientes disponibles; no crear comidas desde totales ni escribir/borrar en Apple Health.\n- [ ] Persistir muestras, procedencia, unidades normalizadas, zona horaria y cursores de forma atómica; importación incremental con altas/eliminaciones, reintentos idempotentes y cobertura/última sincronización visibles.\n- [ ] Usar agregaciones HealthKit para evitar doble conteo de iPhone/Watch y entrenamientos; conservar pesajes y distinguir desconocido de cero. No interpretar autorización completada como lectura concedida.\n- [ ] Desconectar detiene consultas y ofrece borrar la copia local sin alterar Salud. Validar conversiones, superposición, reimportación y permisos reales en iPhone. Compartir con backend requiere NUT-18 y consentimiento adicional.\n\n## Documentación y estado\n\nEspecificación: `docs/product.md`; backlog: `docs/backlog.md` en `peter7z/nutrition-tracker`. La planificación anterior se conserva en `docs/archive/backlog-ios-chat-2026-10-09.md` y `docs/archive/issues-ios-chat-2026-10-10.json`. Los criterios siguen abiertos; la implementación previa no acredita este nuevo alcance.\n\n## Referencias de implementación\n\n- [Servidor MCP del plugin](https://developers.openai.com/plugins/build/mcp-server).\n- [Autenticación OAuth](https://developers.openai.com/plugins/build/auth).\n- [Conectar el plugin a ChatGPT](https://developers.openai.com/api/docs/guides/custom-mcp-server).\n- [UI y extensiones del plugin](https://developers.openai.com/plugins/build/chatgpt-ui).\n",
+    "labels": [
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDkhg",
+        "name": "ios",
+        "description": "App nativa iOS / SwiftUI",
+        "color": "007AFF"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDlYQ",
+        "name": "healthkit",
+        "description": "Lectura e integración de Apple Health",
+        "color": "D73A49"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDmCw",
+        "name": "P0",
+        "description": "Base necesaria del MVP",
+        "color": "B60205"
+      },
+      {
+        "id": "LA_kwDOU9XJNs8AAAAC7wDnvQ",
+        "name": "priority:first",
+        "description": "Primera tarea y máxima prioridad: Apple Health",
+        "color": "B60205"
+      }
+    ],
+    "number": 1,
+    "state": "OPEN",
+    "title": "NUT-01 — Importar Apple Health con HealthKit (primera prioridad)"
+  }
+]

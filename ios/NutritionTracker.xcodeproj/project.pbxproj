@@ -371,9 +371,7 @@
 				DEVELOPMENT_TEAM = 2KHYMP6SN7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Configuration/DebugInfo.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Nutrition Tracker";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Nutrition Tracker uses the camera when you choose to photograph a meal or nutrition label.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Nutrition Tracker reads your weight, activity and nutrition data from Apple Health to show your history and progress.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -415,7 +413,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Nutrition Tracker";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Nutrition Tracker uses the camera when you choose to photograph a meal or nutrition label.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Nutrition Tracker reads your weight, activity and nutrition data from Apple Health to show your history and progress.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;

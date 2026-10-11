@@ -172,17 +172,6 @@ enum TrackingSource: String, Codable { case manual, spreadsheet }
 struct ManualWeightEntry: Codable, Equatable, Identifiable { var id: UUID; var recordedAt: Date; var kilograms: Double; var source: TrackingSource = .manual; var notes = ""; var importBatchID: UUID? = nil }
 struct ManualActivityEntry: Codable, Equatable, Identifiable { var id: UUID; var recordedAt: Date; var kind: String; var durationMinutes: Double?; var activeEnergy: Double? = nil; var source: TrackingSource = .manual; var notes = ""; var importBatchID: UUID? = nil }
 struct HistoricalNutritionSummary: Codable, Equatable, Identifiable { var id: UUID; var dayID: String; var nutrients: NutrientValues; var isClosed: Bool; var notes: String; var importBatchID: UUID; var sourceRow: String }
-struct HistoricalDaySummary: Codable, Equatable {
-    var date: Date
-    var nutrients: NutrientValues
-    var weight: Double? = nil
-    var activeEnergy: Double? = nil
-    var activityMinutes: Double? = nil
-    var notes: String = ""
-    var isClosed = true
-    var sourceBatchID: UUID? = nil
-    var originalRow: String = ""
-}
 struct NutritionImportBatch: Codable, Equatable, Identifiable {
     var id: UUID; var fingerprint: String; var importedAt: Date; var fileName: String; var createdDayIDs: [String] = []
     var previousResolutions: [IntakeResolution] = []
@@ -232,9 +221,7 @@ struct PersistentChatMessage: Codable, Equatable, Identifiable {
     // Optional for existing backups. A deleted input cannot be recreated with the same request ID.
     var attachmentRemoved: Bool? = nil
     var requiresSavedResponse: Bool? = nil
-    var canRetrieveOrRetry: Bool {
-        [.failed, .queued, .cancelled, .delivered].contains(state) && (attachmentRemoved != true || state == .delivered)
-    }
+
 }
 struct ChatOutboxItem: Codable, Equatable, Identifiable { var id: UUID; var messageID: UUID; var attempts: Int = 0; var state: ChatDeliveryState = .queued }
 struct NutritionAttachment: Codable, Equatable, Identifiable { var id: UUID; var relativePath: String; var mimeType: String; var byteCount: Int; var createdAt: Date; var remoteOwnerID: String? = nil; var remoteAttachmentID: String? = nil }
@@ -259,7 +246,6 @@ struct NutritionSnapshot: Codable, Equatable {
     var entries: [FoodEntry] = []
     var days: [NutritionDayLog] = []
     var goals: [NutritionGoalVersion] = []
-    var goalsVersions: [NutritionGoalVersion] { get { goals } set { goals = newValue } }
     var products: [FoodProduct] = []
     var recipes: [FoodRecipe] = []
     var weights: [ManualWeightEntry] = []

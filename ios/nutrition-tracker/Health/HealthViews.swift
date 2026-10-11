@@ -48,7 +48,7 @@ struct HealthConnectionView: View {
                     Section {
                         Text("Read-only access. You choose permissions in Apple's Health dialog. Your original Health data stays unchanged.")
                         Text("No available data can mean no records or no read access. The app cannot distinguish those cases.")
-                        Text("Closed-day Health summaries and consented pending requests stay on this device when you change the import selection. Delete the local Health copy to erase them.")
+                        Text("Saved historical Health summaries stay on this device when you change the import selection. Delete the local Health copy to erase them.")
                     }
                     if !model.isAvailable {
                         Section { Text("Apple Health is not available on this device.") }
@@ -139,7 +139,7 @@ struct HealthConnectionView: View {
             Text("Health nutrition is imported as nutrients, without inventing meals. Active energy does not increase your food budget.")
             if model.snapshot.configuration != nil {
                 Text("Confirming replaces the previous local Health copy with this selection. Your daily goals are kept.")
-                Text("Closed-day Health summaries and consented pending requests are preserved separately. They are not sent through tracking sync.")
+                Text("Saved historical Health summaries are preserved separately on this device.")
             }
             Text("Only confirm when you are ready to save this copy on your device.")
         }
@@ -210,77 +210,6 @@ struct HealthHistoryView: View {
             .sheet(isPresented: $showConnection) { HealthConnectionView() }
             .refreshable { await model.refreshIfConnected() }
             .onChange(of: metric) { _, _ in limit = 100 }
-        }
-    }
-}
-
-struct NutritionSettingsView: View {
-    @Environment(HealthSyncModel.self) private var model
-    @Environment(\.dismiss) private var dismiss
-    @State private var useGoals = false
-    @State private var energy = 2_100.0
-    @State private var protein = 140.0
-    @State private var carbohydrates = 250.0
-    @State private var fat = 60.0
-    @State private var showConnection = false
-    @State private var showDisconnect = false
-
-    private var goals: NutritionGoals? { useGoals ? NutritionGoals(energy: energy, protein: protein, carbohydrates: carbohydrates, fat: fat) : nil }
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    Toggle("Use daily goals", isOn: $useGoals)
-                    if useGoals {
-                        goalField("Energy (kcal)", value: $energy)
-                        goalField("Protein (g)", value: $protein)
-                        goalField("Carbs (g)", value: $carbohydrates)
-                        goalField("Fat (g)", value: $fat)
-                    }
-                } header: { Text("Daily goals") } footer: { Text("Set your own goals. Exercise calories are kept separate from your food budget.") }
-                Section("Apple Health") {
-                    Button(model.snapshot.isConnected ? "Change import settings" : "Connect Apple Health") { showConnection = true }
-                        .disabled(model.isWorking || model.storageNeedsRecovery)
-                    if model.snapshot.isConnected {
-                        Button("Sync now") { Task { await model.refreshIfConnected() } }.disabled(model.isWorking)
-                        Button("Disconnect", role: .destructive) { showDisconnect = true }.disabled(model.isWorking)
-                    } else if !model.snapshot.samples.isEmpty {
-                        Text("Local copy retained. Automatic syncing is off.")
-                        Button("Delete local Health copy", role: .destructive) { showDisconnect = true }
-                    }
-                }
-                if let key = model.errorKey { Section { OperationErrorView(key: key) } }
-            }
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
-                ToolbarItem(placement: .confirmationAction) { Button("Save") {
-                    model.saveGoals(goals)
-                    if model.snapshot.goals == goals && model.errorKey == nil { dismiss() }
-                }.disabled(model.isWorking || model.storageNeedsRecovery || !(goals?.isValid ?? true)) }
-            }
-            .onAppear {
-                if let saved = model.snapshot.goals {
-                    useGoals = true; energy = saved.energy; protein = saved.protein; carbohydrates = saved.carbohydrates; fat = saved.fat
-                }
-            }
-            .sheet(isPresented: $showConnection) { HealthConnectionView() }
-            .confirmationDialog("Disconnect Apple Health?", isPresented: $showDisconnect, titleVisibility: .visible) {
-                if model.snapshot.isConnected { Button("Disconnect and keep local copy") { model.disconnect(removeLocalCopy: false) } }
-                Button("Delete local Health copy", role: .destructive) { model.disconnect(removeLocalCopy: true) }
-                Button("Cancel", role: .cancel) {}
-            } message: { Text("Syncing stops. Original data in Apple Health is never deleted. Your daily goals are kept.") }
-        }
-    }
-
-    private func goalField(_ title: LocalizedStringKey, value: Binding<Double>) -> some View {
-        LabeledContent(title) {
-            TextField(title, value: value, format: .number)
-                .keyboardType(.decimalPad)
-                .multilineTextAlignment(.trailing)
-                .accessibilityLabel(Text(title))
         }
     }
 }

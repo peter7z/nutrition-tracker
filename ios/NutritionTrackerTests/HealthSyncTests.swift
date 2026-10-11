@@ -181,9 +181,9 @@ import HealthKit
     func testDisconnectKeepsCopyAndGoalsWithoutFurtherQueries() async {
         let client = FakeHealthClient(); let store = MemoryHealthPersistence()
         client.deltas = [delta([sample()])]
-        let model = HealthSyncModel(client: client, persistence: store, now: { self.today })
         let goals = NutritionGoals(energy: 2000, protein: 100, carbohydrates: 200, fat: 70)
-        model.saveGoals(goals)
+        store.snapshot.goals = goals
+        let model = HealthSyncModel(client: client, persistence: store, now: { self.today })
         await model.prepareImport(configuration: configuration()); model.confirmImport()
         model.disconnect(removeLocalCopy: false)
         let calls = client.receivedAnchors.count
@@ -208,7 +208,7 @@ import HealthKit
         XCTAssertNil(model.snapshot.value(for: .workout, on: today))
     }
 
-    func testInvalidSamplesAndUnconfirmedGoalsCannotBecomeData() async {
+    func testInvalidSamplesCannotBecomeData() async {
         let client = FakeHealthClient(); let store = MemoryHealthPersistence()
         client.deltas = [delta([sample(value: -1)])]
         let model = HealthSyncModel(client: client, persistence: store, now: { self.today })
@@ -216,7 +216,6 @@ import HealthKit
         XCTAssertNil(model.stagedImport)
         XCTAssertTrue(store.snapshot.samples.isEmpty)
         XCTAssertNil(model.snapshot.goals)
-        model.saveGoals(NutritionGoals(energy: 0, protein: 100, carbohydrates: 200, fat: 50))
         XCTAssertNil(model.snapshot.goals)
     }
 
