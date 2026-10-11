@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: nutrition-tracker-api
+    runtime: python
+    region: virginia
+    plan: 0.5c-512mb
+    branch: main
+    rootDir: backend
+    autoDeployTrigger: checksPass
+    buildCommand: pip install -r requirements.txt -c requirements-lock.txt
+    startCommand: uvicorn app.asgi:app --host 0.0.0.0 --port $PORT --no-access-log --proxy-headers --forwarded-allow-ips="*"
+    healthCheckPath: /healthz
+    numInstances: 1
+    disk:
+      name: nutrition-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.13
+      - key: NUTRITION_ENV
+        value: production
+      - key: NUTRITION_DATABASE
+        value: /var/data/nutrition/nutrition.sqlite3

@@ -9,6 +9,7 @@ build/
 *.dSYM/
 
 # Local credentials and configuration
+.render
 .env
 .env.*
 !.env.example
