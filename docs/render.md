@@ -42,3 +42,19 @@ No usar esta configuración como almacenamiento definitivo de datos reales.
 
 Referencias: https://render.com/docs/free,
 https://render.com/docs/postgresql, https://render.com/docs/blueprint-spec.
+
+## Servicio publicado
+
+- API: https://nutrition-tracker-api-cljy.onrender.com
+- Healthcheck: https://nutrition-tracker-api-cljy.onrender.com/healthz
+- Workspace: `nutrition`.
+- Servicio: `srv-db5emoqd0e5s73f6on6g`.
+- Base: `dpg-db5em1d9fdbs73cjrssg-a`, Postgres 16, plan free.
+- Commit de backend: `8b9a7603516ad9692e84b436558d6e3fefaa85fc`.
+- CI: https://github.com/peter7z/nutrition-tracker/actions/runs/38103222249
+- 87 pruebas locales y backend CI, más validación de iOS/Release en CI.
+
+El backend remoto se probó con datos sintéticos, sin conectar Salud real.
+La prueba inicial rechazó correctamente un registro de peso sin ID (422);
+quedó una cuenta sintética vacía de esa comprobación. La prueba completa
+usa un peso válido, verifica persistencia tras redeploy y elimina su cuenta.
