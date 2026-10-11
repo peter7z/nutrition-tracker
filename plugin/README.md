@@ -45,3 +45,14 @@ Referencias oficiales: [paquete](https://developers.openai.com/plugins/build/plu
 [conexión en ChatGPT](https://developers.openai.com/plugins/deploy/connect-chatgpt).
 
 La identidad del paquete y el núcleo portable del MCP se validaron contra los schemas de Agent Plugins. El schema portable MCP publicado todavía no reconoce `extensions`; la declaración OAuth de OpenAI se conserva según su documentación y requiere verificación de importación en el host. No se declara una validación completa del paquete instalado.
+
+
+### Verificación pública — 10 de octubre de 2026
+
+Render desplegó `a06d63fe9a9580392c8103f77020396b653cc9fc` mediante
+`dep-db5f9kjbc2fs738ndggg`. [CI](https://github.com/peter7z/nutrition-tracker/actions/runs/38105072707)
+aprobó backend (99 pruebas, SQLite/Postgres) e iOS. La prueba HTTP pública
+verificó discovery, OAuth/PKCE, registro/corrección/borrado, totales, reintentos
+idempotentes, aislamiento de cuentas/scopes y renovación/revocación. Las dos
+cuentas sintéticas se eliminaron al terminar. Instalación y conversación real
+en ChatGPT siguen pendientes; no se usaron datos reales de Salud.
