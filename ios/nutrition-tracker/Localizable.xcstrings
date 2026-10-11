@@ -2189,6 +2189,156 @@
           }
         }
       }
+    },
+    "Nutrition Tracker account": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuenta de Nutrition Tracker"
+          }
+        }
+      }
+    },
+    "Account": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuenta"
+          }
+        }
+      }
+    },
+    "Signed in": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sesión iniciada"
+          }
+        }
+      }
+    },
+    "Use this same account when connecting the ChatGPT plugin.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usá esta misma cuenta al conectar el plugin de ChatGPT."
+          }
+        }
+      }
+    },
+    "Sign out": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerrar sesión"
+          }
+        }
+      }
+    },
+    "Sign in with Apple to use the same account in iOS and ChatGPT. Existing accounts with the same verified email are linked automatically.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciá sesión con Apple para usar la misma cuenta en iOS y ChatGPT. Las cuentas existentes con el mismo email verificado se vinculan automáticamente."
+          }
+        }
+      }
+    },
+    "Retry connection": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reintentar conexión"
+          }
+        }
+      }
+    },
+    "Sign out of Nutrition Tracker?": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Cerrar sesión en Nutrition Tracker?"
+          }
+        }
+      }
+    },
+    "Your account and server history are kept. Apple Health stays on this device.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu cuenta y el historial del servidor se conservan. Apple Health permanece en este dispositivo."
+          }
+        }
+      }
+    },
+    "Could not securely restore your session.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo recuperar tu sesión de forma segura."
+          }
+        }
+      }
+    },
+    "Could not connect. Try again.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo conectar. Intentá de nuevo."
+          }
+        }
+      }
+    },
+    "Could not sign in with Apple. Try again.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo iniciar sesión con Apple. Intentá de nuevo."
+          }
+        }
+      }
+    },
+    "Your session expired. Sign in again.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu sesión venció. Iniciá sesión de nuevo."
+          }
+        }
+      }
+    },
+    "Could not securely remove your session.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo eliminar tu sesión de forma segura."
+          }
+        }
+      }
+    },
+    "Could not sign out. Check your connection and try again.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo cerrar sesión. Revisá tu conexión e intentá de nuevo."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

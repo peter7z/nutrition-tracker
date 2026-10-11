@@ -20,6 +20,12 @@ class Settings:
     public_url: str = os.getenv('NUTRITION_PUBLIC_URL', 'http://localhost:8000')
     oauth_redirects: str = os.getenv('OAUTH_REDIRECT_URIS', 'https://chatgpt.com/connector_platform_oauth_redirect')
 
+    apple_app_id: str = os.getenv('APPLE_APP_ID', 'com.peter7z.NutritionTracker')
+    apple_service_id: str = os.getenv('APPLE_SERVICE_ID', '')
+    apple_team_id: str = os.getenv('APPLE_TEAM_ID', '')
+    apple_key_id: str = os.getenv('APPLE_KEY_ID', '')
+    apple_private_key: str = os.getenv('APPLE_PRIVATE_KEY', '')
+
     def __post_init__(self):
         numeric=(self.input_price,self.output_price,self.daily_budget,self.global_budget,self.timeout)
         if not all(math.isfinite(v) and v>=0 for v in numeric) or not 1<=self.timeout<=120:

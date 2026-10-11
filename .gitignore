@@ -15,3 +15,6 @@ build/
 !.env.example
 *.p12
 *.mobileprovision
+
+# Sign in with Apple private keys
+*.p8

@@ -427,3 +427,15 @@ verificó discovery, OAuth/PKCE, registro/corrección/borrado, totales, reintent
 idempotentes, aislamiento de cuentas/scopes y renovación/revocación. Las dos
 cuentas sintéticas se eliminaron al terminar. Instalación y conversación real
 en ChatGPT siguen pendientes; no se usaron datos reales de Salud.
+
+
+## Sign in with Apple — 11 de octubre de 2026
+
+NUT-17 incorpora login Apple nativo, sesión segura en Keychain, perfil/logout
+y autorización web del plugin preparada para Services ID y key. Por decisión
+del producto, la primera conexión une automáticamente la cuenta del mismo
+email verificado por Apple; las posteriores usan su identidad estable.
+121 pruebas backend SQLite/Postgres, 35 unitarias iOS y 4 UI aprobadas.
+Configuración y aceptación pendientes: [Apple](apple-sign-in.md). No se cierra
+NUT-17: faltan Apple real, revocación Apple y aceptación del sistema; NUT-19
+sigue pendiente para lectura/caché remota y NUT-18 para envío de Salud.

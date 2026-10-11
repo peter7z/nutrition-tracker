@@ -34,7 +34,7 @@ class Store:
         if self.postgres:
             with self.connect() as db:
                 db.execute('CREATE TABLE IF NOT EXISTS migrations(version INTEGER PRIMARY KEY)')
-                for version, name in ((1, '001_initial.sql'), (2, '002_global_spend.sql'), (3, '003_plugin_oauth.sql')):
+                for version, name in ((1, '001_initial.sql'), (2, '002_global_spend.sql'), (3, '003_plugin_oauth.sql'), (4, '004_apple_identity.sql')):
                     if not db.execute('SELECT 1 FROM migrations WHERE version=?', (version,)).fetchone():
                         script = (pathlib.Path(__file__).parent.parent / 'migrations/postgres' / name).read_text()
                         db.connection.execute(script)
@@ -52,6 +52,9 @@ class Store:
             if not db.execute('SELECT 1 FROM migrations WHERE version=3').fetchone():
                 db.executescript((pathlib.Path(__file__).parent.parent / 'migrations/003_plugin_oauth.sql').read_text())
                 db.execute('INSERT INTO migrations VALUES(3)')
+            if not db.execute('SELECT 1 FROM migrations WHERE version=4').fetchone():
+                db.executescript((pathlib.Path(__file__).parent.parent / 'migrations/004_apple_identity.sql').read_text())
+                db.execute('INSERT INTO migrations VALUES(4)')
         os.chmod(path,0o600)
 
     @contextmanager

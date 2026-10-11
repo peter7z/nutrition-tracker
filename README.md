@@ -62,3 +62,5 @@ Para que el plugin consulte Salud, el nuevo alcance agrega consentimiento de sin
 [Backlog vigente](docs/backlog.md). Se conservan NUT-01 a NUT-15 reformulados y se agregan tickets de servidor MCP, OAuth, sincronización de Salud, caché de consulta iOS, entrega del plugin y widgets. NUT-09 se retira como no planificado. Las tareas de integración permanecen abiertas hasta aceptar el nuevo alcance.
 
 El enfoque anterior se conserva en [backlog iOS con chat](docs/archive/backlog-ios-chat-2026-10-09.md) y [snapshot de issues](docs/archive/issues-ios-chat-2026-10-10.json), además del [backlog PWA original](docs/archive/backlog-pwa-2026-10-05.md). La migración preserva historial y datos existentes.
+
+Sign in with Apple en iOS y cuenta compartida con el plugin: [configuración y estado](docs/apple-sign-in.md). La vinculación automática usa el email verificado de Apple. El acceso web requiere configurar Services ID y key en Render.

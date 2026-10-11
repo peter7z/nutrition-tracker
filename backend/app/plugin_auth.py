@@ -117,6 +117,28 @@ class PluginOAuth:
             row = db.execute('SELECT family FROM oauth_tokens WHERE hash=?', (hashed(token.token),)).fetchone()
             if row: db.execute('UPDATE oauth_tokens SET revoked=1 WHERE family=?', (row['family'],))
 
+    def approve_owner(self, owner, flow_hash):
+        """Finish an already-consented Apple browser flow, keeping the same account owner."""
+        with self.store.connect() as db:
+            db.execute('BEGIN IMMEDIATE')
+            row=db.execute('SELECT * FROM oauth_flows WHERE hash=? AND expires_at>?',
+                           (flow_hash,int(time.time()))).fetchone()
+            if not row: raise ValueError('expired OAuth flow')
+            params=AuthorizationParams.model_validate_json(row['params'])
+            code=secrets.token_urlsafe(32)
+            authorization=AuthorizationCode(code=code,scopes=params.scopes,expires_at=time.time()+300,
+                client_id=row['client_id'],code_challenge=params.code_challenge,redirect_uri=params.redirect_uri,
+                redirect_uri_provided_explicitly=params.redirect_uri_provided_explicitly,resource=params.resource,subject=owner)
+            db.execute('INSERT INTO oauth_codes VALUES(?,?,?,?)',
+                (hashed(code),owner,row['client_id'],authorization.model_dump_json(exclude={'code'})))
+            db.execute('DELETE FROM oauth_flows WHERE hash=?',(flow_hash,))
+        values={'code':code,'iss':self.base}
+        if params.state is not None: values['state']=params.state
+        separator='&' if urlsplit(str(params.redirect_uri)).query else '?'
+        response=RedirectResponse(str(params.redirect_uri)+separator+urlencode(values),status_code=303)
+        response.delete_cookie('nutrition_oauth_csrf',path='/oauth')
+        return response
+
     def connect_routes(self, app, password_hash, auth_limit):
         def flow_row(db, flow):
             return db.execute('SELECT * FROM oauth_flows WHERE hash=? AND expires_at>?',
@@ -134,17 +156,21 @@ class PluginOAuth:
                 db.execute('UPDATE oauth_flows SET csrf_hash=? WHERE hash=?', (hashed(csrf), hashed(flow)))
             permissions = '<li>Consultar comidas, peso y progreso.</li>'
             if 'tracking:write' in params.scopes: permissions += '<li>Registrar y corregir tracking cuando lo pidas.</li>'
-            page = f'''<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+            apple_button = ''
+            if app.state.apple_identity.web_enabled:
+                apple_button = f'<form method="post" action="/oauth/apple/start"><input type="hidden" name="flow" value="{html.escape(flow)}"><input type="hidden" name="csrf" value="{csrf}"><button>Continuar con Apple y autorizar</button></form>'
+            page = f''' <!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>Conectar Nutrition Tracker</title><body><main><h1>Conectar Nutrition Tracker</h1>
 <p>Autorizar a {html.escape(name)} con tu cuenta de Nutrition Tracker.</p><ul>{permissions}</ul>
 <p>Tu contraseña se envía únicamente a Nutrition Tracker. No se comparte con ChatGPT. No se conecta Apple Health desde esta pantalla.</p>
+{apple_button}
 <form method="post" action="/oauth/connect"><input type="hidden" name="flow" value="{html.escape(flow)}">
 <input type="hidden" name="csrf" value="{csrf}"><p><label>Email <input type="email" name="email" required autocomplete="username"></label></p>
 <p><label>Contraseña <input type="password" name="password" required minlength="12" maxlength="256" autocomplete="current-password"></label></p>
 <button name="action" value="login">Ingresar y autorizar</button>
 <button name="action" value="signup">Crear cuenta y autorizar</button></form></main></body></html>'''
             response = HTMLResponse(page, headers={'Content-Security-Policy':"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'", 'Referrer-Policy':'no-referrer'})
-            response.set_cookie('nutrition_oauth_csrf', csrf, httponly=True, secure=self.settings.environment=='production', samesite='lax', max_age=600, path='/oauth/connect')
+            response.set_cookie('nutrition_oauth_csrf', csrf, httponly=True, secure=self.settings.environment=='production', samesite='lax', max_age=600, path='/oauth')
             return response
 
         @app.post('/oauth/connect')
@@ -191,5 +217,5 @@ class PluginOAuth:
             if params.state is not None: values['state']=params.state
             separator = '&' if urlsplit(str(params.redirect_uri)).query else '?'
             response = RedirectResponse(str(params.redirect_uri)+separator+urlencode(values), status_code=303)
-            response.delete_cookie('nutrition_oauth_csrf', path='/oauth/connect')
+            response.delete_cookie('nutrition_oauth_csrf', path='/oauth')
             return response

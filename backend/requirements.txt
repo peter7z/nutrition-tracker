@@ -5,3 +5,4 @@ python-multipart==0.0.20
 certifi==2026.7.22
 psycopg[binary]==3.2.9
 mcp==1.30.0
+PyJWT[crypto]==2.15.1

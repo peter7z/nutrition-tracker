@@ -2,6 +2,7 @@ import SwiftUI
 import Foundation
 
 @main struct NutritionTrackerApp: App {
+    @State private var account: AccountSession
     @State private var health: HealthSyncModel
     private let history: LegacyHistory
     private let uiTesting: Bool
@@ -24,11 +25,12 @@ import Foundation
         history = .stored()
         _health = State(initialValue: HealthSyncModel())
         #endif
+        _account = State(initialValue: AccountSession(enabled: !uiTesting))
     }
     var body: some Scene {
         WindowGroup {
             AccountTrackingRoot(history: history, uiTesting: uiTesting)
-                .environment(health).environment(\.legacyHistory, history)
+                .environment(account).environment(health).environment(\.legacyHistory, history)
                 .preferredColorScheme(testAppearance)
         }
     }

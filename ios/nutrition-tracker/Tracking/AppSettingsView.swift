@@ -9,6 +9,7 @@ struct AppSettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                AccountSection()
                 Section("Apple Health") {
                     Button("Connect or change selection") { showHealth = true }
                         .disabled(health.isWorking || health.storageNeedsRecovery)
