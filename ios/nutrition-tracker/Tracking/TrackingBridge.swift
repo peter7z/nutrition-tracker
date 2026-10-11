@@ -21,7 +21,7 @@ enum TrackingBridge {
                 func value(_ metric: HealthMetric) -> Double? { archive?.values.first { $0.metric == metric }?.value }
                 values = NutrientValues(energy: value(.dietaryEnergy), protein: value(.protein), carbohydrates: value(.carbohydrates), fat: value(.fat), saturatedFat: value(.saturatedFat))
             } else {
-                values = NutrientValues(energy: closed.totals.energy.value, protein: closed.totals.protein.value, carbohydrates: closed.totals.carbohydrates.value, fat: closed.totals.fat.value, saturatedFat: closed.totals.saturatedFat.value)
+                values = closed.totals.completeValues
             }
             return ResolvedDailyNutrition(values: values, candidates: [source], selection: source, hasConflict: false, hasMissingNutrients: [values.energy, values.protein, values.carbohydrates, values.fat].contains { $0 == nil })
         }
@@ -38,7 +38,7 @@ enum TrackingBridge {
         let choice = saved.flatMap { candidates.contains($0) ? $0 : nil } ?? (candidates.count == 1 ? candidates[0] : nil)
         let values: NutrientValues
         switch choice {
-        case .manual: values = NutrientValues(energy: total.energy.value, protein: total.protein.value, carbohydrates: total.carbohydrates.value, fat: total.fat.value, saturatedFat: total.saturatedFat.value)
+        case .manual: values = NutrientValues(energy: total.energy.value, protein: total.protein.value, carbohydrates: total.carbohydrates.value, fat: total.fat.value, saturatedFat: total.saturatedFat.value, fiber: total.fiber.value)
         case .historical: values = historical.count == 1 ? historical[0].nutrients : NutrientValues()
         case .health: values = healthValues
         case nil: values = NutrientValues()

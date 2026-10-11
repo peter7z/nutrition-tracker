@@ -118,6 +118,23 @@ struct AccountProfile: Decodable { let user_id: String; let email: String }
             catch { errorKey = "Could not securely remove your session." }
         } catch { errorKey = "Could not connect. Try again." }
     }
+    func fetchDiary() async throws -> Data {
+        guard enabled, let captured = session else { throw AccountError.expired }
+        var request = URLRequest(url: base.appendingPathComponent("v1/state"))
+        request.timeoutInterval = 45
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        request.setValue("Bearer " + captured.token, forHTTPHeaderField: "Authorization")
+        let (data, response) = try await network.data(for: request)
+        guard session == captured else { throw CancellationError() }
+        guard let response = response as? HTTPURLResponse else { throw AccountError.request }
+        if response.statusCode == 401 {
+            try persistence.clear(); session = nil; email = nil
+            errorKey = "Your session expired. Sign in again."
+            throw AccountError.expired
+        }
+        guard (200..<300).contains(response.statusCode) else { throw AccountError.request }
+        return data
+    }
     func signOut() async {
         guard !isWorking else { return }
         isWorking = true; errorKey = nil

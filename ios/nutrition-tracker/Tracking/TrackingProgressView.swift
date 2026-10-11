@@ -53,6 +53,7 @@ private struct SegmentedWeightAverage: Identifiable {
 }
 
 struct TrackingProgressView: View {
+    @Environment(AccountSession.self) private var account
     @Environment(NutritionStore.self) private var nutrition
     @Environment(HealthSyncModel.self) private var health
     @Environment(\.legacyHistory) private var history
@@ -283,6 +284,10 @@ struct TrackingProgressView: View {
                 weeklyReviewSection
             }
             .listStyle(.insetGrouped)
+            .refreshable {
+                await nutrition.refresh(account: account)
+                await health.refreshIfConnected()
+            }
             .navigationTitle("Progress")
         }
     }

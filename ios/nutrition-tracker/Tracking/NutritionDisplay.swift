@@ -13,7 +13,7 @@ extension FoodSource {
     var titleKey: String { switch self { case .manual: "Manual"; case .label: "Confirmed label"; case .catalog: "Catalog"; case .estimate: "Estimate"; case .recipe: "Recipe" } }
 }
 extension IntakeSelection {
-    var titleKey: String { switch self { case .manual: "Recorded meals"; case .historical: "Spreadsheet summary"; case .health: "Apple Health" } }
+    var titleKey: String { switch self { case .manual: "Recorded meals"; case .historical: "Daily summary"; case .health: "Apple Health" } }
 }
 
 struct NutrientValuesRows: View {
@@ -24,6 +24,7 @@ struct NutrientValuesRows: View {
         row("Carbs", values.carbohydrates, "g")
         row("Fat", values.fat, "g")
         row("Saturated fat", values.saturatedFat, "g")
+        row("Fiber", values.fiber, "g")
     }
     private func row(_ title: LocalizedStringKey, _ value: Double?, _ unit: String) -> some View {
         LabeledContent(title) {

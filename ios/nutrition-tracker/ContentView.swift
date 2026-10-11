@@ -9,6 +9,7 @@ private enum HomeStyle {
 }
 
 struct ContentView: View {
+    @Environment(AccountSession.self) private var account
     @Environment(HealthSyncModel.self) private var model
     @Environment(NutritionStore.self) private var nutrition
     @Environment(\.scenePhase) private var scenePhase
@@ -24,12 +25,16 @@ struct ContentView: View {
         .environment(\.timeZone, nutrition.snapshot.profile.calendar.timeZone)
         .task { await model.refreshIfConnected() }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active { Task { await model.refreshIfConnected() } }
+            if phase == .active { Task {
+                await nutrition.refresh(account: account)
+                await model.refreshIfConnected()
+            } }
         }
     }
 }
 
 private struct TodayView: View {
+    @Environment(AccountSession.self) private var account
     @Environment(HealthSyncModel.self) private var model
     @Environment(NutritionStore.self) private var nutrition
     @Environment(\.legacyHistory) private var history
@@ -94,7 +99,10 @@ private struct TodayView: View {
                     .frame(maxWidth: 600).frame(maxWidth: .infinity)
                 }
                 .background(Color(uiColor: .systemGroupedBackground))
-                .refreshable { await model.refreshIfConnected() }
+                .refreshable {
+                    await nutrition.refresh(account: account)
+                    await model.refreshIfConnected()
+                }
             }
             .navigationTitle("Today")
             .toolbar { ToolbarItem(placement: .topBarTrailing) {
@@ -109,6 +117,9 @@ private struct TodayView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(selectedDate, format: .dateTime.weekday(.wide).day().month(.wide).locale(locale)).font(.subheadline).foregroundStyle(.secondary)
             if isClosed { Label("Day closed", systemImage: "checkmark.circle").font(.caption) }
+            if nutrition.isRefreshing {
+                HStack { ProgressView(); Text("Syncing diary…").font(.caption) }
+            }
             if model.isWorking {
                 HStack { ProgressView(); Text("Syncing Apple Health…").font(.caption) }
             } else if let selection = resolved.selection {
@@ -145,6 +156,10 @@ private struct TodayView: View {
             }
             if let saturated = resolved.values.saturatedFat {
                 HStack { Text("Saturated fat"); Spacer(); Text("\(saturated.formatted(.number.precision(.fractionLength(0...1)).locale(locale))) g") }
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            if let fiber = resolved.values.fiber {
+                HStack { Text("Fiber"); Spacer(); Text("\(fiber.formatted(.number.precision(.fractionLength(0...1)).locale(locale))) g") }
                     .font(.caption).foregroundStyle(.secondary)
             }
             if consumed == nil { Text("Missing data is not zero intake.").font(.footnote).foregroundStyle(.secondary) }
@@ -272,7 +287,7 @@ private struct TodayView: View {
             Text("Your meals").font(.title3.weight(.bold))
             let entries = nutrition.entries(on: selectedDate)
             if entries.isEmpty {
-                ContentUnavailableView("No meals recorded", systemImage: "fork.knife", description: Text("Apple Health totals are shown without creating meal records."))
+                ContentUnavailableView("No meals recorded", systemImage: "fork.knife", description: Text("Daily summaries and Apple Health totals do not create meal records."))
             }
             ForEach(entries) { entry in
                 VStack(alignment: .leading, spacing: 10) {
@@ -294,6 +309,7 @@ private struct TodayView: View {
 
 #Preview("Today · empty") {
     ContentView().environment(HealthSyncModel(persistence: HealthFileRepository(fileURL: URL.temporaryDirectory.appendingPathComponent(UUID().uuidString))))
+        .environment(AccountSession(enabled: false))
         .environment(NutritionStore()).environment(\.legacyHistory, LegacyHistory(ownerID: nil))
         .environment(\.locale, Locale(identifier: "es_UY"))
 }

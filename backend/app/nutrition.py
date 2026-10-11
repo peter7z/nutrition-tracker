@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 from pydantic import ValidationError
 from .models import EntryDraft,Product,Recipe,Profile,Weight,Activity,Historical,Resolution
 
-NUTRIENTS=('energy','protein','carbohydrates','fat','saturatedFat')
+NUTRIENTS=('energy','protein','carbohydrates','fat','saturatedFat','fiber')
 
 def safe_payload(payload):
     def walk(v):

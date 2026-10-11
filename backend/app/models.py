@@ -23,6 +23,7 @@ class Nutrition(StrictModel):
     carbohydrates: float | None = Field(default=None,ge=0,le=1000000)
     fat: float | None = Field(default=None,ge=0,le=1000000)
     saturatedFat: float | None = Field(default=None,ge=0,le=1000000)
+    fiber: float | None = Field(default=None,ge=0,le=1000000)
     @field_validator('*', mode='before')
     @classmethod
     def numeric(cls,v):

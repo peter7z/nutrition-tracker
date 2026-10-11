@@ -2339,6 +2339,56 @@
           }
         }
       }
+    },
+    "Fiber": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fibra"
+          }
+        }
+      }
+    },
+    "Daily summary": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resumen diario"
+          }
+        }
+      }
+    },
+    "Syncing diary…": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizando diario…"
+          }
+        }
+      }
+    },
+    "Could not refresh your diary. Showing the last downloaded history.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo actualizar tu diario. Se muestra la última copia descargada."
+          }
+        }
+      }
+    },
+    "Daily summaries and Apple Health totals do not create meal records.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los resúmenes diarios y los totales de Salud no crean registros de comidas."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

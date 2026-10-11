@@ -44,12 +44,31 @@ import Foundation
     }
 }
 
-/// The existing account file remains selected without enabling tracking writes.
+/// Read-only server diary with account-scoped caching; legacy files stay intact.
 private struct AccountTrackingRoot: View {
+    @Environment(AccountSession.self) private var account
     @State private var nutrition: NutritionStore
+    private let history: LegacyHistory
+    private let uiTesting: Bool
     init(history: LegacyHistory, uiTesting: Bool) {
+        self.history = history; self.uiTesting = uiTesting
         let url = uiTesting ? URL.temporaryDirectory.appendingPathComponent("nutrition-ui-testing.json") : history.fileURL
         _nutrition = State(initialValue: NutritionStore(persistence: NutritionFileRepository(fileURL: url)))
     }
-    var body: some View { ContentView().environment(nutrition) }
+    var body: some View {
+        Group {
+            if !uiTesting && nutrition.ownerID != account.session?.user_id {
+                ProgressView("Syncing diary…")
+            } else {
+                ContentView()
+            }
+        }
+            .environment(nutrition)
+            .environment(\.legacyHistory, account.session.map { LegacyHistory(ownerID: UUID(uuidString: $0.user_id)) } ?? history)
+            .task(id: account.session?.user_id) {
+                guard !uiTesting else { return }
+                nutrition.selectAccount(account.session?.user_id)
+                await nutrition.refresh(account: account)
+            }
+    }
 }

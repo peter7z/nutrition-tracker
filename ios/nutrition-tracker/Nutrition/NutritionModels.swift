@@ -11,8 +11,9 @@ struct NutrientValues: Codable, Equatable {
     var carbohydrates: Double? = nil
     var fat: Double? = nil
     var saturatedFat: Double? = nil
-    var isValid: Bool { [energy, protein, carbohydrates, fat, saturatedFat].compactMap { $0 }.allSatisfy { $0.isFinite && $0 >= 0 && $0 <= 1_000_000 } }
-    func scaled(by factor: Double) -> Self { Self(energy: energy.map { $0 * factor }, protein: protein.map { $0 * factor }, carbohydrates: carbohydrates.map { $0 * factor }, fat: fat.map { $0 * factor }, saturatedFat: saturatedFat.map { $0 * factor }) }
+    var fiber: Double? = nil
+    var isValid: Bool { [energy, protein, carbohydrates, fat, saturatedFat, fiber].compactMap { $0 }.allSatisfy { $0.isFinite && $0 >= 0 && $0 <= 1_000_000 } }
+    func scaled(by factor: Double) -> Self { Self(energy: energy.map { $0 * factor }, protein: protein.map { $0 * factor }, carbohydrates: carbohydrates.map { $0 * factor }, fat: fat.map { $0 * factor }, saturatedFat: saturatedFat.map { $0 * factor }, fiber: fiber.map { $0 * factor }) }
 }
 
 struct PortionConversion: Codable, Equatable {
@@ -81,14 +82,27 @@ struct NutritionTotals: Codable, Equatable {
     var carbohydrates = NutrientTotal()
     var fat = NutrientTotal()
     var saturatedFat = NutrientTotal()
+    var fiber = NutrientTotal()
     var entryCount = 0
+    init() {}
+    private enum CodingKeys: String, CodingKey { case energy, protein, carbohydrates, fat, saturatedFat, fiber, entryCount }
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        energy = try values.decode(NutrientTotal.self, forKey: .energy)
+        protein = try values.decode(NutrientTotal.self, forKey: .protein)
+        carbohydrates = try values.decode(NutrientTotal.self, forKey: .carbohydrates)
+        fat = try values.decode(NutrientTotal.self, forKey: .fat)
+        saturatedFat = try values.decode(NutrientTotal.self, forKey: .saturatedFat)
+        fiber = try values.decodeIfPresent(NutrientTotal.self, forKey: .fiber) ?? NutrientTotal()
+        entryCount = try values.decode(Int.self, forKey: .entryCount)
+    }
     var isComplete: Bool { energy.isComplete && protein.isComplete && carbohydrates.isComplete && fat.isComplete }
     mutating func include(_ values: NutrientValues) {
         energy.include(values.energy); protein.include(values.protein); carbohydrates.include(values.carbohydrates)
-        fat.include(values.fat); saturatedFat.include(values.saturatedFat); entryCount += 1
+        fat.include(values.fat); saturatedFat.include(values.saturatedFat); fiber.include(values.fiber); entryCount += 1
     }
     // Missing recipe ingredients must keep that nutrient unknown in the recipe snapshot.
-    var completeValues: NutrientValues { NutrientValues(energy: energy.isComplete ? energy.value : nil, protein: protein.isComplete ? protein.value : nil, carbohydrates: carbohydrates.isComplete ? carbohydrates.value : nil, fat: fat.isComplete ? fat.value : nil, saturatedFat: saturatedFat.isComplete ? saturatedFat.value : nil) }
+    var completeValues: NutrientValues { NutrientValues(energy: energy.isComplete ? energy.value : nil, protein: protein.isComplete ? protein.value : nil, carbohydrates: carbohydrates.isComplete ? carbohydrates.value : nil, fat: fat.isComplete ? fat.value : nil, saturatedFat: saturatedFat.isComplete ? saturatedFat.value : nil, fiber: fiber.isComplete ? fiber.value : nil) }
 }
 
 struct FoodEntry: Codable, Equatable, Identifiable {

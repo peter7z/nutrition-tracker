@@ -194,6 +194,7 @@ def create_app(settings=None,ai=None):
                         recompute_closure=True
                 if recompute_closure:
                     day=outgoing.get('id',outgoing.get('day',outgoing.get('date')))
+                    if closed_day(db,owner,day): raise APIError('day_closed_reopen_required',409)
                     day_context,_=context_for(db,owner,day)
                     rows=list(db.execute("SELECT * FROM records WHERE user_id=? AND kind='entry'",(owner,)))
                     aggregate={key:{'known':0,'knownCount':0,'missingCount':0} for key in NUTRIENTS}
@@ -224,6 +225,7 @@ def create_app(settings=None,ai=None):
                     aggregate['entryCount']=count
                     summaries=[dict(v) for v in outgoing['summaries']]
                     summaries[-1]['totals']=aggregate; summaries[-1]['entryVersions']=versions
+                    summaries[-1].setdefault('closedAt',stamp())
                     outgoing['summaries']=summaries
                 payload=canonical(outgoing) if op.action=='upsert' else existing['payload']
                 db.execute('INSERT INTO records VALUES(?,?,?,?,?,?) ON CONFLICT(user_id,id) DO UPDATE SET version=excluded.version,payload=excluded.payload,deleted=excluded.deleted',(owner,eid,op.kind,version+1,payload,int(op.action=='delete')))
@@ -324,7 +326,7 @@ def create_app(settings=None,ai=None):
                 limitations=[]
                 if complete<10: limitations.append('Fewer than ten complete closed nutrition days in this fourteen-day window.')
                 if any(n<3 for n in weights_by_week): limitations.append('At least three observed weight days are required in each seven-day week.')
-                if any(any(v is None for k,v in row['totals'].items() if k!='saturatedFat') for row in daily): limitations.append('Some daily nutrition values are unknown or require source reconciliation.')
+                if any(any(v is None for k,v in row['totals'].items() if k not in ('saturatedFat','fiber')) for row in daily): limitations.append('Some daily nutrition values are unknown or require source reconciliation.')
                 coverage={'window_days':14,'complete_days':complete,'weight_observed_days':observed_days,'complete_days_by_week':complete_by_week,'weight_days_by_week':weights_by_week,'goal_adjustment_allowed':allowed,'limitations':limitations}
                 context['review']={**coverage,'daily_totals':daily,'weights':[{'day':d,'kilograms':v} for d,v in sorted(weight_values.items())],'activities':[{'day':record_day(a),'kind':a['kind'],'duration_minutes':a.get('durationMinutes'),'active_kcal':a.get('activeEnergy')} for a in activities[-100:]],'health_daily_activity':[a.model_dump(mode='json') for a in consented.daily_activity] if consented else [],'minimum_complete_days':10,'minimum_weight_days':6,'minimum_weight_days_per_week':3}
             if not settings.openai_key and isinstance(provider,ResponsesClient): raise APIError('ai_not_configured',503)

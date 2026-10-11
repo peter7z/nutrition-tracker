@@ -60,7 +60,7 @@ enum NutritionBackup {
         for day in snapshot.days {
             guard validDay(day.id), day.version > 0 else { throw NutritionError.invalidData }
             for summary in day.summaries {
-                let totals = [summary.totals.energy, summary.totals.protein, summary.totals.carbohydrates, summary.totals.fat, summary.totals.saturatedFat]
+                let totals = [summary.totals.energy, summary.totals.protein, summary.totals.carbohydrates, summary.totals.fat, summary.totals.saturatedFat, summary.totals.fiber]
                 guard summary.version > 0, summary.closedAt.timeIntervalSince1970.isFinite,
                       summary.totals.entryCount >= 0,
                       totals.allSatisfy({ $0.known.isFinite && $0.known >= 0 && $0.knownCount >= 0 && $0.missingCount >= 0 }),
