@@ -165,7 +165,7 @@ def test_registration_rejects_untrusted_callbacks_and_consent_csrf(client):
 def test_token_expiry_restart_and_foreign_entry_cannot_mutate(client):
     from app.store import Store
     from app.plugin_auth import hashed
-    first,_,_=connect(client)
+    first,client_id,_=connect(client)
     other,_,_=connect(client,email='second@example.com')
     args={'operation_id':str(uuid.uuid4()),'base_revision':0,'consumption_text':'Comí una banana','food':food()}
     saved=tool(client,first['access_token'],'record_food',args)['structuredContent']
@@ -177,6 +177,8 @@ def test_token_expiry_restart_and_foreign_entry_cannot_mutate(client):
         assert db.execute('SELECT COUNT(*) FROM oauth_tokens WHERE revoked=0').fetchone()[0]==4
         db.execute('UPDATE oauth_tokens SET expires_at=0 WHERE hash=?',(hashed(first['access_token']),))
     assert client.post('/mcp',headers={'Authorization':'Bearer '+first['access_token']},json={}).status_code==401
+    assert client.post('/revoke',data={'client_id':client_id,'token':first['access_token']}).status_code==200
+    assert client.post('/token',data={'grant_type':'refresh_token','client_id':client_id,'refresh_token':first['refresh_token'],'resource':RESOURCE}).status_code==400
     assert len(tool(client,other['access_token'],'get_day',{'day':'2026-10-10'})['structuredContent']['entries'])==0
 
 
