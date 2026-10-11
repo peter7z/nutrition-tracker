@@ -13,7 +13,7 @@ La decisión completa, los flujos y límites están en [especificación de produ
 ## Estructura del monorepo
 
 - `ios/`: proyecto Xcode y fuentes de la app nativa.
-- `backend/`: API FastAPI/SQLite de desarrollo para autenticación, sincronización y funciones remotas.
+- `backend/`: API FastAPI/Postgres (SQLite para desarrollo local) para autenticación, sincronización y funciones remotas.
 - `plugin/` (previsto): paquete del plugin, instrucciones/skills, configuración MCP y futuras extensiones.
 - `docs/`: especificación de producto, tickets vigentes y planificación histórica.
 

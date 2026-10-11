@@ -1,6 +1,6 @@
 # Nutrition Tracker backend
 
-FastAPI, SQLite, migraciones versionadas, login por contraseña y sesiones revocables. Las comidas guardadas y los datos de HealthKit permanecen disponibles en el dispositivo; registrar o consultar comidas mediante Chat requiere este servicio remoto configurado y conexión. El backend añade sincronización privada, conversación persistente y OpenAI Responses. No hay respuesta de IA simulada offline, una clave incluida en la app ni proveedor de hosting contratado.
+FastAPI, Postgres en Render y SQLite local, migraciones versionadas, login por contraseña y sesiones revocables. Las comidas guardadas y los datos de HealthKit permanecen disponibles en el dispositivo; registrar o consultar comidas mediante Chat requiere este servicio remoto configurado y conexión. El backend añade sincronización privada, conversación persistente y OpenAI Responses. No hay respuesta de IA simulada offline, una clave incluida en la app y el deploy de pruebas se documenta en [Render](../docs/render.md).
 
 ## Desarrollo reproducible
 
@@ -72,3 +72,7 @@ Prueba API del 2026-10-08 usó [GPT-4o Mini](https://developers.openai.com/api/d
 ## Servicio exclusivo de tests de aceptación nativa
 
 Desde `backend/`, `python -m tests.ui_server --port 8766` inicia un servidor sólo loopback con SQLite privado temporal y proveedor determinístico. Default 8766, puerto configurable. Usa auth/sync/propiedad/versions/guards reales; no requiere ni usa clave/modelo OpenAI, ni llama a red del proveedor. No es `app.asgi:app`, no debe desplegarse como producción y todas sus respuestas dicen Fixture. Consumo banana (150 g), corrección (eran 100 g), hipótesis y cierre permiten tests nativos reproducibles sin costos. La base temporal se elimina al cerrar el servicio. Una prueba HTTP verifica signup, sync, propuestas y ausencia de llamadas reales al proveedor. Este fixture verifica integración del cliente, no calidad de estimación del modelo.
+
+## Postgres
+
+`DATABASE_URL` tiene prioridad sobre el archivo `NUTRITION_DATABASE`. Las migraciones de Postgres están en `migrations/postgres/`; SQLite conserva sus migraciones existentes. No hay importación automática de archivos locales. La suite actual cubre ambos motores con `TEST_POSTGRES_URL` contra una base desechable (borra el schema por caso). Ver [operación en Render](../docs/render.md).
