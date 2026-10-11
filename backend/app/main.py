@@ -97,7 +97,7 @@ def create_app(settings=None,ai=None):
     @app.get('/healthz')
     def healthz():
         with store.connect() as db: db.execute('SELECT 1').fetchone()
-        return {'status':'ok','schema_version':2}
+        return {'status':'ok','schema_version':3}
 
     @app.post('/v1/auth/signup',status_code=201)
     def signup(body:AuthInput,request:Request):
@@ -395,4 +395,6 @@ def create_app(settings=None,ai=None):
         with store.connect() as db:
             r=db.execute('SELECT COUNT(*) requests,COALESCE(SUM(input_tokens),0) input_tokens,COALESCE(SUM(output_tokens),0) output_tokens,COALESCE(SUM(cost),0) estimated_cost_usd FROM ai_usage WHERE user_id=?',(owner,)).fetchone()
         return dict(r)
+    from .plugin_mcp import install_plugin
+    install_plugin(app, store, settings, sync, password_hash, auth_limit)
     return app

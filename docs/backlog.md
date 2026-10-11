@@ -399,3 +399,20 @@ Criterios de aceptación:
 - [UI y extensiones dentro de ChatGPT](https://developers.openai.com/plugins/build/chatgpt-ui).
 
 Estas referencias guían los tickets; no prueban que la cuenta, el host móvil/voz, el deployment o los widgets estén disponibles/configurados. Verificar en la implementación real.
+
+## Implementación inicial del plugin — 10 de octubre de 2026
+
+NUT-16/NUT-17/NUT-20 avanzan con el paquete `plugin/`, skill de tracking,
+MCP Streamable HTTP en `/mcp` y OAuth persistido (DCR, S256 PKCE, resource,
+permisos lectura/escritura, vencimiento/rotación/revocación). NUT-08 entrega
+`record_food`, `update_food`, `delete_food` con las validaciones existentes,
+UUIDs de operación, revisiones/versiones y recibos. `get_profile`, `get_day`
+y `get_progress` entregan consulta estructurada y totales del servidor.
+ChatGPT estima la porción; las tools no invocan otro modelo ni un catálogo.
+
+99 pruebas locales contra SQLite y Postgres verifican protocolo, OAuth,
+aislamiento, permisos, idempotencia, correcciones/borrados y totales. No se
+cierran los tickets por estas pruebas: falta aceptación desde una conversación
+real en ChatGPT, importación del paquete y compatibilidad de superficies.
+Además siguen pendientes peso/actividad por tools específicas, deshacer,
+metas/cierres, scope y transporte de Salud, lectura iOS y widgets.

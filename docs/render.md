@@ -58,3 +58,19 @@ El backend remoto se probó con datos sintéticos, sin conectar Salud real.
 La prueba inicial rechazó correctamente un registro de peso sin ID (422);
 quedó una cuenta sintética vacía de esa comprobación. La prueba completa
 usa un peso válido, verifica persistencia tras redeploy y elimina su cuenta.
+
+## Endpoint del plugin
+
+La primera implementación incorpora `/mcp` en el mismo servicio, SDK Python
+`mcp==1.30.0` (protocolos hasta `2025-11-25` con negociación). La migración 3
+agrega clientes, autorizaciones y tokens OAuth sin reemplazar registros.
+`NUTRITION_PUBLIC_URL` fija el issuer y audience del recurso, sin depender del
+Host que envía un cliente. En producción debe ser HTTPS. El consentimiento
+abre `/oauth/connect`; discovery está en `/.well-known/oauth-authorization-server`
+y `/.well-known/oauth-protected-resource/mcp`. La autorización usa DCR y PKCE,
+no requiere un client secret ni una API key OpenAI. Tokens y códigos se guardan
+por hash; los refresh rotan, y account delete elimina tokens por cascada.
+
+Las herramientas tienen scopes y annotations explícitas. La API previa y
+MCP usan cuentas compartidas, pero sus tokens no son intercambiables.
+Paquete, instalación y límites: [plugin/README.md](../plugin/README.md).

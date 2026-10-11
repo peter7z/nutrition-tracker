@@ -8,13 +8,13 @@ Monorepo de un companion iOS para Apple Health y visualización de progreso, un 
 
 La decisión completa, los flujos y límites están en [especificación de producto](docs/product.md); los tickets vigentes están en [backlog](docs/backlog.md).
 
-**Estado del código:** iOS se reduce a consulta de datos existentes, gráficas y conexión/sincronización local con Salud. Se retiran chat, registro/edición, cámara, catálogo, importación/restauración y el cliente antiguo de mutaciones. Los esquemas y archivos previos se conservan para consulta. Backend FastAPI conserva la implementación de desarrollo anterior; plugin, lectura remota iOS y sincronización de Salud al servidor siguen pendientes. **El peso importado de Apple Health sí debe enviarse al servidor (NUT-18)**. El backend de pruebas está desplegado en Render con Postgres; ver [deploy y límites](docs/render.md). Plugin, widgets y TestFlight siguen pendientes.
+**Estado del código:** iOS se reduce a consulta de datos existentes, gráficas y conexión/sincronización local con Salud. Se retiran chat, registro/edición, cámara, catálogo, importación/restauración y el cliente antiguo de mutaciones. Los esquemas y archivos previos se conservan para consulta. Backend FastAPI conserva la implementación de desarrollo anterior; la primera implementación del plugin incorpora paquete, herramientas MCP y OAuth; la instalación/conversación en ChatGPT, lectura remota iOS y sincronización de Salud al servidor siguen pendientes. **El peso importado de Apple Health sí debe enviarse al servidor (NUT-18)**. El backend de pruebas está desplegado en Render con Postgres; ver [deploy y límites](docs/render.md). Plugin, widgets y TestFlight siguen pendientes.
 
 ## Estructura del monorepo
 
 - `ios/`: proyecto Xcode y fuentes de la app nativa.
 - `backend/`: API FastAPI/Postgres (SQLite para desarrollo local) para autenticación, sincronización y funciones remotas.
-- `plugin/` (previsto): paquete del plugin, instrucciones/skills, configuración MCP y futuras extensiones.
+- `plugin/`: paquete privado 0.1.0, instrucciones/skill, configuración OAuth/MCP y guía de conexión; widgets futuros.
 - `docs/`: especificación de producto, tickets vigentes y planificación histórica.
 
 ## Abrir y ejecutar

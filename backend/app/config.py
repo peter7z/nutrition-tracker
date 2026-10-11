@@ -17,6 +17,8 @@ class Settings:
     max_output_tokens: int = int(os.getenv('AI_MAX_OUTPUT_TOKENS', '1800'))
     auth_per_minute: int = int(os.getenv('AUTH_REQUESTS_PER_MINUTE', '10'))
     session_days: int = 30
+    public_url: str = os.getenv('NUTRITION_PUBLIC_URL', 'http://localhost:8000')
+    oauth_redirects: str = os.getenv('OAUTH_REDIRECT_URIS', 'https://chatgpt.com/connector_platform_oauth_redirect')
 
     def __post_init__(self):
         numeric=(self.input_price,self.output_price,self.daily_budget,self.global_budget,self.timeout)

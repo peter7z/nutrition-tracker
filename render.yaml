@@ -14,6 +14,8 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.13
+      - key: NUTRITION_PUBLIC_URL
+        value: https://nutrition-tracker-api-cljy.onrender.com
       - key: NUTRITION_ENV
         value: production
       - key: DATABASE_URL

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "nutrition-tracker": {
+      "type": "streamable-http",
+      "url": "https://nutrition-tracker-api-cljy.onrender.com/mcp",
+      "extensions": {
+        "com.openai": {
+          "auth": {
+            "type": "oauth",
+            "client": {"mode": "dcr"},
+            "baseScopes": ["tracking:read", "tracking:write"]
+          }
+        }
+      }
+    }
+  }
+}
