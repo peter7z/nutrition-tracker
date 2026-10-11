@@ -3,7 +3,7 @@ services:
     name: nutrition-tracker-api
     runtime: python
     region: virginia
-    plan: 0.5c-512mb
+    plan: free
     branch: main
     rootDir: backend
     autoDeployTrigger: checksPass
@@ -11,14 +11,19 @@ services:
     startCommand: uvicorn app.asgi:app --host 0.0.0.0 --port $PORT --no-access-log --proxy-headers --forwarded-allow-ips="*"
     healthCheckPath: /healthz
     numInstances: 1
-    disk:
-      name: nutrition-data
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.13
       - key: NUTRITION_ENV
         value: production
-      - key: NUTRITION_DATABASE
-        value: /var/data/nutrition/nutrition.sqlite3
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nutrition-tracker-db
+          property: connectionString
+
+databases:
+  - name: nutrition-tracker-db
+    plan: free
+    region: virginia
+    postgresMajorVersion: "16"
+    ipAllowList: []

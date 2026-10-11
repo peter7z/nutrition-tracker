@@ -1,4 +1,6 @@
 import io
+import os
+import psycopg
 import json
 import uuid
 from dataclasses import replace
@@ -26,9 +28,15 @@ class FakeAI:
         out=self.output or dict(message='Revisá esta propuesta.',intent='consumed',proposals=[dict(operation_id=uid(),action='add',entry_id=None,expected_version=None,name='Banana',quantity=150,unit='gram',state='raw',day='2026-10-08',nutrients=dict(energy=133.5,protein=1.65,carbohydrates=34.2,fat=0.45,saturatedFat=None),assumptions=['Estimated generic banana.'],requires_clarification=False)])
         return AssistantOutput.model_validate(out),100,200
 
-@pytest.fixture
-def setup(tmp_path):
-    ai=FakeAI(); settings=Settings(database=str(tmp_path/'db.sqlite'),input_price=1,output_price=2,auth_per_minute=100)
+@pytest.fixture(params=['sqlite'] + (['postgres'] if os.getenv('TEST_POSTGRES_URL') else []))
+def setup(tmp_path, request):
+    database = str(tmp_path/'db.sqlite')
+    if request.param == 'postgres':
+        database = os.environ['TEST_POSTGRES_URL']
+        with psycopg.connect(database, autocommit=True) as db:
+            db.execute('DROP SCHEMA public CASCADE')
+            db.execute('CREATE SCHEMA public')
+    ai=FakeAI(); settings=Settings(database=database,input_price=1,output_price=2,auth_per_minute=100)
     app=create_app(settings,ai); client=TestClient(app)
     a=client.post('/v1/auth/signup',json={'email':'a@example.com','password':'a very long password'}).json()
     b=client.post('/v1/auth/signup',json={'email':'b@example.com','password':'another long password'}).json()
@@ -245,6 +253,10 @@ def test_migration_restart_and_database_backup_restore_preserve_owned_records(se
         assert db.execute('SELECT COUNT(*) FROM migrations').fetchone()[0]==2
         owner=db.execute("SELECT id FROM users WHERE email='a@example.com'").fetchone()[0]
         before=state(db,owner)
+    if restarted.postgres:
+        with restarted.connect() as db: assert state(db,owner)==before
+        assert len(before['records'])==1
+        return
     backup=tmp_path/'restored.sqlite'
     source=sqlite3.connect(path);destination=sqlite3.connect(backup)
     source.backup(destination);destination.close();source.close()

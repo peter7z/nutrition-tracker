@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Settings:
-    database: str = os.getenv('NUTRITION_DATABASE', './data/nutrition.sqlite3')
+    database: str = os.getenv('DATABASE_URL') or os.getenv('NUTRITION_DATABASE', './data/nutrition.sqlite3')
     environment: str = os.getenv('NUTRITION_ENV', 'development')
     openai_key: str = os.getenv('OPENAI_API_KEY', '')
     model: str = os.getenv('OPENAI_MODEL', '')

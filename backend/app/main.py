@@ -3,7 +3,6 @@ import io
 import json
 import logging
 import secrets
-import sqlite3
 import time
 import uuid
 from collections import defaultdict,deque
@@ -14,7 +13,7 @@ from fastapi.exceptions import RequestValidationError
 from PIL import Image,ImageOps,UnidentifiedImageError
 from pydantic import ValidationError
 from .config import Settings
-from .store import Store,canonical,digest,state
+from .store import INTEGRITY_ERRORS,Store,canonical,digest,state
 from .models import AuthInput,SyncInput,ChatInput,EntryDraft
 from .nutrition import context_for,validate_payload,closed_day,NUTRIENTS
 from .assistant import ResponsesClient,AIError,guard_output
@@ -109,7 +108,7 @@ def create_app(settings=None,ai=None):
             with store.connect() as db:
                 db.execute('INSERT INTO users(id,email,password,created_at) VALUES(?,?,?,?)',(owner,body.email,hashed,stamp()))
                 return make_session(db,owner)
-        except sqlite3.IntegrityError: raise APIError('signup_unavailable',409) from None
+        except INTEGRITY_ERRORS: raise APIError('signup_unavailable',409) from None
 
     @app.post('/v1/auth/login')
     def login(body:AuthInput,request:Request):
@@ -334,13 +333,13 @@ def create_app(settings=None,ai=None):
             reserve=((len(canonical(context).encode())+len(body.text.encode())+20000+(15000 if image else 0))*settings.input_price+settings.max_output_tokens*settings.output_price)/1_000_000
             recent=(now()-timedelta(hours=1)).isoformat(); startday=now().date().isoformat()
             count=db.execute('SELECT COUNT(*) FROM ai_usage WHERE user_id=? AND created_at>?',(owner,recent)).fetchone()[0]
-            usercost=db.execute('SELECT COALESCE(SUM(CASE WHEN status="completed" THEN cost ELSE reserved END),0) FROM ai_usage WHERE user_id=? AND created_at>=?',(owner,startday)).fetchone()[0]
+            usercost=db.execute("SELECT COALESCE(SUM(CASE WHEN status='completed' THEN cost ELSE reserved END),0) FROM ai_usage WHERE user_id=? AND created_at>=?",(owner,startday)).fetchone()[0]
             globalrow=db.execute('SELECT amount FROM global_spend WHERE day=?',(startday,)).fetchone()
             globalcost=globalrow['amount'] if globalrow else 0
             if count>=settings.requests_per_hour: raise APIError('ai_rate_limit',429)
             if usercost+reserve>settings.daily_budget or globalcost+reserve>settings.global_budget: raise APIError('ai_budget_limit',429)
             db.execute('INSERT INTO ai_usage(id,user_id,created_at,reserved) VALUES(?,?,?,?)',(usageid,owner,stamp(),reserve))
-            db.execute('INSERT INTO global_spend(day,amount) VALUES(?,?) ON CONFLICT(day) DO UPDATE SET amount=amount+excluded.amount',(startday,reserve))
+            db.execute('INSERT INTO global_spend(day,amount) VALUES(?,?) ON CONFLICT(day) DO UPDATE SET amount=global_spend.amount+excluded.amount',(startday,reserve))
             # Hash health context for replay but never store actual values.
             db.execute('INSERT INTO requests VALUES(?,?,?,?,?)',(owner,rid,route,digest(wire),canonical({'_pending':True})))
             db.execute('INSERT INTO messages VALUES(?,?,?,?,?,?,?,?)',(str(uuid.uuid4()),owner,rid,'user',body.text,body.day.isoformat(),stamp(),'[]'))
@@ -361,7 +360,7 @@ def create_app(settings=None,ai=None):
                 # Account deletion during provider call must not resurrect data.
                 if not db.execute('SELECT 1 FROM users WHERE id=?',(owner,)).fetchone(): raise APIError('account_deleted',401)
                 db.execute('UPDATE global_spend SET amount=MAX(0,amount-?+?) WHERE day=?',(reserve,cost,startday))
-                db.execute('UPDATE ai_usage SET input_tokens=?,output_tokens=?,cost=?,latency_ms=?,status="completed" WHERE id=?',(input_tokens,output_tokens,cost,latency,usageid))
+                db.execute("UPDATE ai_usage SET input_tokens=?,output_tokens=?,cost=?,latency_ms=?,status='completed' WHERE id=?",(input_tokens,output_tokens,cost,latency,usageid))
                 db.execute('UPDATE requests SET result=? WHERE user_id=? AND id=? AND route=?',(canonical(result),owner,rid,route))
                 db.execute('INSERT INTO messages VALUES(?,?,?,?,?,?,?,?)',(str(uuid.uuid4()),owner,rid,'assistant',message,body.day.isoformat(),stamp(),canonical(result['proposals'])))
             logger.info('ai_request status=completed latency_ms=%d input_tokens=%d output_tokens=%d estimated_cost_usd=%.6f',latency,input_tokens,output_tokens,cost)
@@ -373,7 +372,7 @@ def create_app(settings=None,ai=None):
             code,status='ai_invalid_response',503
         latency=int((time.monotonic()-started)*1000)
         with store.connect() as db:
-            db.execute('UPDATE ai_usage SET status="failed",latency_ms=? WHERE id=?',(latency,usageid))
+            db.execute("UPDATE ai_usage SET status='failed',latency_ms=? WHERE id=?",(latency,usageid))
             db.execute('UPDATE requests SET result=? WHERE user_id=? AND id=? AND route=?',(canonical({'_error':code,'_status':status}),owner,rid,route))
         logger.info('ai_request status=%s latency_ms=%d',code,latency)
         raise APIError(code,status)
@@ -381,7 +380,7 @@ def create_app(settings=None,ai=None):
     @app.get('/v1/chat/{request_id}')
     def cached_chat(request_id:uuid.UUID,owner=Depends(identity)):
         with store.connect() as db:
-            rows=db.execute("SELECT result FROM requests WHERE user_id=? AND id=? AND route IN ('chat','review') ORDER BY rowid DESC",(owner,str(request_id))).fetchall()
+            rows=db.execute("SELECT result FROM requests WHERE user_id=? AND id=? AND route IN ('chat','review') ORDER BY route DESC",(owner,str(request_id))).fetchall()
             for row in rows:
                 result=json.loads(row['result'])
                 if not result.get('_pending') and not result.get('_error'): return result

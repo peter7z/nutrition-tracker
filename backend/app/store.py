@@ -3,11 +3,43 @@ import json
 import pathlib
 import os
 import sqlite3
+import psycopg
+from psycopg.rows import dict_row
+
+INTEGRITY_ERRORS = (sqlite3.IntegrityError, psycopg.IntegrityError)
+
+class Record(dict):
+    def __getitem__(self, key):
+        return list(self.values())[key] if isinstance(key, int) else super().__getitem__(key)
+
+def record_row(cursor):
+    factory = dict_row(cursor)
+    return lambda values: Record(factory(values))
+
+class PostgresConnection:
+    def __init__(self, connection):
+        self.connection = connection
+
+    def execute(self, query, parameters=()):
+        if query == "BEGIN IMMEDIATE":
+            return self.connection.execute("SELECT 1")
+        return self.connection.execute(query.replace("?", "%s").replace("MAX(0,amount-", "GREATEST(0,amount-"), parameters)
+
 from contextlib import contextmanager
 
 class Store:
     def __init__(self, path):
         self.path = path
+        self.postgres = path.startswith(('postgres://', 'postgresql://'))
+        if self.postgres:
+            with self.connect() as db:
+                db.execute('CREATE TABLE IF NOT EXISTS migrations(version INTEGER PRIMARY KEY)')
+                for version, name in ((1, '001_initial.sql'), (2, '002_global_spend.sql')):
+                    if not db.execute('SELECT 1 FROM migrations WHERE version=?', (version,)).fetchone():
+                        script = (pathlib.Path(__file__).parent.parent / 'migrations/postgres' / name).read_text()
+                        db.connection.execute(script)
+                        db.execute('INSERT INTO migrations VALUES(?)', (version,))
+            return
         pathlib.Path(path).parent.mkdir(mode=0o700,parents=True,exist_ok=True)
         with self.connect() as db:
             db.execute('CREATE TABLE IF NOT EXISTS migrations(version INTEGER PRIMARY KEY)')
@@ -21,6 +53,13 @@ class Store:
 
     @contextmanager
     def connect(self):
+        if self.postgres:
+            with psycopg.connect(self.path, row_factory=record_row, connect_timeout=10) as connection:
+                # Preserve SQLite's serialized write semantics for revisions, idempotency
+                # and global budget reservations. Released on commit or rollback.
+                connection.execute('SELECT pg_advisory_xact_lock(727410001)')
+                yield PostgresConnection(connection)
+            return
         db = sqlite3.connect(self.path, timeout=10)
         db.row_factory = sqlite3.Row
         db.execute('PRAGMA foreign_keys=ON')

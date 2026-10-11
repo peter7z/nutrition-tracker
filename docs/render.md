@@ -1,48 +1,44 @@
 # Backend en Render
 
-La configuración reproducible está en `render.yaml`: servicio Python desde
-`backend/`, rama `main`, una instancia de 512 MB y disco persistente de 1 GB.
-El servicio y el disco requieren un plan pago; consultar el precio vigente
-en Render antes de cambiar el tamaño. No se configura OpenAI ni se carga
-información real de Salud durante el deploy.
+`render.yaml` describe la API Python y Postgres 16, ambos en Virginia con
+planes gratuitos para pruebas. No se usa disco persistente en la API.
+`DATABASE_URL` se configura con la conexión interna de Postgres; nunca
+incluir credenciales en Git. `.render` es una clave local ignorada por Git.
 
-## Estado al 10 de octubre de 2026
+## Persistencia
 
-La API key local fue validada. El workspace disponible es `My Workspace`.
-La creación del servicio fue rechazada porque Render no puede obtener el
-repositorio privado `peter7z/nutrition-tracker`. No se creó un servicio ni
-se confirmó un endpoint público.
+El backend usa Postgres cuando `DATABASE_URL` contiene una URL PostgreSQL.
+SQLite se conserva para desarrollo local y archivos existentes; no se
+importan automáticamente bases locales ni información de Apple Health.
+Las migraciones específicas de Postgres se ejecutan al arrancar dentro
+de una transacción. Un bloqueo transaccional coordina migraciones y
+operaciones para conservar revisiones, idempotencia y reservas de presupuesto.
+Este bloqueo serializa operaciones de base de datos: apropiado para esta
+etapa, deberá revisarse antes de aumentar el tráfico.
 
-La validación del Blueprint devolvió `need_payment_info` para el servicio:
-también falta configurar un medio de pago en ese workspace. La validación
-completa y el deploy quedan pendientes de resolver ambos requisitos.
+## Deploy
 
-Habilitar el repositorio en la instalación de GitHub de Render:
-https://github.com/apps/render/installations/new. Si todavía no está conectado,
-agregar GitHub en Account Settings → Git Deployment Credentials de Render.
-Luego crear el servicio con esta configuración o sincronizar el Blueprint.
+Build desde `backend/` con dependencias fijadas. Uvicorn escucha en `$PORT`;
+Render termina TLS. Se confían encabezados reenviados en este entorno
+administrado; no reutilizar el comando para un servidor público directo.
+`NUTRITION_ENV=production` desactiva documentación y requiere HTTPS.
+`/healthz` comprueba acceso a la base. Auto deploy tras checks de `main`.
+No se configura OpenAI: el análisis legado responde que no está configurado.
+El plugin, OAuth y el envío de peso de Apple Health siguen pendientes.
 
-## Operación
+## Pruebas
 
-- Build: dependencias fijadas mediante `requirements-lock.txt`.
-- Arranque: Uvicorn en `$PORT`; TLS termina en el proxy de Render.
-- Se confían los encabezados reenviados del proxy en este entorno administrado.
-  No reutilizar este comando para un servidor expuesto directamente.
-- SQLite y sus archivos auxiliares quedan bajo `/var/data/nutrition/`.
-  El disco conserva datos entre deploys; usar una sola instancia.
-- Migraciones al arrancar; `/healthz` comprueba conexión y versión del esquema.
-- Auto deploy tras pasar los checks de GitHub en `main`.
-- La clave `.render` es exclusivamente local y está ignorada por Git.
+La suite verifica SQLite y Postgres cuando se configura `TEST_POSTGRES_URL`.
+**Usar exclusivamente una base desechable:** cada caso Postgres borra y
+recrea el schema `public`. CI usa un servicio Postgres 16 aislado.
 
-## Verificación pendiente tras habilitar GitHub
+## Límites de la etapa gratuita
 
-Confirmar deploy `live` y SHA, HTTPS `/healthz`, respuesta 401 de un endpoint
-privado sin sesión, autenticación con una cuenta sintética y conservación de
-esa cuenta después de un nuevo deploy. Borrar la cuenta de prueba al terminar.
-No declarar el servicio listo antes de completar estas comprobaciones.
+Postgres gratuito vence 30 días después de crearse y no tiene backups.
+La base creada el 10 de octubre vence el 9 de noviembre de 2026 a las
+22:48 de Uruguay (10 de noviembre 01:48 UTC). Antes de esa fecha, migrar
+o pasar a un plan pago para conservar datos. La API gratuita puede dormir.
+No usar esta configuración como almacenamiento definitivo de datos reales.
 
-Esto publica el backend existente. El plugin de ChatGPT, OAuth y el envío
-de peso desde Apple Health siguen siendo trabajo pendiente en el backlog.
-
-Referencias: https://render.com/docs/git-provider,
-https://render.com/docs/disks, https://render.com/docs/blueprint-spec.
+Referencias: https://render.com/docs/free,
+https://render.com/docs/postgresql, https://render.com/docs/blueprint-spec.
