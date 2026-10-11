@@ -155,7 +155,9 @@ import HealthKit
         XCTAssertNil(snapshot.value(for: .dietaryEnergy, on: midnightUTC.addingTimeInterval(4 * 3_600)))
     }
 
-    func testFileRoundTripAndCorruptionAreNotSilentlyOverwritten() throws {
+    // Keep the actor-isolated mock lifetime inside a Swift task. The older CI
+    // runtime crashed in its back-deployed isolated deinitializer outside a task.
+    func testFileRoundTripAndCorruptionAreNotSilentlyOverwritten() async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         let url = directory.appendingPathComponent("health.json")
         let repository = HealthFileRepository(fileURL: url)
