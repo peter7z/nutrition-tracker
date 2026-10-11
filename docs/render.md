@@ -85,3 +85,13 @@ verificó discovery, OAuth/PKCE, registro/corrección/borrado, totales, reintent
 idempotentes, aislamiento de cuentas/scopes y renovación/revocación. Las dos
 cuentas sintéticas se eliminaron al terminar. Instalación y conversación real
 en ChatGPT siguen pendientes; no se usaron datos reales de Salud.
+
+
+## Login Apple — 11 de octubre de 2026
+
+`e8222053d876615792247e6e72ed470122efbec8` desplegado en
+`dep-db5g4lrrjlhs73aonrsg`, schema 4. CI backend/iOS/Release aprobado y
+prueba pública de endpoints Apple y regresión OAuth/MCP aprobada; cuentas
+sintéticas eliminadas. [Configuración y evidencia](apple-sign-in.md).
+Services ID, Team ID, Key ID y PEM privado deben configurarse como variables
+de Render para activar Apple en el consentimiento web del plugin.

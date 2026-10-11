@@ -70,3 +70,20 @@ sí elimina la identidad, las sesiones y los datos de Nutrition Tracker.
 
 [Configuración oficial web](https://developer.apple.com/help/account/capabilities/configure-sign-in-with-apple-for-the-web) ·
 [Verificación de identidad](https://developer.apple.com/documentation/signinwithapple/authenticating-users-with-sign-in-with-apple).
+
+
+## Deploy y verificación — 11 de octubre de 2026
+
+Commit `e8222053d876615792247e6e72ed470122efbec8`, Render
+`dep-db5g4lrrjlhs73aonrsg` live, schema 4.
+[CI](https://github.com/peter7z/nutrition-tracker/actions/runs/38107531954)
+aprobó backend (121 pruebas SQLite/Postgres), iOS (35 unitarias y 4 UI),
+Release y privacy manifest. El primer intento tuvo un fallo al abrir Apple
+Health en el Simulator de CI; el job repetido pasó sin cambios de código.
+
+La prueba pública verificó desafío Apple, rechazo de token inválido y sesión
+ausente, y el flujo OAuth/MCP previo: registro/corrección/borrado, totales,
+idempotencia, aislamiento, scopes y renovación/revocación. Se eliminaron las
+cuentas sintéticas. La obtención de claves públicas Apple se verificó con
+TLS y CA certifi. No se probó un Apple ID real ni se enviaron datos de Salud.
+La activación web y aceptación Apple real requieren la configuración anterior.

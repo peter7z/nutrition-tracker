@@ -56,3 +56,14 @@ verificó discovery, OAuth/PKCE, registro/corrección/borrado, totales, reintent
 idempotentes, aislamiento de cuentas/scopes y renovación/revocación. Las dos
 cuentas sintéticas se eliminaron al terminar. Instalación y conversación real
 en ChatGPT siguen pendientes; no se usaron datos reales de Salud.
+
+
+### Cuenta con Apple
+
+iOS incorpora Sign in with Apple. La primera conexión une automáticamente
+una cuenta existente con el mismo email verificado de Apple; con Ocultar mi
+correo, una dirección relay diferente puede crear otra cuenta. Para entrar
+con Apple desde el consentimiento del plugin, primero configurar Services ID
+y key del mismo App ID primario en Apple Developer/Render. Sin esa configuración
+el botón Apple web permanece oculto.
+[Configuración y aceptación pendiente](https://github.com/peter7z/nutrition-tracker/blob/main/docs/apple-sign-in.md).
