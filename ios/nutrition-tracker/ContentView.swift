@@ -107,6 +107,12 @@ private struct TodayView: View {
                     await weights.sync(account: account, health: model)
                     await nutrition.refresh(account: account)
                 }
+                .simultaneousGesture(DragGesture(minimumDistance: 24).onEnded { value in
+                    let horizontal = value.translation.width
+                    let vertical = value.translation.height
+                    guard abs(horizontal) > abs(vertical), abs(horizontal) > 50 else { return }
+                    changeSelectedDay(by: horizontal < 0 ? -1 : 1)
+                })
             }
             .navigationTitle("Today")
             .toolbar { ToolbarItem(placement: .topBarTrailing) {
@@ -132,6 +138,13 @@ private struct TodayView: View {
                 Text("Connect Health to start with your real data.").font(.caption).foregroundStyle(.secondary)
             }
         }
+    }
+
+    private func changeSelectedDay(by offset: Int) {
+        let calendar = nutrition.snapshot.profile.calendar
+        guard let nextDate = calendar.date(byAdding: .day, value: offset, to: selectedDate) else { return }
+        if offset > 0, nutrition.snapshot.profile.dayID(for: nextDate) > nutrition.snapshot.profile.dayID(for: .now) { return }
+        withAnimation(.easeInOut(duration: 0.2)) { selectedDate = nextDate }
     }
 
     private var nutritionCard: some View {
