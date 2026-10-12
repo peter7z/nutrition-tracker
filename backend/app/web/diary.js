@@ -17,6 +17,7 @@ function reset() {
   token=null;sequence++;controller?.abort();controller=null;
   $('login').hidden=false;$('diary').hidden=true;$('logout').hidden=true;
   $('meals').replaceChildren();$('totals').replaceChildren();$('account').textContent='';$('freshness').textContent='';
+  $('weights').replaceChildren();
 }
 function render(data) {
   $('day').value=data.day;
@@ -27,6 +28,8 @@ function render(data) {
   $('warning').hidden=!data.needs_reconciliation;
   $('warning').textContent='Hay comidas y resúmenes superpuestos. Los totales quedan pendientes hasta resolver qué fuente usar.';
   $('meal-count').textContent='('+data.entries.length+')';
+  $('weights').replaceChildren(...data.weights.map(weight=>node('p',format(weight.kilograms)+' kg · '+new Intl.DateTimeFormat('es-UY',{hour:'2-digit',minute:'2-digit',timeZone:data.time_zone}).format(new Date(weight.recorded_at))+' · '+(weight.source==='appleHealth'?'Apple Health':'Registro manual'))));
+  if(!data.weights.length)$('weights').append(node('p','No hay pesos registrados para esta fecha.'));
   $('meals').replaceChildren(...data.entries.map(entry=>{
     const food=entry.draft,article=node('article',undefined,'meal');
     article.append(node('h3',food.name));

@@ -81,7 +81,7 @@ enum NutritionBackup {
         for weight in snapshot.weights {
             guard weight.kilograms.isFinite && weight.kilograms > 0 && weight.kilograms < 1_000,
                   weight.notes.count <= 20_000,
-                  weight.source == .manual ? weight.importBatchID == nil : snapshot.importBatches.contains(where: { $0.id == weight.importBatchID }) else { throw NutritionError.invalidData }
+                  weight.source != .spreadsheet ? weight.importBatchID == nil : snapshot.importBatches.contains(where: { $0.id == weight.importBatchID }) else { throw NutritionError.invalidData }
         }
         for activity in snapshot.activities {
             guard !activity.kind.isEmpty, activity.durationMinutes.map({ $0.isFinite && $0 >= 0 }) != false,

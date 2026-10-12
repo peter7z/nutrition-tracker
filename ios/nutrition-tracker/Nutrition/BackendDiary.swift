@@ -40,7 +40,10 @@ enum BackendDiary {
                 payload["version"] = version
                 snapshot.days.append(try decode(NutritionDayLog.self, payload))
             case "goal": snapshot.goals.append(try decode(NutritionGoalVersion.self, payload))
-            case "weight": snapshot.weights.append(try decode(ManualWeightEntry.self, payload))
+            case "weight":
+                if payload["notes"] == nil { payload["notes"] = "" }
+                if payload["source"] == nil { payload["source"] = "manual" }
+                snapshot.weights.append(try decode(ManualWeightEntry.self, payload))
             case "activity": snapshot.activities.append(try decode(ManualActivityEntry.self, payload))
             case "historical": snapshot.historicalSummaries.append(try decode(HistoricalNutritionSummary.self, payload))
             case "resolution": snapshot.intakeResolutions.append(try decode(IntakeResolution.self, payload))

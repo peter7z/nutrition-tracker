@@ -2389,6 +2389,196 @@
           }
         }
       }
+    },
+    "Share weight with your account": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir peso con tu cuenta"
+          }
+        }
+      }
+    },
+    "Upload weight measurements and their dates from Apple Health to your Nutrition Tracker account. They will be available in the web diary and ChatGPT. Food, activity and other Health data are not uploaded.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subí las mediciones de peso y sus fechas desde Salud a tu cuenta de Nutrition Tracker. Estarán disponibles en la web y en ChatGPT. No se suben comidas, actividad ni otros datos de Salud."
+          }
+        }
+      }
+    },
+    "Stopping uploads keeps previously shared weights. Delete the server copy to remove them from your account.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detener las cargas conserva los pesos ya compartidos. Borrá la copia del servidor para eliminarlos de tu cuenta."
+          }
+        }
+      }
+    },
+    "Sign in to share weight.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciá sesión para compartir peso."
+          }
+        }
+      }
+    },
+    "Sync weight now": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizar peso ahora"
+          }
+        }
+      }
+    },
+    "Stop sharing weight": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detener la sincronización de peso"
+          }
+        }
+      }
+    },
+    "Enable weight sharing": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activar la sincronización de peso"
+          }
+        }
+      }
+    },
+    "Delete server weight copy": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrar la copia de peso del servidor"
+          }
+        }
+      }
+    },
+    "Last weight upload": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Última carga de peso"
+          }
+        }
+      }
+    },
+    "Retry weight upload": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reintentar carga de peso"
+          }
+        }
+      }
+    },
+    "Upload Apple Health weight?": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Subir el peso de Salud?"
+          }
+        }
+      }
+    },
+    "Authorize weight upload": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autorizar la carga de peso"
+          }
+        }
+      }
+    },
+    "Available weight history will be uploaded, followed by new measurements and deletions. You can stop sharing and delete the server copy at any time.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se subirá el historial de peso disponible y luego las mediciones nuevas y los borrados. Podés detener la sincronización y borrar la copia del servidor cuando quieras."
+          }
+        }
+      }
+    },
+    "Delete uploaded weights?": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Borrar los pesos subidos?"
+          }
+        }
+      }
+    },
+    "Delete server copy": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrar la copia del servidor"
+          }
+        }
+      }
+    },
+    "Sharing will stop. Original measurements in Apple Health and manual weights are kept.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sincronización se detendrá. Se conservan las mediciones originales de Salud y los pesos manuales."
+          }
+        }
+      }
+    },
+    "Could not read weight upload state. No weights were uploaded.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo leer el estado de sincronización. No se subieron pesos."
+          }
+        }
+      }
+    },
+    "Could not update weight sharing. Retry when connected.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo actualizar la autorización. Reintentá cuando tengas conexión."
+          }
+        }
+      }
+    },
+    "Weight upload is pending. It will retry when connected.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La carga de peso está pendiente. Se reintentará cuando haya conexión."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

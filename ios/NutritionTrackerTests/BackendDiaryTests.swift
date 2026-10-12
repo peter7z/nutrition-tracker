@@ -88,4 +88,21 @@ import XCTest
         XCTAssertTrue(store.snapshot.entries.isEmpty)
         XCTAssertNil(store.ownerID)
     }
+    func testUploadedHealthWeightPreservesSourceIDWithoutImportBatch() throws {
+        let id = UUID(); let sampleID = UUID()
+        let snapshot = try BackendDiary.decode(wire([["kind": "weight", "id": id.uuidString, "version": 1,
+            "payload": ["id": id.uuidString, "recordedAt": "2026-10-12T08:00:00-03:00", "kilograms": 80.5,
+                "source": "appleHealth", "sourceSampleID": sampleID.uuidString, "notes": "", "importBatchID": NSNull()]]]))
+        XCTAssertEqual(snapshot.weights.count, 1)
+        XCTAssertEqual(snapshot.weights[0].source, .appleHealth)
+        XCTAssertEqual(snapshot.weights[0].sourceSampleID, sampleID)
+        XCTAssertEqual(snapshot.weights[0].kilograms, 80.5)
+        XCTAssertTrue(snapshot.importBatches.isEmpty)
+        var health = HealthSnapshot()
+        health.samples = [HealthSampleRecord(id: sampleID, metric: .weight, startDate: .now, endDate: .now,
+            value: 80.5, sourceName: "Fixture", sourceBundleIdentifier: "fixture", deviceName: nil, workoutActivityCode: nil)]
+        XCTAssertTrue(TrackingBridge.accountWeights(manual: snapshot, health: health).isEmpty)
+        health.samples = []
+        XCTAssertEqual(TrackingBridge.accountWeights(manual: snapshot, health: health).count, 1)
+    }
 }

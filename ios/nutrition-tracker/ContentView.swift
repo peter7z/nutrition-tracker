@@ -9,6 +9,7 @@ private enum HomeStyle {
 }
 
 struct ContentView: View {
+    @Environment(HealthWeightUpload.self) private var weights
     @Environment(AccountSession.self) private var account
     @Environment(HealthSyncModel.self) private var model
     @Environment(NutritionStore.self) private var nutrition
@@ -26,14 +27,16 @@ struct ContentView: View {
         .task { await model.refreshIfConnected() }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { Task {
-                await nutrition.refresh(account: account)
                 await model.refreshIfConnected()
+                await weights.sync(account: account, health: model)
+                await nutrition.refresh(account: account)
             } }
         }
     }
 }
 
 private struct TodayView: View {
+    @Environment(HealthWeightUpload.self) private var weights
     @Environment(AccountSession.self) private var account
     @Environment(HealthSyncModel.self) private var model
     @Environment(NutritionStore.self) private var nutrition
@@ -100,8 +103,9 @@ private struct TodayView: View {
                 }
                 .background(Color(uiColor: .systemGroupedBackground))
                 .refreshable {
-                    await nutrition.refresh(account: account)
                     await model.refreshIfConnected()
+                    await weights.sync(account: account, health: model)
+                    await nutrition.refresh(account: account)
                 }
             }
             .navigationTitle("Today")
@@ -310,6 +314,7 @@ private struct TodayView: View {
 #Preview("Today · empty") {
     ContentView().environment(HealthSyncModel(persistence: HealthFileRepository(fileURL: URL.temporaryDirectory.appendingPathComponent(UUID().uuidString))))
         .environment(AccountSession(enabled: false))
+        .environment(HealthWeightUpload())
         .environment(NutritionStore()).environment(\.legacyHistory, LegacyHistory(ownerID: nil))
         .environment(\.locale, Locale(identifier: "es_UY"))
 }

@@ -16,6 +16,11 @@ import CoreFoundation
     private var generation = 0
 
     var isAvailable: Bool { client.isAvailable }
+    func weightUploadChanges(anchor: Data?) async throws -> HealthDelta {
+        guard snapshot.isConnected, snapshot.configuration?.metrics.contains(.weight) == true,
+              !storageNeedsRecovery, client.isAvailable else { throw HealthOperationError.unavailable }
+        return try await client.changes(for: .weight, start: nil, anchor: anchor)
+    }
 
     init(client: (any HealthDataClient)? = nil, persistence: (any HealthPersistence)? = nil, now: @escaping () -> Date = Date.init) {
         self.client = client ?? HealthKitClient()

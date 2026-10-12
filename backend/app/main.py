@@ -99,7 +99,7 @@ def create_app(settings=None,ai=None):
     @app.get('/healthz')
     def healthz():
         with store.connect() as db: db.execute('SELECT 1').fetchone()
-        return {'status':'ok','schema_version':4}
+        return {'status':'ok','schema_version':5}
 
     @app.post('/v1/auth/signup',status_code=201)
     def signup(body:AuthInput,request:Request):
@@ -426,6 +426,8 @@ def create_app(settings=None,ai=None):
     apple = AppleIdentity(store, settings)
     app.state.apple_identity = apple
     apple.routes(app, make_session, identity, auth_limit)
+    from .health_weights import install_weight_routes
+    install_weight_routes(app,store,identity,APIError)
     from .plugin_mcp import install_plugin
     install_plugin(app, store, settings, sync, password_hash, auth_limit)
     return app

@@ -9,6 +9,29 @@ private final class TestSessionPersistence: SessionPersistence {
     func clear() throws { if failClear { throw AccountError.storage }; value = nil }
 }
 
+@MainActor private final class UploadHealthClient: HealthDataClient {
+    var isAvailable = true
+    var queriedAnchors: [Data?] = []
+    let sample = HealthSampleRecord(id: UUID(), metric: .weight, startDate: .now, endDate: .now,
+        value: 80, sourceName: "Fixture", sourceBundleIdentifier: "fixture", deviceName: nil, workoutActivityCode: nil)
+    func requestReadAccess(to metrics: Set<HealthMetric>) async throws {}
+    func changes(for metric: HealthMetric, start: Date?, anchor: Data?) async throws -> HealthDelta {
+        XCTAssertEqual(metric, .weight); XCTAssertNil(start)
+        queriedAnchors.append(anchor)
+        return HealthDelta(samples: anchor == nil ? [sample] : [], deletedIDs: [], anchor: Data([1]), hasMore: false)
+    }
+    func dailyStatistics(for metric: HealthMetric, start: Date, end: Date, calendar: Calendar) async throws -> [HealthDayValue] { [] }
+}
+@MainActor private final class UploadHealthPersistence: HealthPersistence {
+    func load() throws -> HealthSnapshot {
+        var value = HealthSnapshot()
+        value.configuration = HealthImportConfiguration(metrics: [.weight], startDate: .now, timeZoneIdentifier: "America/Montevideo")
+        value.isConnected = true
+        return value
+    }
+    func save(_ snapshot: HealthSnapshot) throws {}
+}
+
 private final class AccountURLProtocol: URLProtocol, @unchecked Sendable {
     nonisolated(unsafe) static var handler: ((URLRequest) throws -> (Int, String))?
     override class func canInit(with request: URLRequest) -> Bool { true }
@@ -155,5 +178,64 @@ private final class AccountURLProtocol: URLProtocol, @unchecked Sendable {
         XCTAssertEqual(store.ownerID, second.uuidString)
         XCTAssertTrue(store.snapshot.entries.isEmpty)
         XCTAssertFalse(FileManager.default.fileExists(atPath: BackendDiary.cacheURL(owner: first).path))
+    }
+    func testWeightUploadRequiresConsentAndPersistsExactRetryBeforeAdvancingAnchor() async throws {
+        let owner = UUID(); let (account, _) = setup(owner: owner.uuidString)
+        let root = URL.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let uploader = HealthWeightUpload(root: root)
+        let client = UploadHealthClient()
+        let health = HealthSyncModel(client: client, persistence: UploadHealthPersistence())
+        await uploader.sync(account: account, health: health)
+        XCTAssertTrue(client.queriedAnchors.isEmpty)
+        AccountURLProtocol.handler = { _ in (200, #"{"enabled":true,"version":1}"#) }
+        await uploader.setConsent(enabled: true, account: account, health: health)
+        XCTAssertTrue(uploader.isEnabled)
+        AccountURLProtocol.handler = { request in
+            if request.url?.path.hasSuffix("consent") == true { return (200, #"{"enabled":true,"version":1}"#) }
+            throw URLError(.notConnectedToInternet)
+        }
+        await uploader.sync(account: account, health: health)
+        XCTAssertNotNil(uploader.errorKey)
+        let file = root.appendingPathComponent(owner.uuidString + ".json")
+        let failed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: file)) as? [String: Any])
+        XCTAssertNil(failed["anchor"])
+        let pending = try XCTUnwrap(failed["pending"] as? [String: Any])
+        let original = try XCTUnwrap((pending["body"] as? [String: Any])?["request_id"] as? String)
+        AccountURLProtocol.handler = { request in
+            if request.url?.path.hasSuffix("consent") == true { return (200, #"{"enabled":true,"version":1}"#) }
+            let saved = try JSONSerialization.jsonObject(with: Data(contentsOf: file)) as! [String: Any]
+            let body = (saved["pending"] as! [String: Any])["body"] as! [String: Any]
+            XCTAssertEqual(body["request_id"] as? String, original)
+            return (200, "{\"saved\":true,\"request_id\":\"" + original + "\"}")
+        }
+        await uploader.sync(account: account, health: health)
+        XCTAssertNil(uploader.errorKey)
+        XCTAssertEqual(client.queriedAnchors.count, 2)
+        XCTAssertEqual(client.queriedAnchors.last!, Data([1]))
+        let restored = HealthWeightUpload(root: root); restored.selectAccount(owner.uuidString)
+        XCTAssertTrue(restored.isEnabled)
+        restored.selectAccount(UUID().uuidString)
+        XCTAssertFalse(restored.isEnabled)
+    }
+    func testOfflineRevocationStopsLocallyAndIsRetriedAfterRestart() async throws {
+        let owner = UUID(); let (account, _) = setup(owner: owner.uuidString)
+        let root = URL.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let health = HealthSyncModel(client: UploadHealthClient(), persistence: UploadHealthPersistence())
+        let uploader = HealthWeightUpload(root: root)
+        AccountURLProtocol.handler = { _ in (200, #"{"enabled":true,"version":1}"#) }
+        await uploader.setConsent(enabled: true, account: account, health: health)
+        AccountURLProtocol.handler = { _ in throw URLError(.notConnectedToInternet) }
+        await uploader.setConsent(enabled: false, deleteData: true, account: account, health: health)
+        XCTAssertFalse(uploader.isEnabled)
+        let restored = HealthWeightUpload(root: root); restored.selectAccount(owner.uuidString)
+        AccountURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/v1/health/weight/consent")
+            XCTAssertEqual(request.httpMethod, "POST")
+            return (200, #"{"enabled":false,"version":2}"#)
+        }
+        await restored.sync(account: account, health: health)
+        XCTAssertFalse(restored.isEnabled); XCTAssertNil(restored.errorKey)
     }
 }

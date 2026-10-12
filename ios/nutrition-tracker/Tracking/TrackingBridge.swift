@@ -9,6 +9,10 @@ struct ResolvedDailyNutrition {
 }
 
 enum TrackingBridge {
+    static func accountWeights(manual: NutritionSnapshot, health: HealthSnapshot) -> [ManualWeightEntry] {
+        let localIDs = Set(health.samples.filter { $0.metric == .weight }.map(\.id))
+        return manual.weights.filter { $0.source != .appleHealth || !localIDs.contains($0.sourceSampleID ?? $0.id) }
+    }
     static func nutrition(on date: Date, manual: NutritionSnapshot, health: HealthSnapshot, accountScope: String = "local") -> ResolvedDailyNutrition {
         let dayID = manual.profile.dayID(for: date)
         if let day = manual.days.first(where: { $0.id == dayID && $0.isClosed }), let closed = day.summaries.last {

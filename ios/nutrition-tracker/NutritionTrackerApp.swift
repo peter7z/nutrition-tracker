@@ -4,6 +4,7 @@ import Foundation
 @main struct NutritionTrackerApp: App {
     @State private var account: AccountSession
     @State private var health: HealthSyncModel
+    @State private var weights = HealthWeightUpload()
     private let history: LegacyHistory
     private let uiTesting: Bool
     init() {
@@ -30,7 +31,7 @@ import Foundation
     var body: some Scene {
         WindowGroup {
             AccountTrackingRoot(history: history, uiTesting: uiTesting)
-                .environment(account).environment(health).environment(\.legacyHistory, history)
+                .environment(account).environment(health).environment(weights).environment(\.legacyHistory, history)
                 .preferredColorScheme(testAppearance)
         }
     }
@@ -47,6 +48,8 @@ import Foundation
 /// Read-only server diary with account-scoped caching; legacy files stay intact.
 private struct AccountTrackingRoot: View {
     @Environment(AccountSession.self) private var account
+    @Environment(HealthSyncModel.self) private var health
+    @Environment(HealthWeightUpload.self) private var weights
     @State private var nutrition: NutritionStore
     private let history: LegacyHistory
     private let uiTesting: Bool
@@ -68,6 +71,8 @@ private struct AccountTrackingRoot: View {
             .task(id: account.session?.user_id) {
                 guard !uiTesting else { return }
                 nutrition.selectAccount(account.session?.user_id)
+                weights.selectAccount(account.session?.user_id)
+                await weights.sync(account: account, health: health)
                 await nutrition.refresh(account: account)
             }
     }

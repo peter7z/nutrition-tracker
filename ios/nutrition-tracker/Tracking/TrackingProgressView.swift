@@ -53,6 +53,7 @@ private struct SegmentedWeightAverage: Identifiable {
 }
 
 struct TrackingProgressView: View {
+    @Environment(HealthWeightUpload.self) private var weightUpload
     @Environment(AccountSession.self) private var account
     @Environment(NutritionStore.self) private var nutrition
     @Environment(HealthSyncModel.self) private var health
@@ -77,7 +78,7 @@ struct TrackingProgressView: View {
     }
 
     private var weightObservations: [WeightObservation] {
-        let local = nutrition.snapshot.weights.map { value in
+        let local = TrackingBridge.accountWeights(manual: nutrition.snapshot, health: health.snapshot).map { value in
             WeightObservation(
                 id: weightID(value), date: value.recordedAt, kg: value.kilograms,
                 source: "tracking:\(value.source.rawValue)"
@@ -285,8 +286,9 @@ struct TrackingProgressView: View {
             }
             .listStyle(.insetGrouped)
             .refreshable {
-                await nutrition.refresh(account: account)
                 await health.refreshIfConnected()
+                await weightUpload.sync(account: account, health: health)
+                await nutrition.refresh(account: account)
             }
             .navigationTitle("Progress")
         }
@@ -605,7 +607,7 @@ struct TrackingProgressView: View {
     private func weightSourceName(for id: String) -> String {
         guard let reference = weightReferences[id] else { return "Imported" }
         return switch reference {
-        case let .local(value): value.source == .manual ? "Manual" : "Spreadsheet"
+        case let .local(value): value.source == .appleHealth ? "Apple Health" : value.source == .manual ? "Manual" : "Spreadsheet"
         case let .health(value): value.sourceName
         }
     }

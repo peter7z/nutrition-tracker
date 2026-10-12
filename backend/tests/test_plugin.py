@@ -269,3 +269,20 @@ def test_companion_state_reads_mcp_food_and_closure_for_same_account(client):
     assert day['summaries'][-1]['closedAt']
     other=client.post('/v1/auth/signup',json={'email':'companion-other@example.com','password':'synthetic plugin password'}).json()
     assert client.get('/v1/state',headers={'Authorization':'Bearer '+other['token']}).json()['records']==[]
+
+
+def test_mcp_reads_only_connected_accounts_uploaded_health_weight(client):
+    first,_,_=connect(client)
+    other,_,_=connect(client,email='weight-other@example.com')
+    session=client.post('/v1/auth/login',json={'email':'plugin@example.com','password':'synthetic plugin password'}).json()
+    headers={'Authorization':'Bearer '+session['token']}
+    version=client.post('/v1/health/weight/consent',headers=headers,json={'enabled':True}).json()['version']
+    response=client.post('/v1/health/weight/sync',headers=headers,json={'request_id':str(uuid.uuid4()),
+        'consent_version':version,'samples':[{'sample_id':str(uuid.uuid4()),'recorded_at':'2026-10-12T08:00:00-03:00','kilograms':80.5}], 'deleted_ids':[]})
+    assert response.status_code==200
+    day=tool(client,first['access_token'],'get_day',{'day':'2026-10-12'})['structuredContent']
+    assert len(day['weights'])==1 and day['weights'][0]['kilograms']==80.5
+    assert day['weights'][0]['source']=='appleHealth'
+    assert tool(client,other['access_token'],'get_day',{'day':'2026-10-12'})['structuredContent']['weights']==[]
+    progress=tool(client,first['access_token'],'get_progress',{'start_day':'2026-10-12','end_day':'2026-10-12'})['structuredContent']
+    assert progress['days'][0]['weights']==day['weights']

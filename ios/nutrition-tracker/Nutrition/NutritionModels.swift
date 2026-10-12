@@ -182,8 +182,8 @@ struct FoodRecipe: Codable, Equatable, Identifiable {
         try result.validate(); return result
     }
 }
-enum TrackingSource: String, Codable { case manual, spreadsheet }
-struct ManualWeightEntry: Codable, Equatable, Identifiable { var id: UUID; var recordedAt: Date; var kilograms: Double; var source: TrackingSource = .manual; var notes = ""; var importBatchID: UUID? = nil }
+enum TrackingSource: String, Codable { case manual, spreadsheet, appleHealth }
+struct ManualWeightEntry: Codable, Equatable, Identifiable { var id: UUID; var recordedAt: Date; var kilograms: Double; var source: TrackingSource = .manual; var notes = ""; var importBatchID: UUID? = nil; var sourceSampleID: UUID? = nil }
 struct ManualActivityEntry: Codable, Equatable, Identifiable { var id: UUID; var recordedAt: Date; var kind: String; var durationMinutes: Double?; var activeEnergy: Double? = nil; var source: TrackingSource = .manual; var notes = ""; var importBatchID: UUID? = nil }
 struct HistoricalNutritionSummary: Codable, Equatable, Identifiable { var id: UUID; var dayID: String; var nutrients: NutrientValues; var isClosed: Bool; var notes: String; var importBatchID: UUID; var sourceRow: String }
 struct NutritionImportBatch: Codable, Equatable, Identifiable {

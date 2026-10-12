@@ -101,6 +101,8 @@ def context_for(db,owner,day):
     def same_day(payload):
         return datetime.fromisoformat(payload['recordedAt'].replace('Z','+00:00')).astimezone(zone).date().isoformat()==day
     weights=[{'id':r['id'],'recorded_at':r['payload']['recordedAt'],'kilograms':r['payload']['kilograms']} for r in records if r['kind']=='weight' and same_day(r['payload'])]
+    from .health_weights import weight_records
+    weights.extend({'id':r['id'],'recorded_at':r['payload']['recordedAt'],'kilograms':r['payload']['kilograms'],'source':'appleHealth'} for r in weight_records(db,owner) if same_day(r['payload']))
     activities=[{'id':r['id'],'recorded_at':r['payload']['recordedAt'],'kind':r['payload']['kind'],'duration_minutes':r['payload'].get('durationMinutes'),'active_kcal':r['payload'].get('activeEnergy')} for r in records if r['kind']=='activity' and same_day(r['payload'])]
     return dict(weights=weights[-10:],activities=activities[-10:],closed=bool(frozen),intake_selection=selection or ('historical' if historical and not entries else 'manual'),needs_reconciliation=needs_reconciliation,historical_summary=historical[0] if len(historical)==1 else None,day=day,time_zone=zone.key,entries=entries[-50:],totals=totals,goals=goals[-1] if goals else None,preferences=profile.get('preferences',{})), records
 

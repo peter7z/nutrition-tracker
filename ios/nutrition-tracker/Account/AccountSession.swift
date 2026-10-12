@@ -135,6 +135,12 @@ struct AccountProfile: Decodable { let user_id: String; let email: String }
         guard (200..<300).contains(response.statusCode) else { throw AccountError.request }
         return data
     }
+    func weightRequest<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+        guard let captured = session else { throw AccountError.expired }
+        let result: T = try await request(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true)
+        guard session == captured else { throw CancellationError() }
+        return result
+    }
     func signOut() async {
         guard !isWorking else { return }
         isWorking = true; errorKey = nil
