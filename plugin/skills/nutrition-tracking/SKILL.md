@@ -56,8 +56,15 @@ La conexión OAuth abre Nutrition Tracker para login/creación de cuenta y
 consentimiento de lectura/escritura. No pedir contraseñas, tokens o claves en el
 chat. Ante permisos insuficientes, indicar reconectar con el permiso necesario.
 
-`get_progress` consulta hasta 90 días. La sincronización del peso desde Apple
-Health, registrar peso/actividad por herramientas específicas, cerrar días,
-metas, deshacer y widgets de ChatGPT Extensions siguen pendientes. No afirmar
-que hay datos sincronizados de Salud cuando no se entregaron. iOS no registra
-comidas; conserva su función de consulta, gráficas y sincronización de Salud.
+`get_progress` consulta hasta 90 días e incluye los pesos de Apple Health que
+el usuario autorizó y subió desde iOS. La fuente de esos pesos es `appleHealth`.
+No afirmar que hay mediciones de Salud si el servidor no las entrega. Solo peso
+tiene carga remota; otras métricas de Salud siguen pendientes.
+
+`record_closed_day` guarda los totales consumidos de una fecha y la cierra, sin
+crear comidas ni sumar ese resumen a las comidas existentes. Acepta calorías,
+macros, grasa saturada y fibra; valores desconocidos permanecen null.
+
+Registrar peso/actividad por herramientas específicas, reabrir días, metas,
+deshacer y widgets siguen pendientes. iOS consulta datos y sincroniza peso;
+el registro de comidas sigue ocurriendo en ChatGPT.

@@ -283,6 +283,7 @@ def test_mcp_reads_only_connected_accounts_uploaded_health_weight(client):
     day=tool(client,first['access_token'],'get_day',{'day':'2026-10-12'})['structuredContent']
     assert len(day['weights'])==1 and day['weights'][0]['kilograms']==80.5
     assert day['weights'][0]['source']=='appleHealth'
+    assert day['health_sync_available'] and day['health_sync_metrics']==['weight']
     assert tool(client,other['access_token'],'get_day',{'day':'2026-10-12'})['structuredContent']['weights']==[]
     progress=tool(client,first['access_token'],'get_progress',{'start_day':'2026-10-12','end_day':'2026-10-12'})['structuredContent']
     assert progress['days'][0]['weights']==day['weights']
