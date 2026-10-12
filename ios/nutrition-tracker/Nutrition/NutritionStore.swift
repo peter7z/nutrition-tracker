@@ -40,6 +40,9 @@ import Observation
             guard account.session?.user_id == owner, ownerID == owner, refreshID == attempt else { return }
             let url = BackendDiary.cacheURL(owner: id)
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            var folder = url.deletingLastPathComponent()
+            var attributes = URLResourceValues(); attributes.isExcludedFromBackup = true
+            try folder.setResourceValues(attributes)
             try JSONEncoder().encode(incoming).write(to: url, options: [.atomic, .completeFileProtection])
             snapshot = incoming; errorKey = nil; storageNeedsRecovery = false
         } catch is CancellationError { }
