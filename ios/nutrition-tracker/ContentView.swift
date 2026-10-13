@@ -189,7 +189,10 @@ private struct DailyNutritionView: View {
                     .buttonStyle(.borderedProminent).tint(HomeStyle.buttonGreen).controlSize(.large)
                     .disabled(model.isWorking || model.storageNeedsRecovery)
                 }
-                if model.snapshot.configuration != nil { healthCard; activityCard }
+                if model.snapshot.configuration != nil {
+                    if !model.snapshot.isConnected { healthCard }
+                    activityCard
+                }
                 mealsSection
             }
             .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 24)

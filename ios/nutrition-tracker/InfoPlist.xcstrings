@@ -1,76 +1,76 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "CFBundleDisplayName": {
-      "comment": "Bundle display name",
-      "extractionState": "extracted_with_value",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "Bocado Log"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bocado"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bocado Log"
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Bocado Log"
           }
         }
       }
     },
-    "CFBundleName": {
-      "comment": "Bundle name",
-      "extractionState": "extracted_with_value",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "Bocado Log"
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bocado"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bocado Log"
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Bocado Log"
           }
         }
       }
     },
-    "NSHealthShareUsageDescription": {
-      "comment": "Privacy - Health Share Usage Description",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bocado Log reads your weight, activity and nutrition data from Apple Health to show your history and progress."
+    "NSHealthShareUsageDescription" : {
+      "comment" : "Privacy - Health Share Usage Description",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bocado Log reads your weight, activity and nutrition data from Apple Health to show your history and progress."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bocado Log lee tus datos de peso, actividad y nutrición de Apple Health para mostrar tu historial y progreso."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bocado Log lee tus datos de peso, actividad y nutrición de Apple Health para mostrar tu historial y progreso."
           }
         }
       }
     },
-    "NSHealthUpdateUsageDescription": {
-      "comment": "Privacy - Health Update Usage Description",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bocado Log saves the calories and nutrients from your food diary to Apple Health when you enable nutrition sync."
+    "NSHealthUpdateUsageDescription" : {
+      "comment" : "Privacy - Health Update Usage Description",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bocado Log saves the calories and nutrients from your food diary to Apple Health when you enable nutrition sync."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bocado Log guarda en Apple Health las calorías y los nutrientes de tu diario cuando activás la sincronización de nutrición."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bocado Log guarda en Apple Health las calorías y los nutrientes de tu diario cuando activás la sincronización de nutrición."
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }

@@ -479,11 +479,22 @@
       }
     },
     "A goal review needs at least 10 of 14 complete nutrition days and 6 weight days, with at least 3 weight days in each 7-day week." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Para revisar los objetivos, necesitás al menos 10 de 14 días completos de nutrición y 6 días con peso, con al menos 3 días con peso en cada semana de 7 días."
+          }
+        }
+      }
+    },
+    "A goal review needs at least 10 of 14 explicitly complete nutrition days and 6 weight days, with at least 3 weight days in each 7-day week." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para revisar los objetivos, necesitás al menos 10 de 14 días de nutrición marcados explícitamente como completos y 6 días con peso, con al menos 3 días con peso en cada semana de 7 días."
           }
         }
       }
@@ -726,6 +737,17 @@
       }
     },
     "Bocado account" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuenta de Bocado Log"
+          }
+        }
+      }
+    },
+    "Bocado Log account" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1701,6 +1723,17 @@
       }
     },
     "Keep your food diary and progress together. Use the same account in Bocado and ChatGPT." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu diario de comidas y tu progreso, juntos. Usá la misma cuenta en Bocado Log y ChatGPT."
+          }
+        }
+      }
+    },
+    "Keep your food diary and progress together. Use the same account in Bocado Log and ChatGPT." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2682,7 +2715,18 @@
         }
       }
     },
+    "Sign out of Bocado Log?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cerrar sesión en Bocado Log?"
+          }
+        }
+      }
+    },
     "Sign out of Bocado?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
