@@ -2,23 +2,27 @@
   <style>
     :root { color-scheme: light dark; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
     * { box-sizing: border-box; }
-    body { margin: 0; padding: 12px; color: var(--text-primary, #202124); background: transparent; }
-    .card { max-width: 560px; padding: 16px; border: 1px solid var(--border, rgba(127,127,127,.25)); border-radius: 18px; background: var(--surface, rgba(127,127,127,.06)); }
+    body { margin: 0; padding: 8px 10px; color: CanvasText; background: transparent; }
+    .card { max-width: 520px; padding: 12px; border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); border-radius: 16px; background: color-mix(in srgb, Canvas 96%, CanvasText 4%); }
     .top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
     h1 { margin: 0; font-size: 15px; font-weight: 650; }
-    .date, .muted { color: var(--text-secondary, #70757a); font-size: 12px; }
-    .calories { display: flex; align-items: baseline; gap: 6px; margin-top: 16px; }
-    .calories strong { font-size: 32px; line-height: 1; letter-spacing: -.04em; }
-    .calories span { color: var(--text-secondary, #70757a); font-size: 13px; }
-    .progress-track { height: 7px; margin-top: 12px; overflow: hidden; border-radius: 99px; background: rgba(127,127,127,.18); }
-    .progress-fill { height: 100%; width: 0; border-radius: inherit; background: var(--accent, #16845b); transition: width .2s ease; }
-    .goal-line { margin-top: 7px; color: var(--text-secondary, #70757a); font-size: 12px; }
-    .nutrients { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
-    .metric { min-width: 0; padding: 10px; border-radius: 12px; background: rgba(127,127,127,.08); }
-    .metric-label { color: var(--text-secondary, #70757a); font-size: 11px; }
-    .metric-value { margin-top: 4px; font-size: 15px; font-weight: 600; white-space: nowrap; }
-    .foot { display: flex; justify-content: space-between; gap: 12px; margin-top: 14px; }
-    .notice { margin-top: 12px; padding: 9px 10px; border-radius: 10px; background: rgba(210,150,30,.12); color: var(--text-primary, #202124); font-size: 12px; }
+    .date, .muted { color: color-mix(in srgb, CanvasText 68%, transparent); font-size: 12px; }
+    .calories { display: flex; align-items: baseline; gap: 6px; margin-top: 10px; }
+    .calories strong { color: #35a779; font-size: 30px; line-height: 1; letter-spacing: -.04em; }
+    .calories span { color: color-mix(in srgb, CanvasText 72%, transparent); font-size: 13px; }
+    .progress-track { height: 6px; margin-top: 9px; overflow: hidden; border-radius: 99px; background: color-mix(in srgb, CanvasText 16%, transparent); }
+    .progress-fill { height: 100%; width: 0; border-radius: inherit; background: #35a779; transition: width .2s ease; }
+    .goal-line { margin-top: 6px; color: color-mix(in srgb, CanvasText 72%, transparent); font-size: 12px; }
+    .nutrients { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 12px; }
+    .metric { min-width: 0; padding: 8px; border-radius: 10px; background: color-mix(in srgb, CanvasText 7%, transparent); }
+    .metric-label { color: color-mix(in srgb, CanvasText 72%, transparent); font-size: 11px; }
+    .metric-value { margin-top: 3px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+    .metric:nth-child(1) { border-top: 2px solid #5b9bf5; }
+    .metric:nth-child(2) { border-top: 2px solid #e5a63b; }
+    .metric:nth-child(3) { border-top: 2px solid #e57987; }
+    .metric:nth-child(4) { border-top: 2px solid #35a779; }
+    .foot { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; }
+    .notice { margin-top: 10px; padding: 8px 9px; border-radius: 10px; background: color-mix(in srgb, #e5a63b 18%, Canvas); color: CanvasText; font-size: 12px; }
     @media (max-width: 420px) { .nutrients { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   </style>
   <article class="card" aria-live="polite" aria-busy="true">
@@ -41,6 +45,17 @@
     (() => {
       const root = document.getElementById('nutrition-day-widget');
       const $ = (id) => document.getElementById(id);
+      const reportHeight = () => {
+        window.openai?.notifyIntrinsicHeight?.(document.documentElement.scrollHeight);
+      };
+      const applyTheme = (theme) => {
+        if (theme === 'dark' || theme === 'light') document.documentElement.style.colorScheme = theme;
+      };
+      applyTheme(window.openai?.theme);
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(() => requestAnimationFrame(reportHeight)).observe(root);
+      }
+      window.addEventListener('load', reportHeight, { once: true });
       const locale = (document.documentElement.lang || 'es-UY').toLowerCase().startsWith('es') ? 'es-UY' : 'en-US';
       const copy = locale.startsWith('es')
         ? { title: 'Resumen del día', protein: 'Proteínas', carbohydrates: 'Carbohidratos', fat: 'Grasas', fiber: 'Fibra', progress: 'Progreso de calorías', pending: 'El total del día está pendiente de conciliación.', unavailable: 'El total de calorías no está disponible.', meals: (n) => `${n} ${n === 1 ? 'comida registrada' : 'comidas registradas'}`, goal: (used, target, pct) => `${used} de ${target} kcal · ${pct}% del objetivo`, manual: 'Consumo registrado', historical: 'Resumen del día' }
@@ -100,6 +115,7 @@
         $('entries').textContent = copy.meals(Array.isArray(day.entries) ? day.entries.length : 0);
         $('source').textContent = day.intake_selection === 'historical' ? copy.historical : copy.manual;
         root.querySelector('article').setAttribute('aria-busy', 'false');
+        requestAnimationFrame(reportHeight);
       }
 
       const initial = window.openai?.toolOutput;
@@ -107,6 +123,10 @@
       window.addEventListener('message', (event) => {
         if (event.source !== window.parent) return;
         const message = event.data;
+        if (message?.jsonrpc === '2.0' && message.method === 'ui/notifications/host-context-changed') {
+          applyTheme(message.params?.hostContext?.theme);
+          requestAnimationFrame(reportHeight);
+        }
         if (message?.jsonrpc === '2.0' && message.method === 'ui/notifications/tool-result') {
           render(message.params);
         }
