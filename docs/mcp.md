@@ -41,5 +41,5 @@ La conexión existente de ChatGPT usa `ui://nutrition-tracker/day-summary-v1.htm
 Es el único recurso HTML: siempre entrega la interfaz actual de Bocado Log.
 El URI es una identidad estable, no la versión del diseño; no crear recursos
 v2/v3 ni aliases al actualizar la interfaz. Todas las herramientas con UI
-referencian el mismo recurso. Solo `open_tracker` es exclusivo de la interfaz;
-las herramientas de resumen y registro permanecen disponibles al modelo.
+referencian el mismo recurso y permanecen disponibles al modelo y la interfaz.
+`open_tracker` además declara el entrypoint global de ChatGPT.

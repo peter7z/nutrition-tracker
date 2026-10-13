@@ -135,7 +135,6 @@ def install_plugin(app, store, settings, sync, password_hash, auth_limit):
         description='Open the read-only daily nutrition summary from ChatGPT navigation.',
         annotations=read_annotation,
         meta=security() | DAY_SUMMARY_META | {
-            'ui': {'resourceUri': DAY_SUMMARY_URI, 'visibility': ['app']},
             'openai/ui': {'entrypoints': [{'type': 'global'}]}})
     def open_tracker() -> dict[str, Any]:
         """Open Bocado Log's read-only daily dashboard in the ChatGPT sidebar. Accepts no arguments and never changes tracking."""
