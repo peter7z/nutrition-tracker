@@ -97,7 +97,7 @@ jobs:
           PY
       - name: Run unit and UI acceptance tests on isolated local data
         run: |
-          xcodebuild -project ios/NutritionTracker.xcodeproj -scheme NutritionTracker \
+          xcodebuild -project ios/Bocado.xcodeproj -scheme NutritionTracker \
             -configuration Debug -destination "platform=iOS Simulator,id=$NUTRITION_SIMULATOR_ID" \
             -derivedDataPath "$RUNNER_TEMP/NutritionTrackerDerivedData" \
             -resultBundlePath "$RUNNER_TEMP/NutritionTrackerTests.xcresult" \
@@ -105,7 +105,7 @@ jobs:
             CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY="-" test
       - name: Build Release for iOS
         run: |
-          xcodebuild -project ios/NutritionTracker.xcodeproj -scheme NutritionTracker \
+          xcodebuild -project ios/Bocado.xcodeproj -scheme NutritionTracker \
             -configuration Release -destination 'generic/platform=iOS' \
             -derivedDataPath "$RUNNER_TEMP/NutritionTrackerRelease" \
             CODE_SIGNING_ALLOWED=NO build
