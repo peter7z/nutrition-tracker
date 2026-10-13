@@ -17,7 +17,7 @@ from pydantic import ValidationError
 from .config import Settings
 from .store import INTEGRITY_ERRORS,Store,canonical,digest,state
 from .models import AuthInput,SyncInput,ChatInput,EntryDraft
-from .nutrition import context_for,validate_payload,closed_day,NUTRIENTS,NUTRIENT_UNITS
+from .nutrition import context_for,validate_payload,NUTRIENTS,NUTRIENT_UNITS
 from .assistant import ResponsesClient,AIError,guard_output
 
 Image.MAX_IMAGE_PIXELS=20_000_000
@@ -169,6 +169,73 @@ def create_app(settings=None,ai=None):
             return result
         return None
 
+    def capture_day_snapshot(db,owner,day):
+        """Append a correctable snapshot of the selected totals for a past day."""
+        context,_=context_for(db,owner,day)
+        rows=list(db.execute("SELECT * FROM records WHERE user_id=?",(owner,)))
+        profile=next((json.loads(row['payload']) for row in rows if row['kind']=='profile' and not row['deleted']),{})
+        from zoneinfo import ZoneInfo
+        try: zone=ZoneInfo(profile.get('timeZoneIdentifier','America/Montevideo'))
+        except Exception: zone=ZoneInfo('America/Montevideo')
+        aggregate={key:{'known':0,'knownCount':0,'missingCount':0} for key in NUTRIENTS}
+        entry_versions={}; entry_count=0
+        for row in rows:
+            if row['kind']!='entry': continue
+            payload=json.loads(row['payload'])
+            draft=EntryDraft.model_validate(payload.get('draft',payload))
+            if draft.consumedAt.astimezone(zone).date().isoformat()!=day: continue
+            entry_versions[payload.get('id',row['id'])]=payload.get('version',row['version'])
+            if row['deleted']: continue
+            entry_count+=1
+            for key in NUTRIENTS:
+                value=getattr(draft.nutrition,key)
+                if value is None: aggregate[key]['missingCount']+=1
+                else:
+                    aggregate[key]['known']+=value*draft.multiplier()
+                    aggregate[key]['knownCount']+=1
+        historical=[json.loads(row['payload']) for row in rows if row['kind']=='historical' and not row['deleted'] and json.loads(row['payload']).get('dayID')==day]
+        selected=context.get('intake_selection','manual')
+        if selected=='health' or context.get('needs_reconciliation'):
+            return False
+        if selected=='historical' and len(historical)==1:
+            nutrients=historical[0].get('nutrients',{})
+            aggregate={key:{'known':nutrients.get(key) or 0,'knownCount':int(nutrients.get(key) is not None),'missingCount':int(nutrients.get(key) is None)} for key in NUTRIENTS}
+            entry_count=0
+        elif selected!='manual':
+            aggregate={key:{'known':0,'knownCount':0,'missingCount':0} for key in NUTRIENTS}
+            entry_count=0
+        aggregate['entryCount']=entry_count
+        matches=[]
+        for row in db.execute("SELECT * FROM records WHERE user_id=? AND kind='day' AND deleted=0",(owner,)):
+            payload=json.loads(row['payload'])
+            if str(payload.get('date',payload.get('day',payload.get('id',''))))[:10]==day:
+                matches.append((row,payload))
+        has_entry_record=bool(entry_versions)
+        has_prior_snapshot=bool(matches and matches[0][1].get('summaries'))
+        if not entry_count and not historical and not has_entry_record and not has_prior_snapshot:
+            return False
+        goals=context.get('goals') or {}
+        complete=bool(selected=='historical' and len(historical)==1 and historical[0].get('isComplete',historical[0].get('isClosed')) is True
+            and all(historical[0].get('nutrients',{}).get(key) is not None for key in ('energy','protein','carbohydrates','fat')))
+        summary={'id':str(uuid.uuid4()),'version':1,'closedAt':stamp(),
+            'completeness':'complete' if complete else 'incomplete','intakeSource':selected,
+            'goalVersionID':goals.get('id'),'totals':aggregate,'entryVersions':entry_versions}
+        if matches:
+            row,payload=matches[0]
+            payload.pop('isClosed',None); payload.pop('status',None)
+            summaries=list(payload.get('summaries',[]))
+            if summaries and summaries[-1].get('totals')==aggregate and summaries[-1].get('entryVersions')==entry_versions:
+                return False
+            summary['version']=len(summaries)+1
+            summaries.append(summary)
+            payload.update({'id':day,'version':int(payload.get('version',1))+1,'summaries':summaries})
+            db.execute('UPDATE records SET version=?,payload=? WHERE user_id=? AND id=?',(row['version']+1,canonical(payload),owner,row['id']))
+        else:
+            identifier=str(uuid.uuid5(uuid.NAMESPACE_URL,'closed-day:'+owner+':'+day))
+            payload={'id':day,'version':1,'summaries':[summary]}
+            db.execute('INSERT INTO records VALUES(?,?,?,?,?,0)',(owner,identifier,'day',1,canonical(payload)))
+        return True
+
     @app.post('/v1/sync')
     def sync(body:SyncInput,owner=Depends(identity)):
         wire=body.model_dump(mode='json'); rid=str(body.request_id)
@@ -178,7 +245,7 @@ def create_app(settings=None,ai=None):
             if old is not None: return old
             revision=db.execute('SELECT revision FROM users WHERE id=?',(owner,)).fetchone()['revision']
             if revision!=body.base_revision: raise APIError('revision_conflict',409)
-            ack=[]; changed=False
+            ack=[]; changed=False; affected_entry_days=set(); first_ingest_days=set()
             for op in body.operations:
                 oid=str(op.operation_id); eid=str(op.id); od=digest(op.model_dump(mode='json'))
                 prior=db.execute('SELECT digest FROM operations WHERE user_id=? AND id=?',(owner,oid)).fetchone()
@@ -196,65 +263,38 @@ def create_app(settings=None,ai=None):
                 if op.kind=='entry':
                     context,_=context_for(db,owner,'1900-01-01')
                     from zoneinfo import ZoneInfo
-                    affected=[draft.consumedAt.astimezone(ZoneInfo(context['time_zone'])).date().isoformat()]
+                    zone=ZoneInfo(context['time_zone'])
+                    incoming_day=draft.consumedAt.astimezone(zone).date().isoformat()
+                    affected=[incoming_day]
                     if existing:
                         prev=EntryDraft.model_validate(json.loads(existing['payload']).get('draft',json.loads(existing['payload'])))
-                        affected.append(prev.consumedAt.astimezone(ZoneInfo(context['time_zone'])).date().isoformat())
-                    if any(closed_day(db,owner,d) for d in affected): raise APIError('day_closed_reopen_required',409)
+                        previous_day=prev.consumedAt.astimezone(zone).date().isoformat()
+                        affected.append(previous_day)
+                    else: previous_day=None
+                    affected_entry_days.update(affected)
+                    if op.action=='upsert' and (not existing or existing['deleted'] or previous_day!=incoming_day):
+                        others=list(db.execute("SELECT payload FROM records WHERE user_id=? AND kind='entry' AND deleted=0 AND id<>?",(owner,eid)))
+                        has_existing_day=any(EntryDraft.model_validate(json.loads(row['payload']).get('draft',json.loads(row['payload']))).consumedAt.astimezone(zone).date().isoformat()==incoming_day for row in others)
+                        if not has_existing_day and not (existing and not existing['deleted'] and previous_day==incoming_day): first_ingest_days.add(incoming_day)
                 if existing and op.action=='upsert':
                     previous=json.loads(existing['payload'])
                     old_version=previous.get('version'); new_version=op.payload.get('version')
                     if old_version is not None and new_version is not None and (isinstance(new_version,bool) or not isinstance(new_version,int) or new_version<=old_version) and op.payload!=previous:
                         raise APIError('domain_version_conflict',409)
                 outgoing=dict(op.payload)
-                recompute_closure=False
-                if op.kind=='day' and op.action=='upsert' and outgoing.get('isClosed') is True:
-                    prior=json.loads(existing['payload']) if existing and not existing['deleted'] else {}
-                    previous=prior.get('summaries',[]); incoming=outgoing.get('summaries',[])
-                    if prior.get('isClosed') is True:
-                        # Metadata updates cannot republish a historical closure with new totals/source/goals.
-                        if incoming!=previous: raise APIError('closed_summary_conflict',409)
-                    elif incoming:
-                        if previous and (len(incoming)!=len(previous)+1 or incoming[:-1]!=previous): raise APIError('closed_summary_history_conflict',409)
-                        recompute_closure=True
-                if recompute_closure:
-                    day=outgoing.get('id',outgoing.get('day',outgoing.get('date')))
-                    if closed_day(db,owner,day): raise APIError('day_closed_reopen_required',409)
-                    day_context,_=context_for(db,owner,day)
-                    rows=list(db.execute("SELECT * FROM records WHERE user_id=? AND kind='entry'",(owner,)))
-                    aggregate={key:{'known':0,'knownCount':0,'missingCount':0} for key in NUTRIENTS}
-                    versions={}; count=0
-                    for row in rows:
-                        p=json.loads(row['payload']); d=EntryDraft.model_validate(p.get('draft',p))
-                        from zoneinfo import ZoneInfo
-                        if d.consumedAt.astimezone(ZoneInfo(day_context['time_zone'])).date().isoformat()!=day: continue
-                        versions[p.get('id',row['id'])]=p.get('version',row['version'])
-                        if row['deleted']: continue
-                        count+=1
-                        for key in NUTRIENTS:
-                            value=getattr(d.nutrition,key)
-                            if value is None: aggregate[key]['missingCount']+=1
-                            else:
-                                aggregate[key]['known']+=value*d.multiplier(); aggregate[key]['knownCount']+=1
-                    source=outgoing['summaries'][-1].get('intakeSource','manual')
-                    if source=='historical':
-                        summaries_history=[json.loads(r['payload']) for r in db.execute("SELECT payload FROM records WHERE user_id=? AND kind='historical' AND deleted=0",(owner,)) if json.loads(r['payload']).get('dayID')==day]
-                        if len(summaries_history)!=1: raise APIError('historical_source_unavailable',409)
-                        aggregate={key:{'known':summaries_history[0]['nutrients'].get(key) or 0,'knownCount':int(summaries_history[0]['nutrients'].get(key) is not None),'missingCount':int(summaries_history[0]['nutrients'].get(key) is None)} for key in NUTRIENTS}
-                        count=0
-                    elif source=='health':
-                        supplied=outgoing['summaries'][-1].get('totals',{})
-                        if any(isinstance(supplied.get(key),dict) and (supplied[key].get('known',0)!=0 or supplied[key].get('knownCount',0)!=0) for key in NUTRIENTS): raise APIError('health_data_forbidden_in_sync',422)
-                        aggregate={key:{'known':0,'knownCount':0,'missingCount':0} for key in NUTRIENTS};count=0
-                    elif source!='manual': raise APIError('invalid_intake_source',422)
-                    aggregate['entryCount']=count
-                    summaries=[dict(v) for v in outgoing['summaries']]
-                    summaries[-1]['totals']=aggregate; summaries[-1]['entryVersions']=versions
-                    summaries[-1].setdefault('closedAt',stamp())
-                    outgoing['summaries']=summaries
                 payload=canonical(outgoing) if op.action=='upsert' else existing['payload']
                 db.execute('INSERT INTO records VALUES(?,?,?,?,?,?) ON CONFLICT(user_id,id) DO UPDATE SET version=excluded.version,payload=excluded.payload,deleted=excluded.deleted',(owner,eid,op.kind,version+1,payload,int(op.action=='delete')))
                 db.execute('INSERT INTO operations VALUES(?,?,?)',(owner,oid,od)); ack.append(oid); changed=True
+            snapshot_days=set()
+            for ingested_day in first_ingest_days:
+                snapshot_days.add((date.fromisoformat(ingested_day)-timedelta(days=1)).isoformat())
+            for affected_day in affected_entry_days:
+                if affected_day<now().astimezone(zone).date().isoformat(): snapshot_days.add(affected_day)
+                if db.execute("SELECT 1 FROM records WHERE user_id=? AND kind='day' AND deleted=0",(owner,)).fetchone():
+                    if any(str(json.loads(row['payload']).get('id',''))[:10]==affected_day and json.loads(row['payload']).get('summaries') for row in db.execute("SELECT payload FROM records WHERE user_id=? AND kind='day' AND deleted=0",(owner,))):
+                        snapshot_days.add(affected_day)
+            for snapshot_day in sorted(snapshot_days):
+                if capture_day_snapshot(db,owner,snapshot_day): changed=True
             if changed: db.execute('UPDATE users SET revision=revision+1 WHERE id=?',(owner,))
             result=state(db,owner); result.pop('messages'); result['acknowledged_operation_ids']=ack
             db.execute('INSERT INTO requests VALUES(?,?,?,?,?)',(owner,rid,'sync',digest(wire),canonical(result)))
@@ -327,7 +367,11 @@ def create_app(settings=None,ai=None):
                     try: return datetime.fromisoformat(str(value).replace('Z','+00:00')).astimezone(zone).date().isoformat()
                     except ValueError: return str(value)[:10]
                 days=[r['payload'] for r in records if r['kind']=='day' and first<=str(r['payload'].get('date',r['payload'].get('day',r['payload'].get('id',''))))[:10]<=body.day.isoformat()]
-                complete_dates={str(p.get('date',p.get('day',p.get('id',''))))[:10] for p in days if (p.get('status')=='closed' or p.get('isClosed') is True) and (p.get('isComplete',p.get('complete',False)) is True or (p.get('summaries') and p['summaries'][-1].get('completeness')=='complete'))}
+                complete_dates={str(p.get('date',p.get('day',p.get('id',''))))[:10] for p in days if (p.get('isComplete',p.get('complete',False)) is True or (p.get('summaries') and p['summaries'][-1].get('intakeSource')=='historical' and p['summaries'][-1].get('completeness')=='complete'))}
+                complete_dates.update(str(payload.get('dayID',''))[:10] for payload in (r['payload'] for r in records if r['kind']=='historical')
+                    if first<=str(payload.get('dayID',''))[:10]<=body.day.isoformat()
+                    and payload.get('isComplete',payload.get('isClosed')) is True
+                    and all((payload.get('nutrients') or {}).get(key) is not None for key in ('energy','protein','carbohydrates','fat')))
                 weights=[r['payload'] for r in records if r['kind']=='weight' and first<=record_day(r['payload'])<=body.day.isoformat()]
                 activities=[r['payload'] for r in records if r['kind']=='activity' and first<=record_day(r['payload'])<=body.day.isoformat()]
                 weight_values={record_day(w):w['kilograms'] for w in sorted(weights,key=lambda p:p['recordedAt'])}
@@ -350,7 +394,7 @@ def create_app(settings=None,ai=None):
                 complete=len(complete_dates); observed_days=len(weight_values)
                 allowed=complete>=10 and observed_days>=6 and all(n>=3 for n in weights_by_week)
                 limitations=[]
-                if complete<10: limitations.append('Fewer than ten complete closed nutrition days in this fourteen-day window.')
+                if complete<10: limitations.append('Fewer than ten explicitly complete nutrition days in this fourteen-day window.')
                 if any(n<3 for n in weights_by_week): limitations.append('At least three observed weight days are required in each seven-day week.')
                 if any(any(v is None for k,v in row['totals'].items() if k not in ('saturatedFat','fiber')) for row in daily): limitations.append('Some daily nutrition values are unknown or require source reconciliation.')
                 coverage={'window_days':14,'complete_days':complete,'weight_observed_days':observed_days,'complete_days_by_week':complete_by_week,'weight_days_by_week':weights_by_week,'goal_adjustment_allowed':allowed,'limitations':limitations}

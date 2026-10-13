@@ -90,7 +90,14 @@ def digest(value):
 
 def state(db, owner):
     revision = db.execute('SELECT revision FROM users WHERE id=?', (owner,)).fetchone()['revision']
-    records = [dict(id=r['id'],kind=r['kind'],version=r['version'],payload=json.loads(r['payload'])) for r in db.execute('SELECT * FROM records WHERE user_id=? AND deleted=0 ORDER BY id',(owner,))]
+    records=[]
+    for row in db.execute('SELECT * FROM records WHERE user_id=? AND deleted=0 ORDER BY id',(owner,)):
+        payload=json.loads(row['payload'])
+        if row['kind']=='day':
+            payload.pop('isClosed',None); payload.pop('status',None)
+        elif row['kind']=='historical' and 'isClosed' in payload:
+            payload['isComplete']=payload.pop('isClosed')
+        records.append(dict(id=row['id'],kind=row['kind'],version=row['version'],payload=payload))
     from .health_weights import weight_records
     records.extend(weight_records(db,owner))
     messages = [dict(id=r['id'],request_id=r['request_id'],role=r['role'],content=r['content'],day=r['day'],created_at=r['created_at'],proposals=json.loads(r['proposals'])) for r in db.execute('SELECT * FROM messages WHERE user_id=? ORDER BY created_at,id',(owner,))]

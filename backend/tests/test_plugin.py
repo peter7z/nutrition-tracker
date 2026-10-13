@@ -119,7 +119,7 @@ def test_read_only_scope_and_owner_isolation(client):
 def test_food_receipt_idempotency_correction_delete_and_server_totals(client):
     tokens,_,_=connect(client);token=tokens['access_token']
     tools=rpc(client,token,'tools/list')['result']['tools']
-    assert {t['name'] for t in tools}=={'get_profile','get_day','show_day_summary','get_progress','open_tracker','record_food','update_food','delete_food','record_closed_day'}
+    assert {t['name'] for t in tools}=={'get_profile','get_day','show_day_summary','get_progress','open_tracker','record_food','update_food','delete_food','record_day_totals'}
     day_reader=next(t for t in tools if t['name']=='get_day')
     day_renderer=next(t for t in tools if t['name']=='show_day_summary')
     sidebar=next(t for t in tools if t['name']=='open_tracker')
@@ -235,7 +235,7 @@ def test_wrong_pkce_and_audience_never_issue_token(client):
     assert client.post('/token',data=form|{'code_verifier':verifier}).status_code==400
 
 
-def test_closed_day_totals_atomic_replay_scope_and_frozen(client):
+def test_day_totals_atomic_replay_scope_and_correctable(client):
     tokens,_,_=connect(client);token=tokens['access_token']
     read,_,_=connect(client,email='reader@example.com',scopes='tracking:read')
     saved=tool(client,token,'record_food',{'operation_id':str(uuid.uuid4()),'base_revision':0,
@@ -243,31 +243,31 @@ def test_closed_day_totals_atomic_replay_scope_and_frozen(client):
     nutrients={'energy':2200,'protein':140,'carbohydrates':250,'fat':70,'saturatedFat':15,'fiber':30}
     args={'operation_id':str(uuid.uuid4()),'base_revision':1,'day':'2026-10-10',
         'consumption_text':'Guardar el día completo que consumí','nutrients':nutrients}
-    assert tool(client,read['access_token'],'record_closed_day',args)['isError']
+    assert tool(client,read['access_token'],'record_day_totals',args)['isError']
     for invalid in (-1,True,'20'):
-        assert tool(client,token,'record_closed_day',args|{'nutrients':{'fiber':invalid}})['isError']
-    assert tool(client,token,'record_closed_day',args|{'base_revision':5})['isError']
-    assert tool(client,token,'record_closed_day',args|{'consumption_text':'Si como eso mañana'})['isError']
-    first=tool(client,token,'record_closed_day',args)['structuredContent']
-    assert first['saved'] and first['closed'] and first['revision']==2
-    assert tool(client,token,'record_closed_day',args)['structuredContent']==first
+        assert tool(client,token,'record_day_totals',args|{'nutrients':{'fiber':invalid}})['isError']
+    assert tool(client,token,'record_day_totals',args|{'base_revision':5})['isError']
+    assert tool(client,token,'record_day_totals',args|{'consumption_text':'Si como eso mañana'})['isError']
+    first=tool(client,token,'record_day_totals',args)['structuredContent']
+    assert first['saved'] and first['revision']==2 and 'closed' not in first
+    assert tool(client,token,'record_day_totals',args)['structuredContent']==first
     day=tool(client,token,'get_day',{'day':'2026-10-10'})['structuredContent']
     expected_totals={key:nutrients.get(key) for key in NUTRIENTS}
-    assert day['closed'] and day['totals']==expected_totals and len(day['entries'])==1
+    assert 'closed' not in day and day['totals']==expected_totals and len(day['entries'])==1
     assert not day['needs_reconciliation']
     assert tool(client,token,'get_progress',{'start_day':'2026-10-10','end_day':'2026-10-10'})['structuredContent']['days'][0]['totals']==expected_totals
-    assert tool(client,token,'record_closed_day',args|{'operation_id':str(uuid.uuid4()),'base_revision':2})['isError']
-    assert tool(client,token,'update_food',{'operation_id':str(uuid.uuid4()),'base_revision':2,
-        'entry_id':saved['entry_id'],'expected_version':1,'correction_text':'Eran dos bananas','food':food()})['isError']
-    assert tool(client,token,'get_day',{'day':'2026-10-10'})['structuredContent']['revision']==2
+    assert tool(client,token,'record_day_totals',args|{'operation_id':str(uuid.uuid4()),'base_revision':2})['isError']
+    correction=tool(client,token,'update_food',{'operation_id':str(uuid.uuid4()),'base_revision':2,
+        'entry_id':saved['entry_id'],'expected_version':1,'correction_text':'Eran dos bananas','food':food()})
+    assert correction['structuredContent']['saved']
     other=tool(client,read['access_token'],'get_day',{'day':'2026-10-10'})['structuredContent']
-    assert not other['closed'] and other['totals']['energy'] is None
-    unknown=args|{'operation_id':str(uuid.uuid4()),'base_revision':2,'day':'2026-10-09','nutrients':{'energy':1800}}
-    assert tool(client,token,'record_closed_day',unknown)['structuredContent']['saved']
+    assert 'closed' not in other and other['totals']['energy'] is None
+    unknown=args|{'operation_id':str(uuid.uuid4()),'base_revision':3,'day':'2026-10-09','nutrients':{'energy':1800}}
+    assert tool(client,token,'record_day_totals',unknown)['structuredContent']['saved']
     assert tool(client,token,'get_day',{'day':'2026-10-09'})['structuredContent']['totals']['fiber'] is None
 
 
-def test_companion_state_reads_mcp_food_and_closure_for_same_account(client):
+def test_companion_state_reads_mcp_food_and_daily_snapshots_for_same_account(client):
     tokens,_,_=connect(client)
     token=tokens['access_token']
     session=client.post('/v1/auth/login',json={'email':'plugin@example.com','password':'synthetic plugin password'}).json()
@@ -276,20 +276,18 @@ def test_companion_state_reads_mcp_food_and_closure_for_same_account(client):
     saved=tool(client,token,'record_food',{'operation_id':str(uuid.uuid4()),'base_revision':0,
         'consumption_text':'Comí una banana','food':food()})['structuredContent']
     state=client.get('/v1/state',headers=headers).json()
-    assert state['revision']==1 and len(state['records'])==1
-    entry=state['records'][0]
+    assert state['revision']==1 and {record['kind'] for record in state['records']}=={'entry','day'}
+    entry=next(record for record in state['records'] if record['kind']=='entry')
     assert entry['id']==saved['entry_id'] and entry['version']==1
     assert entry['payload']['draft']['nutrition']['fiber']==3.9
     assert entry['payload']['draft']['consumedAt'].endswith('-03:00')
-    closed=tool(client,token,'record_closed_day',{'operation_id':str(uuid.uuid4()),'base_revision':1,
+    totals=tool(client,token,'record_day_totals',{'operation_id':str(uuid.uuid4()),'base_revision':1,
         'day':'2026-10-10','consumption_text':'Guardar el total consumido del día','nutrients':{'energy':2200,'fiber':30}})
-    assert closed['structuredContent']['saved']
+    assert totals['structuredContent']['saved']
     state=client.get('/v1/state',headers=headers).json()
-    assert state['revision']==2 and {r['kind'] for r in state['records']}=={'entry','historical','day'}
+    assert state['revision']==2 and {r['kind'] for r in state['records']}=={'entry','historical','resolution','day'}
     day=next(r['payload'] for r in state['records'] if r['kind']=='day')
-    assert day['isClosed'] and day['id']=='2026-10-10'
-    assert day['summaries'][-1]['totals']['energy']['known']==2200
-    assert day['summaries'][-1]['totals']['fiber']['known']==30
+    assert 'isClosed' not in day and day['id']=='2026-10-10'
     assert day['summaries'][-1]['closedAt']
     other=client.post('/v1/auth/signup',json={'email':'companion-other@example.com','password':'synthetic plugin password'}).json()
     assert client.get('/v1/state',headers={'Authorization':'Bearer '+other['token']}).json()['records']==[]

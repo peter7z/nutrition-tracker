@@ -22,7 +22,6 @@ function reset() {
 function render(data) {
   $('day').value=data.day;
   $('day-title').textContent=new Intl.DateTimeFormat('es-UY',{dateStyle:'long',timeZone:'UTC'}).format(new Date(data.day+'T12:00:00Z'));
-  $('closed').textContent=data.closed?'Día cerrado':'Día abierto';
   $('source').textContent='Totales de '+({manual:'las comidas registradas',historical:'un resumen diario',health:'Apple Health'}[data.intake_selection]||'la fuente seleccionada')+' · '+data.time_zone;
   $('totals').replaceChildren(...nutrients.map(([key,title,unit])=>{const dl=node('dl',undefined,'metric');dl.append(node('dt',title));const dd=node('dd',format(data.totals[key]));dd.append(node('small',' '+unit));dl.append(dd);return dl;}));
   $('warning').hidden=!data.needs_reconciliation;
@@ -40,7 +39,7 @@ function render(data) {
     if(food.notes)article.append(node('p',food.notes));
     return article;
   }));
-  if(!data.entries.length)$('meals').append(node('p',data.closed?'Este día tiene un cierre, pero no hay comidas individuales registradas.':'No hay comidas registradas para esta fecha.'));
+  if(!data.entries.length)$('meals').append(node('p','No hay comidas registradas para esta fecha.'));
   if(data.entries.length===50)$('meals').append(node('p','Se muestran las últimas 50 comidas. Los totales incluyen todas las entradas del día.'));
   $('freshness').textContent='Datos del servidor · actualizados a las '+new Intl.DateTimeFormat('es-UY',{timeStyle:'short'}).format(new Date());
 }

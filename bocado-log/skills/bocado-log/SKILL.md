@@ -73,11 +73,12 @@ el usuario autorizó y subió desde iOS. La fuente de esos pesos es `appleHealth
 No afirmar que hay mediciones de Salud si el servidor no las entrega. Solo peso
 tiene carga remota; otras métricas de Salud siguen pendientes.
 
-`record_closed_day` guarda los totales consumidos de una fecha y la cierra, sin
-crear comidas ni sumar ese resumen a las comidas existentes. Acepta calorías,
+`record_day_totals` guarda totales explícitos de todo el día como fuente
+histórica completa, sin crear comidas ni sumar ese resumen a las existentes.
+No cierra el día ni bloquea correcciones. Acepta calorías,
 macros, grasa saturada, fibra y los micronutrientes indicados por
 `nutrient_units`; valores desconocidos permanecen null.
 
-Registrar peso/actividad por herramientas específicas, reabrir días, metas y
-deshacer siguen pendientes. iOS consulta datos y sincroniza peso; el registro
+Registrar peso/actividad por herramientas específicas, metas y deshacer siguen
+pendientes. No existe cierre/reapertura del día. iOS consulta datos y sincroniza peso; el registro
 de comidas sigue ocurriendo en ChatGPT.

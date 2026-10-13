@@ -249,16 +249,16 @@ struct TrackingProgressView: View {
             guard let date = calendar.date(byAdding: .day, value: -(WeeklyReviewSummary.reviewWindowDays - 1 - offset), to: today) else { return nil }
             let dayID = nutrition.dayID(for: date)
             let day = nutrition.snapshot.days.first { $0.id == dayID }
-            let closedSummary = day?.summaries.last
+            let daySummary = day?.summaries.last
             let bridge = TrackingBridge.nutrition(on: date, manual: nutrition.snapshot, health: health.snapshot, accountScope: history.accountScope)
             let historical = nutrition.snapshot.historicalSummaries.filter { $0.dayID == dayID }
             let historicalIsComplete: Bool = {
-                guard (day == nil || day?.isClosed == true), closedSummary == nil, bridge.selection == .historical,
-                      historical.count == 1, historical[0].isClosed else { return false }
+                guard daySummary == nil, bridge.selection == .historical,
+                      historical.count == 1, historical[0].isComplete else { return false }
                 let values = historical[0].nutrients
-                return values.isValid && values.energy?.isFinite == true && values.protein?.isFinite == true
+                return values.isValid && [values.energy, values.protein, values.carbohydrates, values.fat].allSatisfy { $0?.isFinite == true }
             }()
-            let explicitlyComplete = day?.isClosed == true && closedSummary?.completeness == .complete
+            let explicitlyComplete = daySummary?.intakeSource == .historical && daySummary?.completeness == .complete
             let isComplete = explicitlyComplete || historicalIsComplete
             return DailyIntakeObservation(
                 date: date,
@@ -711,7 +711,7 @@ struct TrackingProgressView: View {
             }
             LabeledContent("Unresolved weight matches") { Text("\(weeklyReview.unresolvedWeightConflictCount)") }
 
-            Text("A goal review needs at least 10 of 14 complete nutrition days and 6 weight days, with at least 3 weight days in each 7-day week.")
+            Text("A goal review needs at least 10 of 14 explicitly complete nutrition days and 6 weight days, with at least 3 weight days in each 7-day week.")
                 .font(.footnote).foregroundStyle(.secondary)
             Text("These are summaries of recorded observations. They do not explain why weight changed. Unknown values remain missing, and activity is separate from food intake.")
                 .font(.footnote).foregroundStyle(.secondary)
@@ -724,7 +724,7 @@ struct TrackingProgressView: View {
                     .font(.footnote).foregroundStyle(.secondary)
             }
         } header: { Text("14-day review") } footer: {
-            Text("Complete days come from explicit completed day closures. A historical spreadsheet day counts only when it was closed and has valid calorie and protein totals. Apple Health totals alone never mark a day complete.")
+            Text("Complete days require explicitly recorded whole-day totals. Logged meals alone and Apple Health totals do not prove that a day is complete.")
         }
     }
 

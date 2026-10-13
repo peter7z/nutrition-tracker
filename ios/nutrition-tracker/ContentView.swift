@@ -148,13 +148,12 @@ private struct DailyNutritionView: View {
     let selectedDate: Date
     private var resolved: ResolvedDailyNutrition { TrackingBridge.nutrition(on: selectedDate, manual: nutrition.snapshot, health: model.snapshot, accountScope: history.accountScope) }
     private var dailyGoals: NutritionGoals? {
-        if history.ownerID == nil && nutrition.snapshot.goals.isEmpty && !isClosed { return model.snapshot.goals }
+        if history.ownerID == nil && nutrition.snapshot.goals.isEmpty { return model.snapshot.goals }
         return nutrition.goals(on: selectedDate)
     }
     private var consumed: Double? { resolved.values.energy }
     private var goal: Double? { dailyGoals?.energy }
     private var dayID: String { nutrition.snapshot.profile.dayID(for: selectedDate) }
-    private var isClosed: Bool { nutrition.snapshot.days.first { $0.id == dayID }?.isClosed == true }
     private var fraction: Double {
         guard let consumed, let goal, goal > 0 else { return 0 }
         return min(max(consumed / goal, 0), 1)
@@ -207,7 +206,6 @@ private struct DailyNutritionView: View {
 
     private var dayStatus: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if isClosed { Label("Day closed", systemImage: "checkmark.circle").font(.caption) }
             if nutrition.isRefreshing {
                 HStack { ProgressView(); Text("Syncing diary…").font(.caption) }
             }

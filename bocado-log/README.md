@@ -24,7 +24,7 @@ para callbacks propios. OAuth publica discovery, PKCE S256, resource, scopes,
 access tokens opacos de una hora, refresh rotatorio y revocación persistida.
 
 Herramientas: `get_profile`, `get_day`, `show_day_summary`, `get_progress`, `open_tracker`, `record_food`,
-`update_food`, `delete_food`, `record_closed_day`. ChatGPT estima el snapshot;
+`update_food`, `delete_food`, `record_day_totals`. ChatGPT estima el snapshot;
 no hay catálogo ni inferencia de OpenAI en el servidor. Las mutaciones devuelven
 recibos y exigen revisión/versiones. Al registrar o corregir una comida, el MCP
 entrega los totales autoritativos del día y vincula una tarjeta MCP Apps inline

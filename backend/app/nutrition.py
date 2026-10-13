@@ -103,24 +103,12 @@ def context_for(db,owner,day):
         totals={key:None for key in NUTRIENTS}
     elif selection=='historical' or (not entries and len(historical)==1):
         totals={key:historical[0]['nutrients'].get(key) if historical else None for key in NUTRIENTS}
-    frozen=next((r['payload']['summaries'][-1] for r in records if r['kind']=='day' and str(r['payload'].get('date',r['payload'].get('day',r['payload'].get('id',''))))[:10]==day and r['payload'].get('isClosed') is True and r['payload'].get('summaries')),None)
-    if frozen:
-        selection=frozen.get('intakeSource') or 'manual';needs_reconciliation=False
-        totals={key:(metric.get('known') if metric.get('knownCount',0)>0 and metric.get('missingCount',0)==0 else None) for key in NUTRIENTS for metric in [frozen.get('totals',{}).get(key,{})]}
-        if selection=='health': totals={key:None for key in NUTRIENTS}
-        goal_id=str(frozen.get('goalVersionID','')).lower()
-        goals=[r['payload'] for r in records if r['kind']=='goal' and r['id'].lower()==goal_id]
-        if selection=='historical': historical=[{'dayID':day,'nutrients':totals,'isClosed':True,'frozen':True}]
+    # Day summaries are history only. Current totals always come from the selected
+    # source records, so a late correction can never be hidden by an old snapshot.
     def same_day(payload):
         return datetime.fromisoformat(payload['recordedAt'].replace('Z','+00:00')).astimezone(zone).date().isoformat()==day
     weights=[{'id':r['id'],'recorded_at':r['payload']['recordedAt'],'kilograms':r['payload']['kilograms']} for r in records if r['kind']=='weight' and same_day(r['payload'])]
     from .health_weights import weight_records
     weights.extend({'id':r['id'],'recorded_at':r['payload']['recordedAt'],'kilograms':r['payload']['kilograms'],'source':'appleHealth'} for r in weight_records(db,owner) if same_day(r['payload']))
     activities=[{'id':r['id'],'recorded_at':r['payload']['recordedAt'],'kind':r['payload']['kind'],'duration_minutes':r['payload'].get('durationMinutes'),'active_kcal':r['payload'].get('activeEnergy')} for r in records if r['kind']=='activity' and same_day(r['payload'])]
-    return dict(weights=weights[-10:],activities=activities[-10:],closed=bool(frozen),intake_selection=selection or ('historical' if historical and not entries else 'manual'),needs_reconciliation=needs_reconciliation,historical_summary=historical[0] if len(historical)==1 else None,day=day,time_zone=zone.key,entries=entries[-50:],totals=totals,goals=goals[-1] if goals else None,preferences=profile.get('preferences',{})), records
-
-def closed_day(db,owner,day):
-    for r in db.execute("SELECT payload FROM records WHERE user_id=? AND kind='day' AND deleted=0",(owner,)):
-        p=json.loads(r['payload'])
-        if str(p.get('date',p.get('day',p.get('id',''))))[:10]==day and (p.get('status')=='closed' or p.get('isClosed') is True): return True
-    return False
+    return dict(weights=weights[-10:],activities=activities[-10:],intake_selection=selection or ('historical' if historical and not entries else 'manual'),needs_reconciliation=needs_reconciliation,historical_summary=historical[0] if len(historical)==1 else None,day=day,time_zone=zone.key,entries=entries[-50:],totals=totals,goals=goals[-1] if goals else None,preferences=profile.get('preferences',{})), records

@@ -71,7 +71,7 @@ Prueba API del 2026-10-08 usó [GPT-4o Mini](https://developers.openai.com/api/d
 
 ## Servicio exclusivo de tests de aceptación nativa
 
-Desde `backend/`, `python -m tests.ui_server --port 8766` inicia un servidor sólo loopback con SQLite privado temporal y proveedor determinístico. Default 8766, puerto configurable. Usa auth/sync/propiedad/versions/guards reales; no requiere ni usa clave/modelo OpenAI, ni llama a red del proveedor. No es `app.asgi:app`, no debe desplegarse como producción y todas sus respuestas dicen Fixture. Consumo banana (150 g), corrección (eran 100 g), hipótesis y cierre permiten tests nativos reproducibles sin costos. La base temporal se elimina al cerrar el servicio. Una prueba HTTP verifica signup, sync, propuestas y ausencia de llamadas reales al proveedor. Este fixture verifica integración del cliente, no calidad de estimación del modelo.
+Desde `backend/`, `python -m tests.ui_server --port 8766` inicia un servidor sólo loopback con SQLite privado temporal y proveedor determinístico. Default 8766, puerto configurable. Usa auth/sync/propiedad/versions/guards reales; no requiere ni usa clave/modelo OpenAI, ni llama a red del proveedor. No es `app.asgi:app`, no debe desplegarse como producción y todas sus respuestas dicen Fixture. Consumo banana (150 g), corrección (eran 100 g) e hipótesis permiten tests nativos reproducibles sin costos. El fixture explica que no hace falta cerrar el día. La base temporal se elimina al cerrar el servicio. Una prueba HTTP verifica signup, sync, propuestas y ausencia de llamadas reales al proveedor. Este fixture verifica integración del cliente, no calidad de estimación del modelo.
 
 ## Postgres
 

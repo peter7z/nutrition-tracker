@@ -2,7 +2,7 @@
 
 From backend/: python -m tests.ui_server --port 8766
 The real auth, owner filtering, sync, chat guards and SQLite migrations run unchanged.
-Responses are deterministic test data for banana consumption/correction/planning/closure.
+Responses are deterministic test data for banana consumption/correction/planning.
 """
 import argparse
 import re
@@ -24,8 +24,7 @@ class FixtureResponses:
         if re.search(r'\b(y si|si como|what if|qué ceno|que ceno)\b',normalized):
             intent='hypothetical'; message='Fixture: esta hipótesis no registra consumo.'
         elif re.search(r'\b(cerr[aá]|cerrar|close)\b',normalized):
-            intent='close';proposal.update(action='close_day',name=None,quantity=None,unit=None,state=None,nutrients=None)
-            proposals=[proposal];message='Fixture: revisá el cierre del día antes de confirmarlo.'
+            intent='query';message='Fixture: no hace falta cerrar el día; los totales se guardan automáticamente al comenzar el siguiente.'
         elif re.search(r'\b(eran|correg[ií]|actually|correct)\b',normalized):
             matches=[e for e in context['entries'] if 'banana' in e['draft']['name'].casefold()]
             proposal['action']='update';intent='correction';proposals=[proposal]

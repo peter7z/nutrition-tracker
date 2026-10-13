@@ -5,10 +5,11 @@ Keychain. Esa cuenta debe ser la misma que se conectó al plugin de ChatGPT.
 No se utiliza el token OAuth del MCP ni acceso directo a Supabase.
 
 `BackendDiary` convierte los registros del servidor a `NutritionSnapshot`:
-las comidas se agrupan por la fecha de consumo en la zona horaria del perfil;
-los días cerrados conservan sus resúmenes y fuente de totales. Un resumen diario
-no crea comidas. Fibra se conserva en entradas, totales y cierres; los cierres
-antiguos sin ese campo siguen siendo legibles.
+las comidas se agrupan por la fecha de consumo en la zona horaria del perfil.
+Los snapshots diarios son historial corregible; los totales visibles siempre
+se derivan de la fuente seleccionada. Un resumen diario no crea comidas.
+Fibra se conserva en entradas y totales; los resúmenes antiguos sin ese campo
+siguen siendo legibles.
 
 La descarga ocurre al restaurar o iniciar una sesión, al volver al primer plano
 y al deslizar para actualizar Hoy o Progreso. Cada descarga reemplaza la copia
@@ -27,6 +28,6 @@ sin un registro `import`. El adaptador agrega metadatos de procedencia solamente
 a la caché para validar y mostrar ese resumen; no inventa comidas ni nutrientes.
 
 Validación: pruebas backend de MCP → `/v1/state` para la misma cuenta,
-aislamiento y cierres; pruebas iOS del adaptador, fibra, fechas, compatibilidad,
+aislamiento y snapshots; pruebas iOS del adaptador, fibra, fechas, compatibilidad,
 descarga autenticada, correcciones/borrados, caché offline y cambio de cuenta.
 Las pruebas iOS requieren Xcode 26 o posterior en macOS.

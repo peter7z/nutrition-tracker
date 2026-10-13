@@ -107,13 +107,13 @@ def test_invalid_numbers_fail_closed(setup,bad):
     else: assert sync(c,a,[operation(payload={'draft':d})]).status_code==422
     assert c.get('/v1/state',headers=a).json()['revision']==0
 
-def test_closed_day_requires_explicit_reopen(setup):
+def test_legacy_closed_day_metadata_does_not_block_entry_corrections(setup):
     c,ai,app,a,b=setup; entry=operation(); day=operation(kind='day',payload={'id':'2026-10-08','isClosed':True,'version':1,'summaries':[]})
     assert sync(c,a,[entry,day]).status_code==200
-    assert sync(c,a,[operation(id=entry['id'],version=1)],1).status_code==409
-    reopened=operation(kind='day',id=day['id'],version=1,payload={'id':'2026-10-08','isClosed':False,'version':2,'summaries':[]})
-    assert sync(c,a,[reopened],1).status_code==200
-    assert sync(c,a,[operation(id=entry['id'],version=1,payload={'draft':draft(100)})],2).status_code==200
+    assert sync(c,a,[operation(id=entry['id'],version=1,payload={'draft':draft(100)})],1).status_code==200
+    records=c.get('/v1/state',headers=a).json()['records']
+    day_record=next(record for record in records if record['kind']=='day')
+    assert 'isClosed' not in day_record['payload']
 
 def test_chat_proposals_no_write_idempotent_and_owned_context(setup):
     c,ai,app,a,b=setup
@@ -274,17 +274,17 @@ def test_two_identity_chat_messages_usage_and_deletion_are_isolated(setup):
     assert c.delete('/v1/account',headers=b).status_code==200
     assert len(c.get('/v1/state',headers=a).json()['messages'])==2
 
-def test_closed_to_open_and_entry_update_same_atomic_batch(setup):
+def test_legacy_day_status_and_entry_update_sync_atomically(setup):
     c,ai,app,a,b=setup
     e=operation();d=operation(kind='day',payload={'id':'2026-10-08','version':1,'isClosed':True,'summaries':[]})
     assert sync(c,a,[e,d]).status_code==200
-    reopen=operation(kind='day',id=d['id'],version=1,payload={'id':'2026-10-08','version':2,'isClosed':False,'summaries':[]})
     correction=operation(id=e['id'],version=1,payload={'draft':draft(100)})
-    reclose=operation(kind='day',id=d['id'],version=2,payload={'id':'2026-10-08','version':3,'isClosed':True,'summaries':[]})
-    response=sync(c,a,[reopen,correction,reclose],1)
+    update_day=operation(kind='day',id=d['id'],version=1,payload={'id':'2026-10-08','version':2,'isClosed':True,'summaries':[]})
+    response=sync(c,a,[correction,update_day],1)
     assert response.status_code==200
     assert response.json()['revision']==2
     assert chat(c,a).json()['totals']['energy']==89
+    assert 'isClosed' not in next(record['payload'] for record in response.json()['records'] if record['kind']=='day')
 
 def test_historical_totals_are_not_added_to_meals_and_resolution_is_explicit(setup):
     c,ai,app,a,b=setup
@@ -311,17 +311,18 @@ def test_health_intake_requires_specific_nutrition_context(setup):
     assert result.json()['totals']['fat'] is None
     assert 'dietary_kcal' not in json.dumps(c.get('/v1/state',headers=a).json())
 
-def test_close_summary_is_recomputed_in_code_not_trusted_from_client(setup):
+def test_day_snapshot_is_recomputed_in_code_not_trusted_from_client(setup):
     c,ai,app,a,b=setup
     summary=dict(id=uid(),version=1,closedAt='2026-10-08T18:00:00Z',completeness='complete',totals={'energy':99999},entryVersions={})
-    closed=operation(kind='day',payload=dict(id='2026-10-08',version=2,isClosed=True,summaries=[summary]))
-    result=sync(c,a,[operation(),closed])
+    snapshot=operation(kind='day',payload=dict(id='2026-10-08',version=2,isClosed=True,summaries=[summary]))
+    result=sync(c,a,[operation(),snapshot])
     assert result.status_code==200
     day=next(r for r in result.json()['records'] if r['kind']=='day')
     totals=day['payload']['summaries'][0]['totals']
     assert totals['energy']['known']==133.5
     assert totals['saturatedFat']['missingCount']==1
     assert totals['entryCount']==1
+    assert 'isClosed' not in day['payload']
 
 @pytest.mark.parametrize('text',['¿Qué tiene una banana?','Si me como una banana, ¿cuánto sumo?','How much protein is in a banana?'])
 def test_general_queries_with_misclassified_provider_never_propose_consumption(setup,text):
@@ -415,7 +416,7 @@ def test_review_health_aggregate_scope_and_goal_gate(setup):
     other=c.post('/v1/review',headers=b,json={**body,'request_id':uid()}).json()
     assert other['review_coverage']['complete_days']==0 and other['goal_proposal'] is None
 
-def test_closed_context_freezes_totals_source_and_goal_version(setup):
+def test_context_uses_current_sources_instead_of_old_day_snapshots(setup):
     from app.nutrition import context_for
     c,ai,app,a,b=setup
     assert sync(c,a,[operation()]).status_code==200
@@ -427,14 +428,14 @@ def test_closed_context_freezes_totals_source_and_goal_version(setup):
         summary=dict(intakeSource='historical',goalVersionID=goal_id,totals={k:dict(known=v,knownCount=1,missingCount=0) for k,v in dict(energy=2100,protein=120,carbohydrates=240,fat=70,saturatedFat=10).items()})
         day_id=uid();db.execute('INSERT INTO records VALUES(?,?,?,?,?,?)',(owner,day_id,'day',1,json.dumps(dict(id='2026-10-08',isClosed=True,summaries=[summary])),0))
         context,_=context_for(db,owner,'2026-10-08')
-        assert context['closed'] is True and context['totals']['energy']==2100
-        assert context['goals']['energy']==1900 and context['intake_selection']=='historical'
+        assert 'closed' not in context and context['totals']['energy']==133.5
+        assert context['goals']['energy']==2500 and context['intake_selection']=='manual'
         db.execute("UPDATE records SET deleted=1 WHERE user_id=? AND kind='entry'",(owner,))
-        context,_=context_for(db,owner,'2026-10-08');assert context['totals']['energy']==2100
+        context,_=context_for(db,owner,'2026-10-08');assert all(v is None for v in context['totals'].values())
         summary['intakeSource']='health';summary['goalVersionID']=None
         db.execute('UPDATE records SET payload=? WHERE user_id=? AND id=?',(json.dumps(dict(id='2026-10-08',isClosed=True,summaries=[summary])),owner,day_id))
         context,_=context_for(db,owner,'2026-10-08')
-        assert all(v is None for v in context['totals'].values()) and context['goals'] is None
+        assert all(v is None for v in context['totals'].values()) and context['goals']['energy']==2500
 
 
 def test_legacy_catalog_sync_preserved_but_not_in_active_assistant_context_or_schema(setup):
@@ -479,38 +480,27 @@ def test_spanish_food_estimate_correction_and_hypothetical_require_no_manual_mac
     assert c.get('/v1/state',headers=a).json()['revision']==1
 
 
-def test_sync_closed_metadata_preserves_frozen_history_until_explicit_reopen(setup):
+def test_sync_legacy_day_metadata_allows_snapshot_correction(setup):
     c,ai,app,a,b=setup
     entry=operation();day_id=uid()
     summary=dict(id=uid(),version=1,closedAt='2026-10-08T15:00:00Z',completeness='complete',intakeSource='manual',goalVersionID=None,totals={},entryVersions={})
     day=dict(id='2026-10-08',version=1,isClosed=True,summaries=[summary])
     reply=sync(c,a,[entry,operation(kind='day',id=day_id,payload=day)])
     assert reply.status_code==200
-    frozen=next(r['payload'] for r in reply.json()['records'] if r['kind']=='day')
-    original_totals=frozen['summaries'][0]['totals']
-    # Source imports/observations do not rewrite an existing close snapshot.
+    stored=next(r['payload'] for r in reply.json()['records'] if r['kind']=='day')
+    assert 'isClosed' not in stored
+    # Historical imports do not freeze the current intake or reject updates.
     historic_id=uid(); historic=dict(id=historic_id,dayID='2026-10-08',nutrients=dict(energy=3000),isClosed=True,notes='',importBatchID=uid(),sourceRow='fixture')
     assert sync(c,a,[operation(kind='historical',id=historic_id,payload=historic)],revision=1).status_code==200
-    metadata={**frozen,'version':2}
+    metadata={**stored,'version':2}
     reply=sync(c,a,[operation(kind='day',id=day_id,version=1,payload=metadata)],revision=2)
     assert reply.status_code==200
-    closed=next(r['payload'] for r in reply.json()['records'] if r['kind']=='day')
-    assert closed['summaries'][0]['totals']==original_totals
-    tampered={**closed,'version':3,'summaries':[{**closed['summaries'][0],'intakeSource':'historical'}]}
-    rejected=sync(c,a,[operation(kind='day',id=day_id,version=2,payload=tampered)],revision=3)
-    assert rejected.status_code==409 and rejected.json()['error']['code']=='closed_summary_conflict'
-    reopened={**closed,'version':3,'isClosed':False}
-    next_summary={**summary,'id':uid(),'version':2,'intakeSource':'historical'}
-    reclosed={**reopened,'version':4,'isClosed':True,'summaries':closed['summaries']+[next_summary]}
-    reply=sync(c,a,[operation(kind='day',id=day_id,version=2,payload=reopened),operation(kind='day',id=day_id,version=3,payload=reclosed)],revision=3)
+    edited={**metadata,'version':3,'summaries':[{**summary,'intakeSource':'historical'}]}
+    reply=sync(c,a,[operation(kind='day',id=day_id,version=2,payload=edited)],revision=3)
     assert reply.status_code==200
     result=next(r['payload'] for r in reply.json()['records'] if r['kind']=='day')
-    assert result['summaries'][0]['totals']==original_totals
-    assert result['summaries'][1]['totals']['energy']['known']==3000
-    # Reopen can prepare a later close, but a new close may not rewrite older IDs/totals.
-    open_again={**result,'isClosed':False,'version':5}
-    wrong={**result,'version':6,'summaries':[{**result['summaries'][0],'goalVersionID':uid()},result['summaries'][1],{**next_summary,'id':uid(),'version':3}]}
-    assert sync(c,a,[operation(kind='day',id=day_id,version=4,payload=open_again),operation(kind='day',id=day_id,version=5,payload=wrong)],revision=4).status_code==409
+    assert 'isClosed' not in result
+    assert result['summaries'][0]['intakeSource']=='historical'
     assert c.get('/v1/state',headers=a).json()['revision']==4
 
 

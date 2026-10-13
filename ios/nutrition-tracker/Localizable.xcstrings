@@ -892,12 +892,18 @@
         }
       }
     },
-    "Complete days come from explicit completed day closures. A historical spreadsheet day counts only when it was closed and has valid calorie and protein totals. Apple Health totals alone never mark a day complete." : {
+    "Complete days require explicitly recorded whole-day totals. Logged meals alone and Apple Health totals do not prove that a day is complete." : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complete days require explicitly recorded whole-day totals. Logged meals alone and Apple Health totals do not prove that a day is complete."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los días completos requieren que hayas cerrado el día como completo. Un día histórico de la planilla cuenta solo si figura cerrado y tiene totales válidos de calorías y proteína. Los totales de Apple Health por sí solos nunca completan un día."
+            "value" : "Los días completos requieren totales explícitos del día entero. Registrar comidas o importar totales de Apple Health no demuestra que el día esté completo."
           }
         }
       }
@@ -1309,16 +1315,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fecha"
-          }
-        }
-      }
-    },
-    "Day closed" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Día cerrado"
           }
         }
       }

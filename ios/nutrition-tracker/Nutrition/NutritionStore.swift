@@ -61,8 +61,8 @@ import Observation
     func goals(on date: Date) -> NutritionGoals? { goalVersion(on: date)?.goals }
     func goalVersion(on date: Date) -> NutritionGoalVersion? {
         let day = dayID(for: date)
-        if let closed = snapshot.days.first(where: { $0.id == day && $0.isClosed }) {
-            guard let id = closed.summaries.last?.goalVersionID else { return nil }
+        if let summary = snapshot.days.first(where: { $0.id == day })?.summaries.last {
+            guard let id = summary.goalVersionID else { return nil }
             return snapshot.goals.first { $0.id == id }
         }
         return snapshot.goals.filter { $0.effectiveDay <= day }.sorted { $0.effectiveDay == $1.effectiveDay ? $0.createdAt < $1.createdAt : $0.effectiveDay < $1.effectiveDay }.last

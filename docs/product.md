@@ -33,7 +33,7 @@ flowchart LR
     P -->|fase posterior| W[Widgets con ChatGPT Extensions]
 ```
 
-La importación técnica de Salud, la gestión de cuenta y el consentimiento no son registro manual de tracking. Que iOS pueda subir datos importados no habilita formularios para crear comidas, pesajes, actividades, objetivos o cierres.
+La importación técnica de Salud, la gestión de cuenta y el consentimiento no son registro manual de tracking. Que iOS pueda subir datos importados no habilita formularios para crear comidas, pesajes, actividades u objetivos.
 
 ## Cómo debe ser la app iOS
 
@@ -49,7 +49,7 @@ La navegación se centra en **Hoy, Progreso, Datos y Ajustes/Salud**. Debe senti
 
 **Ajustes/Salud** permite conectar Apple Health, elegir tipos/rango, gestionar permisos y consentimiento, consultar la cuenta y cerrar sesión, sincronizar y revisar errores/última actualización. Desconectar o borrar la copia de Salud no borra los originales.
 
-La app no incluye chat propio, botón para agregar comidas, dictado propio, cámara para registrar alimentos, editor de macros, catálogo, recetas, formularios de peso/ejercicio, edición de metas ni botones para cerrar/reabrir días. Puede explicar que esas operaciones se hacen en ChatGPT; no debe simular una integración ya disponible.
+La app no incluye chat propio, botón para agregar comidas, dictado propio, cámara para registrar alimentos, editor de macros, catálogo, recetas, formularios de peso/ejercicio ni edición de metas. No presenta estado ni botones para cerrar/reabrir días. Puede explicar que el registro de consumo se hace en ChatGPT; no debe simular una integración ya disponible.
 
 ## Registro desde ChatGPT
 
@@ -64,9 +64,9 @@ Ejemplo de flujo:
 
 «Eran 100 g» corrige la entrada identificada, con control de versión, sin añadir una segunda. Si hay varias candidatas, ChatGPT aclara cuál. Los reintentos de herramientas usan identidad de operación estable para no duplicar.
 
-«¿Y si como una banana?» y «¿qué ceno?» consultan/proyectan y no crean consumo. Mostrar una tarjeta o una gráfica tampoco registra nada. Las acciones destructivas, cambios de metas y cierres explícitos conservan su política de autorización/confirmación; esa política no se reemplaza por texto generado o annotations del host.
+«¿Y si como una banana?» y «¿qué ceno?» consultan/proyectan y no crean consumo. Mostrar una tarjeta o una gráfica tampoco registra nada. Las acciones destructivas y cambios de metas conservan su política de autorización/confirmación; esa política no se reemplaza por texto generado o annotations del host. Registrar comidas no requiere confirmar ni cerrar el día.
 
-Peso y actividad también pueden registrarse desde el plugin. Los datos importados de Salud mantienen su fuente y no se editan en Apple Health mediante esta integración. El cierre/reapertura de días y las metas, cuando estén habilitados, se operan desde ChatGPT y se visualizan en iOS.
+Peso y actividad también pueden registrarse desde el plugin. Los datos importados de Salud mantienen su fuente y no se editan en Apple Health mediante esta integración. Los totales del día se calculan desde sus registros; no existe estado abierto/cerrado ni se bloquean correcciones al pasar la fecha.
 
 ## Datos y fuente de verdad
 
@@ -76,7 +76,7 @@ Se conservan cantidad/unidad, preparación, fecha de consumo, zona horaria, nutr
 
 Apple Health sigue siendo la fuente original de Salud. Su copia remota contiene únicamente lo seleccionado y autorizado. Los datos de Salud, tracking y planilla se identifican por fuente; no se suman indiscriminadamente observaciones superpuestas ni resúmenes diarios sobre comidas. Ausencia de observaciones no significa cero ni permiso de lectura concedido.
 
-Los objetivos tienen versiones y vigencia. Los días cerrados conservan sus snapshots; una corrección histórica exige la operación correspondiente. Las fechas relativas se resuelven en la zona horaria del usuario, inicialmente America/Montevideo.
+Los objetivos tienen versiones y vigencia. Al primer registro de un nuevo día se guarda automáticamente un snapshot histórico del día anterior. Es solo una referencia: una corrección tardía actualiza los totales y agrega una versión al historial, sin reabrir nada. El paso de fecha o la existencia de comidas no demuestra que el registro esté completo; solo los totales explícitos de todo el día cuentan como completos para revisar cobertura. Las fechas relativas se resuelven en la zona horaria del usuario, inicialmente America/Montevideo.
 
 ## Sincronización y privacidad de Salud
 

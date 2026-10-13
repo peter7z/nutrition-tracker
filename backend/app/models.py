@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Any, Literal
 from uuid import UUID
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
 import math
 
 class StrictModel(BaseModel):
@@ -210,7 +210,7 @@ class ChatInput(StrictModel):
 
 class Proposal(StrictModel):
     operation_id: UUID
-    action: Literal['add','update','delete','query','close_day','add_weight','add_activity']
+    action: Literal['add','update','delete','query','add_weight','add_activity']
     entry_id: UUID | None
     expected_version: int | None = Field(ge=0,strict=True)
     name: str | None
@@ -242,7 +242,7 @@ class Proposal(StrictModel):
 
 class AssistantOutput(StrictModel):
     message: str = Field(min_length=1,max_length=12000)
-    intent: Literal['consumed','hypothetical','query','correction','close','photo','label','weekly_review','weight','activity']
+    intent: Literal['consumed','hypothetical','query','correction','photo','label','weekly_review','weight','activity']
     goal_proposal: GoalProposal | None = None
     proposals: list[Proposal] = Field(max_length=20)
 
@@ -318,7 +318,7 @@ class Historical(StrictModel):
     id: UUID
     dayID: date
     nutrients: Nutrition
-    isClosed: bool
+    isComplete: bool = Field(validation_alias=AliasChoices('isComplete','isClosed'))
     notes: str = Field(max_length=20000)
     importBatchID: UUID
     sourceRow: str = Field(max_length=20000)

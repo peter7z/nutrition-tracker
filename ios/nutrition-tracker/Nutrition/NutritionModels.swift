@@ -206,7 +206,7 @@ struct FoodEntry: Codable, Equatable, Identifiable {
     var values: NutrientValues { (try? draft.values()) ?? NutrientValues() }
 }
 enum DayCompleteness: String, Codable, CaseIterable { case complete, incomplete }
-struct ClosedDaySummary: Codable, Equatable, Identifiable {
+struct DailyNutritionSnapshot: Codable, Equatable, Identifiable {
     var id: UUID
     var version: Int
     var closedAt: Date
@@ -216,11 +216,25 @@ struct ClosedDaySummary: Codable, Equatable, Identifiable {
     var goalVersionID: UUID?
     var intakeSource: IntakeSelection? = nil
 }
+typealias ClosedDaySummary = DailyNutritionSnapshot
 struct NutritionDayLog: Codable, Equatable, Identifiable {
     var id: String
-    var version = 1
-    var isClosed = false
-    var summaries: [ClosedDaySummary] = []
+    var version: Int
+    var summaries: [DailyNutritionSnapshot]
+    private enum CodingKeys: String, CodingKey { case id, version, summaries }
+    init(id: String, version: Int = 1, summaries: [DailyNutritionSnapshot] = []) {
+        self.id = id; self.version = version; self.summaries = summaries
+    }
+    // Source compatibility for fixtures and older callers; the legacy flag is ignored.
+    init(id: String, version: Int = 1, isClosed: Bool, summaries: [DailyNutritionSnapshot] = []) {
+        self.init(id: id, version: version, summaries: summaries)
+    }
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        id = try values.decode(String.self, forKey: .id)
+        version = try values.decodeIfPresent(Int.self, forKey: .version) ?? 1
+        summaries = try values.decodeIfPresent([DailyNutritionSnapshot].self, forKey: .summaries) ?? []
+    }
 }
 struct NutritionProfile: Codable, Equatable {
     var timeZoneIdentifier = "America/Montevideo"
@@ -275,7 +289,35 @@ struct FoodRecipe: Codable, Equatable, Identifiable {
 enum TrackingSource: String, Codable { case manual, spreadsheet, appleHealth }
 struct ManualWeightEntry: Codable, Equatable, Identifiable { var id: UUID; var recordedAt: Date; var kilograms: Double; var source: TrackingSource = .manual; var notes = ""; var importBatchID: UUID? = nil; var sourceSampleID: UUID? = nil }
 struct ManualActivityEntry: Codable, Equatable, Identifiable { var id: UUID; var recordedAt: Date; var kind: String; var durationMinutes: Double?; var activeEnergy: Double? = nil; var source: TrackingSource = .manual; var notes = ""; var importBatchID: UUID? = nil }
-struct HistoricalNutritionSummary: Codable, Equatable, Identifiable { var id: UUID; var dayID: String; var nutrients: NutrientValues; var isClosed: Bool; var notes: String; var importBatchID: UUID; var sourceRow: String }
+struct HistoricalNutritionSummary: Codable, Equatable, Identifiable {
+    var id: UUID
+    var dayID: String
+    var nutrients: NutrientValues
+    var isComplete: Bool
+    var notes: String
+    var importBatchID: UUID
+    var sourceRow: String
+    private enum CodingKeys: String, CodingKey { case id, dayID, nutrients, isComplete, notes, importBatchID, sourceRow }
+    private enum LegacyCodingKeys: String, CodingKey { case isClosed }
+    init(id: UUID, dayID: String, nutrients: NutrientValues, isComplete: Bool, notes: String, importBatchID: UUID, sourceRow: String) {
+        self.id = id; self.dayID = dayID; self.nutrients = nutrients; self.isComplete = isComplete
+        self.notes = notes; self.importBatchID = importBatchID; self.sourceRow = sourceRow
+    }
+    init(id: UUID, dayID: String, nutrients: NutrientValues, isClosed: Bool, notes: String, importBatchID: UUID, sourceRow: String) {
+        self.init(id: id, dayID: dayID, nutrients: nutrients, isComplete: isClosed, notes: notes, importBatchID: importBatchID, sourceRow: sourceRow)
+    }
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
+        id = try values.decode(UUID.self, forKey: .id)
+        dayID = try values.decode(String.self, forKey: .dayID)
+        nutrients = try values.decode(NutrientValues.self, forKey: .nutrients)
+        isComplete = try values.decodeIfPresent(Bool.self, forKey: .isComplete) ?? legacy.decode(Bool.self, forKey: .isClosed)
+        notes = try values.decode(String.self, forKey: .notes)
+        importBatchID = try values.decode(UUID.self, forKey: .importBatchID)
+        sourceRow = try values.decode(String.self, forKey: .sourceRow)
+    }
+}
 struct NutritionImportBatch: Codable, Equatable, Identifiable {
     var id: UUID; var fingerprint: String; var importedAt: Date; var fileName: String; var createdDayIDs: [String] = []
     var previousResolutions: [IntakeResolution] = []
@@ -366,4 +408,4 @@ struct NutritionSnapshot: Codable, Equatable {
     var outbox: [ChatOutboxItem] = []
     var attachments: [NutritionAttachment] = []
 }
-enum NutritionError: Error, Equatable { case invalidData, conversionRequired, closedDay, notFound, conflict, unsupportedSchema, storageUnavailable, attachmentMissing }
+enum NutritionError: Error, Equatable { case invalidData, conversionRequired, notFound, conflict, unsupportedSchema, storageUnavailable, attachmentMissing }

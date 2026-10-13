@@ -75,18 +75,20 @@ Criterios de aceptación:
 - [ ] Mutaciones atómicas, idempotencia por operación, control de versión, auditoría y deshacer con conflictos visibles. Múltiples registros similares no se deduplican como si fueran la misma ingesta.
 - [ ] Pruebas de cantidades parciales, nutrientes faltantes, permisos de propietario, reintentos y correcciones; mismo snapshot/totales para plugin e iOS.
 
-### [NUT-04 — Cerrar, reabrir y corregir días desde el plugin](https://github.com/peter7z/nutrition-tracker/issues/4)
+### [NUT-04 — Snapshot diario automático y correcciones históricas](https://github.com/peter7z/nutrition-tracker/issues/4)
 
 P1 · backend,plugin · Dependencias: NUT-03, NUT-08.
 
-Las acciones de cierre y corrección ocurren en ChatGPT; iOS refleja el estado.
+No existe un estado abierto/cerrado. Los totales se derivan de los registros y
+las correcciones históricas no requieren reapertura.
 
 Criterios de aceptación:
 
-- [ ] Herramientas tipadas para cerrar/reabrir y consultar completitud; cierre explícito e idempotente, sin cierre automático a medianoche.
-- [ ] Corrección de día cerrado requiere reapertura explícita y conserva historial, totales y metas congeladas/versionadas.
+- [ ] Primer registro de un nuevo día crea una sola vez el snapshot del día anterior, con totales y metas vigentes.
+- [ ] Una corrección histórica recalcula totales y agrega una versión al historial, sin bloquear operaciones ni simular reapertura.
+- [ ] La completitud proviene solo de un total explícito del día entero; el paso de fecha y el log de comidas no la infieren.
 - [ ] Resolver hoy/ayer/fechas con zona horaria del usuario y devolver el día afectado; no asumir fecha de conversación como fecha de consumo.
-- [ ] iOS solo muestra estado/completitud y resumen actualizado, sin botones de cierre, reapertura o edición.
+- [ ] iOS muestra el resumen actualizado y la cobertura de datos, sin estado ni botones de cierre/reapertura.
 
 ### [NUT-05 — Pantalla Hoy de consulta: calorías, macros y Salud](https://github.com/peter7z/nutrition-tracker/issues/5)
 
