@@ -128,12 +128,13 @@ def test_food_receipt_idempotency_correction_delete_and_server_totals(client):
     assert sidebar['_meta']['ui']['visibility']==['app']
     opened=tool(client,token,'open_tracker')['structuredContent']
     assert opened['day'] and 'totals' in opened
-    resource=rpc(client,token,'resources/read',{'uri':'ui://bocado-log/day-summary-v2.html'})['result']
+    resource=rpc(client,token,'resources/read',{'uri':'ui://bocado-log/day-summary-v3.html'})['result']
     html=resource['contents'][0]['text']
     assert 'renderBocadoLogSummary' in html and 'Nutrition Tracker' not in html
-    assert 'light-dark(#202124, #f5f5f7)' in html and 'notifyIntrinsicHeight' in html
+    assert '--day-text: light-dark(#202124, #f5f5f7)' in html and 'context?.styles?.variables' not in html
+    assert 'notifyIntrinsicHeight' in html
     assert 'ui' not in day_reader['_meta']
-    assert day_renderer['_meta']['ui']['resourceUri']=='ui://bocado-log/day-summary-v2.html'
+    assert day_renderer['_meta']['ui']['resourceUri']=='ui://bocado-log/day-summary-v3.html'
     for descriptor in tools:
         assert descriptor['_meta']['securitySchemes'][0]['type']=='oauth2'
         assert 'outputSchema' in descriptor

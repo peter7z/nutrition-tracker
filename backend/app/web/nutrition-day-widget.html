@@ -3,14 +3,14 @@
     :root {
       color-scheme: light dark;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --day-text: var(--color-text-primary, light-dark(#202124, #f5f5f7));
-      --day-muted: var(--color-text-secondary, light-dark(#5f6368, #c3c5ca));
-      --day-card: var(--color-background-secondary, light-dark(#ffffff, #1f2023));
-      --day-border: var(--color-border-primary, light-dark(#d6d8dc, #45484e));
-      --day-tile: var(--color-background-tertiary, light-dark(#f2f3f5, #2b2c30));
-      --day-success: var(--color-text-success, light-dark(#16794d, #70d9a6));
-      --day-warning-bg: var(--color-background-warning, light-dark(#fff5df, #392b15));
-      --day-warning-text: var(--color-text-warning, light-dark(#6b4a00, #ffd27a));
+      --day-text: light-dark(#202124, #f5f5f7);
+      --day-muted: light-dark(#5f6368, #c3c5ca);
+      --day-card: light-dark(#ffffff, #1f2023);
+      --day-border: light-dark(#d6d8dc, #45484e);
+      --day-tile: light-dark(#f2f3f5, #2b2c30);
+      --day-success: light-dark(#16794d, #70d9a6);
+      --day-warning-bg: light-dark(#fff5df, #392b15);
+      --day-warning-text: light-dark(#6b4a00, #ffd27a);
     }
     :root[data-theme="light"] { color-scheme: light; }
     :root[data-theme="dark"] { color-scheme: dark; }
@@ -66,14 +66,6 @@
         if (theme === 'dark' || theme === 'light') {
           document.documentElement.dataset.theme = theme;
           document.documentElement.style.colorScheme = theme;
-        }
-        const variables = context?.styles?.variables;
-        if (variables && typeof variables === 'object') {
-          for (const [name, value] of Object.entries(variables)) {
-            if (/^--[a-z0-9-]+$/i.test(name) && typeof value === 'string') {
-              document.documentElement.style.setProperty(name, value);
-            }
-          }
         }
       };
       applyHostContext({ theme: window.openai?.theme });
