@@ -119,7 +119,11 @@ def test_read_only_scope_and_owner_isolation(client):
 def test_food_receipt_idempotency_correction_delete_and_server_totals(client):
     tokens,_,_=connect(client);token=tokens['access_token']
     tools=rpc(client,token,'tools/list')['result']['tools']
-    assert {t['name'] for t in tools}=={'get_profile','get_day','get_progress','record_food','update_food','delete_food','record_closed_day'}
+    assert {t['name'] for t in tools}=={'get_profile','get_day','show_day_summary','get_progress','record_food','update_food','delete_food','record_closed_day'}
+    day_reader=next(t for t in tools if t['name']=='get_day')
+    day_renderer=next(t for t in tools if t['name']=='show_day_summary')
+    assert 'ui' not in day_reader['_meta']
+    assert day_renderer['_meta']['ui']['resourceUri']=='ui://nutrition-tracker/day-summary-v1.html'
     for descriptor in tools:
         assert descriptor['_meta']['securitySchemes'][0]['type']=='oauth2'
         assert 'outputSchema' in descriptor
@@ -132,6 +136,8 @@ def test_food_receipt_idempotency_correction_delete_and_server_totals(client):
     assert len(day['entries'])==1 and day['totals']['energy']==133.5
     assert day['totals']['saturatedFat'] is None
     assert day['totals']['fiber']==3.9
+    summary=tool(client,token,'show_day_summary',{'day':'2026-10-10'})['structuredContent']
+    assert summary['day']=='2026-10-10' and summary['totals']['energy']==133.5
     hypothetical=tool(client,token,'record_food',args|{'consumption_text':'¿Y si como una banana?'})
     assert hypothetical['isError']
     for text in ('Voy a comer una banana', '¿Qué tiene una banana?', 'How much protein is in a banana?'):
