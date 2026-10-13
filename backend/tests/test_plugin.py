@@ -125,7 +125,7 @@ def test_food_receipt_idempotency_correction_delete_and_server_totals(client):
     sidebar=next(t for t in tools if t['name']=='open_tracker')
     assert sidebar['title']=='Bocado Log'
     assert sidebar['_meta']['openai/ui']['entrypoints']==[{'type':'global'}]
-    assert sidebar['_meta']['ui']['visibility']==['app']
+    assert 'visibility' not in sidebar['_meta']['ui']
     opened=tool(client,token,'open_tracker')['structuredContent']
     assert opened['day'] and 'totals' in opened
     resource=rpc(client,token,'resources/read',{'uri':'ui://nutrition-tracker/day-summary-v1.html'})['result']
