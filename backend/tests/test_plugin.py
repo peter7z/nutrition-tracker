@@ -10,6 +10,7 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import create_app
 from app.config import Settings
+from app.nutrition import NUTRIENTS
 
 BASE='http://localhost:8000'
 CALLBACK='https://chatgpt.com/connector_platform_oauth_redirect'
@@ -229,9 +230,10 @@ def test_closed_day_totals_atomic_replay_scope_and_frozen(client):
     assert first['saved'] and first['closed'] and first['revision']==2
     assert tool(client,token,'record_closed_day',args)['structuredContent']==first
     day=tool(client,token,'get_day',{'day':'2026-10-10'})['structuredContent']
-    assert day['closed'] and day['totals']==nutrients and len(day['entries'])==1
+    expected_totals={key:nutrients.get(key) for key in NUTRIENTS}
+    assert day['closed'] and day['totals']==expected_totals and len(day['entries'])==1
     assert not day['needs_reconciliation']
-    assert tool(client,token,'get_progress',{'start_day':'2026-10-10','end_day':'2026-10-10'})['structuredContent']['days'][0]['totals']==nutrients
+    assert tool(client,token,'get_progress',{'start_day':'2026-10-10','end_day':'2026-10-10'})['structuredContent']['days'][0]['totals']==expected_totals
     assert tool(client,token,'record_closed_day',args|{'operation_id':str(uuid.uuid4()),'base_revision':2})['isError']
     assert tool(client,token,'update_food',{'operation_id':str(uuid.uuid4()),'base_revision':2,
         'entry_id':saved['entry_id'],'expected_version':1,'correction_text':'Eran dos bananas','food':food()})['isError']

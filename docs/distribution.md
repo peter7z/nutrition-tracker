@@ -1,12 +1,23 @@
-# Distribución y aceptación de Nutrition Tracker
+# Distribución y aceptación de Bocado iOS
 
 > **Cambio de producto — 10 de octubre de 2026:** este documento conserva implementación/evidencia del enfoque anterior. El alcance vigente se define en [especificación de producto](product.md) y el backlog: companion iOS de consulta/Salud, registro desde el plugin de ChatGPT y widgets futuros con Extensions. Sus referencias a chat, registro o edición en iOS no son requisitos vigentes. La adaptación del código y de los contratos está pendiente.
 
 Estado de preparación: 9 de octubre de 2026. El archivo vigente es **1.0 (build 3)**, firmado para desarrollo; build 2 es histórico. La suite actual valida el flujo chat-first. Este documento distingue compilación, instalación de desarrollo, aceptación funcional y distribución. Ninguno de estos resultados constituye un build TestFlight.
 
+## Validación del cambio de identidad (12 de octubre de 2026)
+
+- Debug en iPhone 17 Pro Simulator iOS 26.5: 56 tests de unidad y 1 test de UI, sin fallos; resultado `/private/tmp/BocadoRenameTests.xcresult`.
+- Release para iOS: `BUILD SUCCEEDED` con `CODE_SIGNING_ALLOWED=NO`; paquete `/private/tmp/BocadoRenameRelease/Build/Products/Release-iphoneos/Bocado.app`.
+- Ambos paquetes: Bundle ID `com.pedrozunino.bocado`, nombre y ejecutable `Bocado`; nombres y descripciones de Salud efectivos comprobados en inglés y español.
+- Manifest de privacidad válido y firma ad-hoc del paquete Simulator verificada. Esta firma no valida distribución en dispositivos.
+- Backend: 11 tests de login Apple pasaron con el nuevo audience; `.env.example` y el default `APPLE_APP_ID` están actualizados. No se modificaron variables del servidor ni registros de Apple Developer/App Store Connect.
+
 ## Identidad y recursos
 
-- Nombre: **Nutrition Tracker**. Bundle ID: `com.peter7z.NutritionTracker`.
+- Nombre de la app iOS: **Bocado**. Bundle ID: `com.pedrozunino.bocado`.
+- Producto generado: `Bocado.app`. Los nombres internos del proyecto, esquema y módulo Swift se conservan para compatibilidad con las herramientas existentes.
+- El [Bundle ID identifica la app para iOS](https://developer.apple.com/documentation/BundleResources/Information-Property-List/CFBundleIdentifier). La instalación anterior conserva sus datos; este cambio no migra su contenedor ni sus permisos. Los identificadores persistidos de archivos, Keychain y metadata de HealthKit se mantienen para compatibilidad, pero no conceden acceso al contenedor de la app anterior.
+- Antes de distribuir, registrar/configurar el nuevo App ID con HealthKit y Sign in with Apple y generar su perfil de firma. El código del repositorio no acredita esa configuración en Apple Developer ni App Store Connect.
 - Proyecto: `ios/NutritionTracker.xcodeproj`, esquema compartido `NutritionTracker`, iOS 18+; iPhone e iPad.
 - Team de desarrollo conservado: `2KHYMP6SN7`. Confirmar que tiene membresía vigente, acuerdos aceptados y acceso a App Store Connect antes de distribuir.
 - Icono: `AppIcon.appiconset/AppIcon.png`, 1024 × 1024, RGB opaco, hoja blanca y anillo sobre verde bosque. El catálogo genera los tamaños del sistema; no contiene texto ni un borde redondeado dibujado.
@@ -51,7 +62,7 @@ xcodebuild -project ios/NutritionTracker.xcodeproj -scheme NutritionTracker \
      -allowProvisioningUpdates archive
    ```
 
-3. Confirmar que el archivo contiene `Products/Applications/nutrition-tracker.app`, Info.plist con versión/build correctos, icono y manifest. Verificar firma con `codesign --verify --deep --strict` y entitlements con `codesign -d --entitlements :- RUTA_APP`; HealthKit debe seguir presente. El provisioning de **distribución** debe ser válido para el team y bundle; una instalación de desarrollo no lo demuestra.
+3. Confirmar que el archivo contiene `Products/Applications/Bocado.app`, Info.plist con versión/build correctos, icono y manifest. Verificar firma con `codesign --verify --deep --strict` y entitlements con `codesign -d --entitlements :- RUTA_APP`; HealthKit debe seguir presente. El provisioning de **distribución** debe ser válido para el team y bundle; una instalación de desarrollo no lo demuestra.
 4. En Organizer, generar/revisar **Privacy Report** y usar **Validate App**. Resolver errores de permisos, manifest, dependencias, icono, export compliance y signing. Revisar el `.app` efectivo antes de cambiar declaraciones. Apple describe el [manifest de privacidad](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files) y las [APIs de razón obligatoria](https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitype).
 5. Crear o verificar la app correspondiente en App Store Connect. Publicar una política de privacidad accesible públicamente y completar App Privacy a partir del backend realmente habilitado. `docs/privacy.md` es una fuente editable; un archivo de un repo privado no satisface la URL pública requerida por [Apple](https://developer.apple.com/app-store/app-privacy-details/).
 6. En Organizer, **Distribute App → App Store Connect → Upload**. Verificar procesamiento exitoso, versión/build y grupo de testers en TestFlight. Para testers externos, completar la revisión beta exigida por Apple.

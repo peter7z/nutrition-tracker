@@ -7,6 +7,12 @@ struct ServerSession: Codable, Equatable {
     let token: String
     let user_id: String
     let expires_at: String
+
+    var expirationDate: Date? {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter.date(from: expires_at) ?? ISO8601DateFormatter().date(from: expires_at)
+    }
 }
 
 protocol SessionPersistence {
@@ -16,6 +22,7 @@ protocol SessionPersistence {
 }
 
 struct KeychainSessionPersistence: SessionPersistence {
+    // Keep the persisted service namespace stable across display-name changes.
     private var query: [String: Any] {
         [kSecClass as String: kSecClassGenericPassword,
          kSecAttrService as String: "com.peter7z.NutritionTracker.session",
@@ -65,7 +72,13 @@ struct AccountProfile: Decodable { let user_id: String; let email: String }
     init(persistence: any SessionPersistence = KeychainSessionPersistence(), network: URLSession = .shared,
          enabled: Bool = true, base: URL = URL(string: "https://nutrition-tracker-api-cljy.onrender.com")!) {
         self.persistence = persistence; self.network = network; self.base = base; self.enabled = enabled
-        do { session = enabled ? try persistence.load() : nil } catch { errorKey = "Could not securely restore your session." }
+        do {
+            let stored = enabled ? try persistence.load() : nil
+            if let stored, stored.expirationDate.map({ $0 <= .now }) ?? true {
+                errorKey = "Your session expired. Sign in again."
+                try persistence.clear()
+            } else { session = stored }
+        } catch { errorKey = "Could not securely restore your session." }
     }
     private func request<T: Decodable>(_ path: String, method: String = "GET", body: Data? = nil, authenticated: Bool = false) async throws -> T {
         var request = URLRequest(url: base.appendingPathComponent(path))
@@ -108,15 +121,15 @@ struct AccountProfile: Decodable { let user_id: String; let email: String }
         }
     }
     func refreshProfile() async {
-        guard enabled, session != nil else { return }
+        guard enabled, let captured = session else { return }
         do {
             let profile: AccountProfile = try await request("v1/auth/me", authenticated: true)
-            guard profile.user_id == session?.user_id else { throw AccountError.request }
+            guard session == captured else { return }
+            guard profile.user_id == captured.user_id else { throw AccountError.request }
             email = profile.email
         } catch AccountError.expired {
-            do { try persistence.clear(); session = nil; email = nil; errorKey = "Your session expired. Sign in again." }
-            catch { errorKey = "Could not securely remove your session." }
-        } catch { errorKey = "Could not connect. Try again." }
+            invalidateSession(captured)
+        } catch { if session == captured { errorKey = "Could not connect. Try again." } }
     }
     func fetchDiary() async throws -> Data {
         guard enabled, let captured = session else { throw AccountError.expired }
@@ -128,8 +141,7 @@ struct AccountProfile: Decodable { let user_id: String; let email: String }
         guard session == captured else { throw CancellationError() }
         guard let response = response as? HTTPURLResponse else { throw AccountError.request }
         if response.statusCode == 401 {
-            try persistence.clear(); session = nil; email = nil
-            errorKey = "Your session expired. Sign in again."
+            invalidateSession(captured)
             throw AccountError.expired
         }
         guard (200..<300).contains(response.statusCode) else { throw AccountError.request }
@@ -137,9 +149,21 @@ struct AccountProfile: Decodable { let user_id: String; let email: String }
     }
     func weightRequest<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
         guard let captured = session else { throw AccountError.expired }
-        let result: T = try await request(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true)
-        guard session == captured else { throw CancellationError() }
-        return result
+        do {
+            let result: T = try await request(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true)
+            guard session == captured else { throw CancellationError() }
+            return result
+        } catch AccountError.expired {
+            invalidateSession(captured)
+            throw AccountError.expired
+        }
+    }
+    private func invalidateSession(_ captured: ServerSession) {
+        guard session == captured else { return }
+        session = nil; email = nil; challenge = nil
+        errorKey = "Your session expired. Sign in again."
+        do { try persistence.clear() }
+        catch { errorKey = "Could not securely remove your session." }
     }
     func signOut() async {
         guard !isWorking else { return }
@@ -150,7 +174,9 @@ struct AccountProfile: Decodable { let user_id: String; let email: String }
             let _: Receipt = try await request("v1/auth/logout", method: "POST", authenticated: true)
         } catch AccountError.expired { /* Already invalid on the server. */ }
         catch { errorKey = "Could not sign out. Check your connection and try again."; return }
-        do { try persistence.clear(); session = nil; email = nil; challenge = nil }
+        // The server has revoked this session, so it must no longer unlock the app.
+        session = nil; email = nil; challenge = nil
+        do { try persistence.clear() }
         catch { errorKey = "Could not securely remove your session." }
     }
 }

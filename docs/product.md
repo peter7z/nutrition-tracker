@@ -39,13 +39,15 @@ La importación técnica de Salud, la gestión de cuenta y el consentimiento no 
 
 La navegación se centra en **Hoy, Progreso, Datos y Ajustes/Salud**. Debe sentirse nativa, legible y sencilla, con español/inglés, Dynamic Type, VoiceOver y modo claro/oscuro.
 
+**Inicio de sesión** es obligatorio para usar la app. Sin una sesión vigente se muestra únicamente la pantalla de entrada con Apple. Una sesión guardada vigente permite entrar directamente; cerrar sesión o recibir un rechazo por sesión vencida vuelve a la entrada.
+
 **Hoy** muestra calorías y macros registrados, metas vigentes, diferencia y estado del día. Puede mostrar peso y actividad, diferenciados de la ingesta. Elegir otra fecha permite consultar el historial. Cada valor tiene procedencia y frescura; los nutrientes desconocidos no se convierten en cero.
 
 **Progreso** muestra evolución de peso, tendencia/media móvil, calorías, macros y actividad por rango de fechas. Los huecos y la cobertura se hacen visibles. La actividad no aumenta automáticamente el presupuesto de comida. Los detalles y registros son de solo lectura.
 
 **Datos** permite revisar el historial y las fuentes importadas o creadas desde el plugin. No permite editar ni borrar registros de tracking. Los conflictos de fuentes deben explicarse; las decisiones que cambian tracking se resuelven desde el plugin.
 
-**Ajustes/Salud** permite conectar Apple Health, elegir tipos/rango, gestionar permisos y consentimiento, vincular la cuenta, sincronizar y revisar errores/última actualización. Desconectar o borrar la copia de Salud no borra los originales.
+**Ajustes/Salud** permite conectar Apple Health, elegir tipos/rango, gestionar permisos y consentimiento, consultar la cuenta y cerrar sesión, sincronizar y revisar errores/última actualización. Desconectar o borrar la copia de Salud no borra los originales.
 
 La app no incluye chat propio, botón para agregar comidas, dictado propio, cámara para registrar alimentos, editor de macros, catálogo, recetas, formularios de peso/ejercicio, edición de metas ni botones para cerrar/reabrir días. Puede explicar que esas operaciones se hacen en ChatGPT; no debe simular una integración ya disponible.
 
@@ -78,7 +80,7 @@ Los objetivos tienen versiones y vigencia. Los días cerrados conservan sus snap
 
 ## Sincronización y privacidad de Salud
 
-HealthKit local puede funcionar sin login, conexión o backend. Para que ChatGPT vea Salud hace falta un paso adicional: autorización explícita para enviar y almacenar una copia seleccionada en el backend y habilitar su consulta desde el plugin.
+La app requiere una sesión vigente; la lectura local de HealthKit puede funcionar sin conexión al backend una vez iniciada la sesión. Para que ChatGPT vea Salud hace falta un paso adicional: autorización explícita para enviar y almacenar una copia seleccionada en el backend y habilitar su consulta desde el plugin.
 
 El consentimiento indica tipos, rango y finalidad, permite revisar qué se comparte y puede revocarse. Compartir no significa exportar toda HealthKit ni sus metadatos de dispositivo. Se transmiten observaciones normalizadas necesarias y agregados, con identificadores estables, procedencia, fechas y cobertura. Los scopes del plugin separan lectura de tracking, escritura y lectura de Salud autorizada.
 

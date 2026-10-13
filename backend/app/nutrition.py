@@ -6,7 +6,20 @@ from zoneinfo import ZoneInfo
 from pydantic import ValidationError
 from .models import EntryDraft,Product,Recipe,Profile,Weight,Activity,Historical,Resolution
 
-NUTRIENTS=('energy','protein','carbohydrates','fat','saturatedFat','fiber')
+MICRONUTRIENTS=(
+    'vitaminA','thiamin','riboflavin','niacin','pantothenicAcid','vitaminB6','biotin','vitaminB12',
+    'vitaminC','vitaminD','vitaminE','vitaminK','folate','calcium','chloride','iron','magnesium',
+    'phosphorus','potassium','sodium','zinc','chromium','copper','iodine','manganese','molybdenum','selenium',
+)
+NUTRIENTS=('energy','protein','carbohydrates','fat','saturatedFat','fiber',*MICRONUTRIENTS)
+NUTRIENT_UNITS={
+    'energy':'kcal','protein':'g','carbohydrates':'g','fat':'g','saturatedFat':'g','fiber':'g',
+    'vitaminA':'mcg','thiamin':'mg','riboflavin':'mg','niacin':'mg','pantothenicAcid':'mg',
+    'vitaminB6':'mg','biotin':'mcg','vitaminB12':'mcg','vitaminC':'mg','vitaminD':'mcg',
+    'vitaminE':'mg','vitaminK':'mcg','folate':'mcg','calcium':'mg','chloride':'mg','iron':'mg',
+    'magnesium':'mg','phosphorus':'mg','potassium':'mg','sodium':'mg','zinc':'mg','chromium':'mcg',
+    'copper':'mg','iodine':'mcg','manganese':'mg','molybdenum':'mcg','selenium':'mcg',
+}
 
 def safe_payload(payload):
     def walk(v):

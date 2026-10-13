@@ -156,7 +156,7 @@ import CoreFoundation
             guard closure.accountScope == "local" || UUID(uuidString: closure.accountScope) != nil,
                   formatter.date(from: closure.dayID).map({ formatter.string(from: $0) == closure.dayID }) == true,
                   closure.closedAt.timeIntervalSince1970.isFinite, closure.goals?.isValid != false,
-                  closure.values.count <= 5, Set(closure.values.map(\.metric)).count == closure.values.count else { throw HealthOperationError.invalidData }
+                  closure.values.count <= 33, Set(closure.values.map(\.metric)).count == closure.values.count else { throw HealthOperationError.invalidData }
             for day in closure.values {
                 guard day.metric.isNutrition, day.value.isFinite, day.value >= 0, day.date.timeIntervalSince1970.isFinite,
                       day.sourceNames.count <= 100, day.sourceNames.allSatisfy({ $0.count <= 1000 }) else { throw HealthOperationError.invalidData }

@@ -4,19 +4,21 @@ struct AppSettingsView: View {
     @Environment(AccountSession.self) private var account
     @Environment(NutritionStore.self) private var nutrition
     @Environment(HealthWeightUpload.self) private var weightUpload
+    @Environment(HealthNutritionUpload.self) private var nutritionUpload
     @Environment(HealthSyncModel.self) private var health
     @Environment(\.dismiss) private var dismiss
     @State private var showHealth = false
     @State private var showDisconnect = false
     @State private var confirmWeightSharing = false
     @State private var confirmDeleteWeights = false
+    @State private var confirmNutritionSync = false
 
     var body: some View {
         NavigationStack {
             Form {
                 AccountSection()
                 Section("Share weight with your account") {
-                    Text("Upload weight measurements and their dates from Apple Health to your Nutrition Tracker account. They will be available in the web diary and ChatGPT. Food, activity and other Health data are not uploaded.")
+                    Text("Upload weight measurements and their dates from Apple Health to your Bocado account. They will be available in the web diary and ChatGPT. Food, activity and other Health data are not uploaded.")
                         .font(.footnote).foregroundStyle(.secondary)
                     Text("Stopping uploads keeps previously shared weights. Delete the server copy to remove them from your account.")
                         .font(.footnote).foregroundStyle(.secondary)
@@ -53,9 +55,30 @@ struct AppSettingsView: View {
                     if let date = health.snapshot.lastSyncDate {
                         LabeledContent("Last sync") { Text(date, format: .dateTime.day().month().hour().minute()) }
                     }
-                    Text("Read-only access. Your original Health data stays unchanged.")
+                    Text("Apple Health reads stay on this device. Nutrition sync writes food records to Apple Health when you enable it.")
                         .font(.footnote).foregroundStyle(.secondary)
                 }
+                Section("Nutrition in Apple Health") {
+                    Text("Save calories, macros, fiber, vitamins and minerals from your food diary to Apple Health. Sync follows your signed-in account and updates diary changes; existing Health records stay if you stop syncing.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                    if account.session == nil {
+                        Text("Sign in to sync nutrition.")
+                    } else if nutritionUpload.isEnabled {
+                        Button("Sync nutrition now") {
+                            Task { await nutritionUpload.sync(entries: nutrition.snapshot.entries) }
+                        }
+                        Button("Stop nutrition sync", role: .destructive) { nutritionUpload.disable() }
+                    } else {
+                        Button("Enable nutrition sync") { confirmNutritionSync = true }
+                            .disabled(!nutritionUpload.isAvailable || nutritionUpload.isWorking)
+                    }
+                    if let date = nutritionUpload.lastSyncDate {
+                        LabeledContent("Last nutrition sync") { Text(date, format: .dateTime.day().month().hour().minute()) }
+                    }
+                    if let error = nutritionUpload.errorKey { Text(LocalizedStringKey(error)).foregroundStyle(.red) }
+                    if nutritionUpload.isWorking { ProgressView() }
+                }
+                .disabled(nutritionUpload.isWorking)
                 if let key = health.errorKey {
                     Section {
                         OperationErrorView(key: key)
@@ -77,6 +100,12 @@ struct AppSettingsView: View {
                     await nutrition.refresh(account: account)
                 } }
             } message: { Text("Available weight history will be uploaded, followed by new measurements and deletions. You can stop sharing and delete the server copy at any time.") }
+            .confirmationDialog("Enable nutrition sync?", isPresented: $confirmNutritionSync, titleVisibility: .visible) {
+                Button("Enable nutrition sync") { Task { await nutritionUpload.enable(account: account, entries: nutrition.snapshot.entries) } }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Your food diary's calories, macros, fiber, vitamins and minerals will be saved to Apple Health. New and edited diary entries will sync when your diary refreshes. You can stop sync here; records already saved in Health will remain.")
+            }
             .confirmationDialog("Delete uploaded weights?", isPresented: $confirmDeleteWeights, titleVisibility: .visible) {
                 Button("Delete server copy", role: .destructive) { Task {
                     await weightUpload.setConsent(enabled: false, deleteData: true, account: account, health: health)

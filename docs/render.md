@@ -95,3 +95,18 @@ prueba pública de endpoints Apple y regresión OAuth/MCP aprobada; cuentas
 sintéticas eliminadas. [Configuración y evidencia](apple-sign-in.md).
 Services ID, Team ID, Key ID y PEM privado deben configurarse como variables
 de Render para activar Apple en el consentimiento web del plugin.
+
+
+## Bundle ID de Bocado — 12 de octubre de 2026
+
+Se configuró `APPLE_APP_ID=com.pedrozunino.bocado` directamente en el servicio
+`srv-db5emoqd0e5s73f6on6g` y se verificó su lectura por la API de Render.
+El deploy `dep-db6ispjrjlhs73f01jcg` quedó **live** usando el mismo commit
+`9c1b9070b97791793d7fca636cc269b6631d32fd` que estaba activo; el cambio operativo es la variable
+de entorno, sin desplegar las modificaciones locales del repositorio.
+`render.yaml` también declara ese valor para las próximas sincronizaciones.
+
+Después del deploy, `/healthz` y `POST /v1/auth/apple/challenge` respondieron
+200. El desafío tiene los campos esperados; no se almacenaron ni publicaron
+sus valores. El login completo con un Apple ID real queda pendiente de
+reintento en la app; estos checks no acreditan esa autenticación.

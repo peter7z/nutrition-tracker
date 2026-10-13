@@ -110,7 +110,7 @@ jobs:
             -derivedDataPath "$RUNNER_TEMP/NutritionTrackerRelease" \
             CODE_SIGNING_ALLOWED=NO build
       - name: Validate the bundled privacy manifest
-        run: plutil -lint "$RUNNER_TEMP/NutritionTrackerRelease/Build/Products/Release-iphoneos/nutrition-tracker.app/PrivacyInfo.xcprivacy"
+        run: plutil -lint "$RUNNER_TEMP/NutritionTrackerRelease/Build/Products/Release-iphoneos/Bocado.app/PrivacyInfo.xcprivacy"
       - uses: actions/upload-artifact@v7
         if: always()
         with:

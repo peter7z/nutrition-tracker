@@ -1,12 +1,17 @@
 # Sign in with Apple — cuenta compartida
 
-La app tiene Sign in with Apple en Ajustes → Cuenta de Nutrition Tracker.
+La app muestra una pantalla de inicio de sesión con Apple antes de permitir
+el acceso a Hoy, Progreso o Ajustes. Una sesión vigente guardada en Keychain
+permite entrar directamente; una sesión vencida o rechazada vuelve al login.
+Ajustes → Cuenta de Bocado muestra la cuenta y permite cerrar sesión.
 El backend valida el JWT firmado por Apple con sus claves públicas, issuer,
 audience, expiración y nonce de un desafío de cinco minutos, consumido una
 sola vez. El token de Nutrition Tracker se guarda en Keychain, únicamente
 accesible con el dispositivo desbloqueado y sin migración a otros equipos.
 Cerrar sesión revoca el token en el servidor antes de eliminarlo del equipo;
-sin conexión se mantiene para reintentar. Las sesiones vencen a los 30 días.
+sin conexión se mantiene para reintentar. Al cerrar sesión se vuelve al login
+sin borrar el historial de la cuenta ni los originales de Apple Health.
+Las sesiones vencen a los 30 días.
 
 La identidad estable de Apple se vincula al usuario del backend. Al conectar
 por primera vez, **se une automáticamente una cuenta existente con el mismo
@@ -29,9 +34,9 @@ la identidad entre iOS y web.
 
 [Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources/identifiers/list):
 
-1. App ID `com.peter7z.NutritionTracker`, equipo `2KHYMP6SN7`: activar Sign in
+1. App ID `com.pedrozunino.bocado`, equipo `2KHYMP6SN7`: activar Sign in
    with Apple. El proyecto Xcode ya declara la capability y entitlement.
-2. Crear un Services ID, sugerido `com.peter7z.NutritionTracker.web`, activar
+2. Crear un Services ID, sugerido `com.pedrozunino.bocado.web`, activar
    Sign in with Apple y seleccionar ese App ID primario.
 3. Registrar dominio `nutrition-tracker-api-cljy.onrender.com` y return URL
    exacta `https://nutrition-tracker-api-cljy.onrender.com/oauth/apple/callback`.
@@ -40,7 +45,9 @@ la identidad entre iOS y web.
 
 Variables de Render:
 
-- `APPLE_APP_ID=com.peter7z.NutritionTracker` (default del backend).
+- `APPLE_APP_ID=com.pedrozunino.bocado` (default del backend).
+
+  Si el backend desplegado define explícitamente `APPLE_APP_ID`, actualizar ese valor al nuevo Bundle ID y desplegar el cambio antes de probar el login Apple de Bocado. El App ID, el Services ID y su asociación se configuran en Apple Developer; cambiar los defaults del repositorio no modifica esos registros ni las variables del servidor desplegado.
 - `APPLE_SERVICE_ID`: Services ID registrado.
 - `APPLE_TEAM_ID`: Team ID del equipo propietario.
 - `APPLE_KEY_ID`: ID de la key.

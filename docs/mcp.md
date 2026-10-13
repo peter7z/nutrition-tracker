@@ -24,6 +24,13 @@ existentes siguen registradas, pero no se suman al total suministrado.
 No sobrescribe cierres ni resúmenes históricos existentes. Un cierre impide
 agregar, corregir o borrar comidas de ese día hasta que se reabra.
 
+`record_food` y `update_food` devuelven `day_summary` con los totales y metas
+autoritativos del día después de guardar. Esas herramientas enlazan el recurso
+MCP Apps `ui://nutrition-tracker/day-summary-v1.html` para mostrar una tarjeta
+inline con calorías, progreso del objetivo disponible, proteínas,
+carbohidratos, grasas y fibra. Los valores desconocidos siguen apareciendo
+como no disponibles; la tarjeta no vuelve a calcular los totales.
+
 Antes de escribir, consultar `get_day`. Reintentar con el mismo
 `operation_id` y los mismos argumentos devuelve el recibo original sin
 duplicar registros. Una revisión desactualizada falla sin guardar cambios.

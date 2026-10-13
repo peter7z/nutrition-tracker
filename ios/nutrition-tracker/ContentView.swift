@@ -9,6 +9,7 @@ private enum HomeStyle {
 }
 
 struct ContentView: View {
+    var refreshOnActivation = true
     @Environment(HealthWeightUpload.self) private var weights
     @Environment(AccountSession.self) private var account
     @Environment(HealthSyncModel.self) private var model
@@ -26,7 +27,7 @@ struct ContentView: View {
         .environment(\.timeZone, nutrition.snapshot.profile.calendar.timeZone)
         .task { await model.refreshIfConnected() }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active { Task {
+            if phase == .active && refreshOnActivation { Task {
                 await model.refreshIfConnected()
                 await weights.sync(account: account, health: model)
                 await nutrition.refresh(account: account)
@@ -36,6 +37,105 @@ struct ContentView: View {
 }
 
 private struct TodayView: View {
+    @Environment(NutritionStore.self) private var nutrition
+    @Environment(\.locale) private var locale
+    @State private var showHealth = false
+    @State private var showSettings = false
+    @State private var referenceDate = Date.now
+    @State private var firstDayOffset = -365
+    @State private var visibleDay: Int? = 0
+    @Binding var selectedDate: Date
+
+    private var calendar: Calendar { nutrition.snapshot.profile.calendar }
+    private var referenceDay: Date { calendar.startOfDay(for: referenceDate) }
+    private var todayOffset: Int { offset(for: .now) }
+    private var title: String {
+        if calendar.isDate(selectedDate, inSameDayAs: .now) { return String(localized: "Today", locale: locale) }
+        if let yesterday = calendar.date(byAdding: .day, value: -1, to: .now), calendar.isDate(selectedDate, inSameDayAs: yesterday) {
+            return String(localized: "Yesterday", locale: locale)
+        }
+        var format = Date.FormatStyle.dateTime.day().month(.abbreviated).locale(locale)
+        format.timeZone = calendar.timeZone
+        if calendar.component(.year, from: selectedDate) != calendar.component(.year, from: .now) {
+            format = format.year()
+        }
+        return selectedDate.formatted(format)
+    }
+
+    var body: some View {
+        NavigationStack {
+            TimelineView(.periodic(from: .now, by: 60)) { _ in
+                VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(selectedDate, format: .dateTime.weekday(.wide).day().month(.wide).locale(locale))
+                            .font(.subheadline).foregroundStyle(.secondary)
+                        SelectedDayPicker(selection: Binding(
+                            get: { selectedDate },
+                            set: { selectedDate = min($0, Date.now) }
+                        )).accessibilityIdentifier("today.selectedDay")
+                    }
+                    .padding(.horizontal, 20).padding(.top, 4)
+                    .frame(maxWidth: 600).frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityElement(children: .contain)
+                    .accessibilityIdentifier("today.dayHeader")
+
+                    ScrollView(.horizontal) {
+                        LazyHStack(spacing: 0) {
+                            ForEach(firstDayOffset...todayOffset, id: \.self) { dayOffset in
+                                if let date = calendar.date(byAdding: .day, value: dayOffset, to: referenceDay) {
+                                    DailyNutritionView(showHealth: $showHealth, selectedDate: date)
+                                        .containerRelativeFrame(.horizontal)
+                                        .id(dayOffset)
+                                        .accessibilityHidden(visibleDay != dayOffset)
+                                }
+                            }
+                        }
+                        .scrollTargetLayout()
+                    }
+                    .scrollIndicators(.hidden)
+                    .defaultScrollAnchor(.trailing)
+                    .scrollTargetBehavior(.paging)
+                    .scrollPosition(id: $visibleDay)
+                    .accessibilityIdentifier("today.dayPages")
+                    .onScrollPhaseChange { _, phase in
+                        if phase == .idle, let day = visibleDay, day <= firstDayOffset + 7 {
+                            firstDayOffset -= 365
+                        }
+                    }
+                }
+                .background(Color(uiColor: .systemGroupedBackground))
+            }
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) {
+                Button { showSettings = true } label: { Image(systemName: "slider.horizontal.3") }.accessibilityLabel("Settings").accessibilityIdentifier("tracking.settings")
+            } }
+            .sheet(isPresented: $showHealth) { HealthConnectionView() }
+            .sheet(isPresented: $showSettings) { AppSettingsView() }
+            .onAppear { selectDay(selectedDate, animated: false) }
+            .onChange(of: visibleDay) { _, dayOffset in
+                guard let dayOffset, let date = calendar.date(byAdding: .day, value: dayOffset, to: referenceDay),
+                      !calendar.isDate(date, inSameDayAs: selectedDate) else { return }
+                selectedDate = date
+            }
+            .onChange(of: selectedDate) { _, date in selectDay(date, animated: true) }
+            .onChange(of: nutrition.snapshot.profile.timeZoneIdentifier) { _, _ in selectDay(selectedDate, animated: false) }
+        }
+    }
+
+    private func offset(for date: Date) -> Int {
+        calendar.dateComponents([.day], from: referenceDay, to: calendar.startOfDay(for: date)).day ?? 0
+    }
+
+    private func selectDay(_ date: Date, animated: Bool) {
+        let day = min(offset(for: date), todayOffset)
+        if day < firstDayOffset { firstDayOffset = day - 365 }
+        guard visibleDay != day else { return }
+        withAnimation(animated ? .snappy : nil) { visibleDay = day }
+    }
+}
+
+private struct DailyNutritionView: View {
     @Environment(HealthWeightUpload.self) private var weights
     @Environment(AccountSession.self) private var account
     @Environment(HealthSyncModel.self) private var model
@@ -44,9 +144,8 @@ private struct TodayView: View {
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @ScaledMetric(relativeTo: .largeTitle) private var ringSize = 138
-    @State private var showHealth = false
-    @State private var showSettings = false
-    @Binding var selectedDate: Date
+    @Binding var showHealth: Bool
+    let selectedDate: Date
     private var resolved: ResolvedDailyNutrition { TrackingBridge.nutrition(on: selectedDate, manual: nutrition.snapshot, health: model.snapshot, accountScope: history.accountScope) }
     private var dailyGoals: NutritionGoals? {
         if history.ownerID == nil && nutrition.snapshot.goals.isEmpty && !isClosed { return model.snapshot.goals }
@@ -62,70 +161,52 @@ private struct TodayView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            TimelineView(.periodic(from: .now, by: 60)) { _ in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        dayHeader
-                        SelectedDayPicker(selection: $selectedDate).accessibilityIdentifier("today.selectedDay")
-                        if let error = nutrition.errorKey { OperationErrorView(key: error) }
-                        if let key = model.errorKey {
-                            OperationErrorView(key: key)
-                            if model.storageNeedsRecovery { Button("Retry reading local data") { model.reload() } }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                dayStatus
+                if let error = nutrition.errorKey { OperationErrorView(key: error) }
+                if let key = model.errorKey {
+                    OperationErrorView(key: key)
+                    if model.storageNeedsRecovery { Button("Retry reading local data") { model.reload() } }
+                }
+                nutritionCard
+                if resolved.hasConflict || resolved.candidates.count > 1 {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Nutrition sources").font(.headline)
+                        Text("Overlapping sources are never added together.").font(.footnote).foregroundStyle(.secondary)
+                        if resolved.hasConflict {
+                            Text("Overlapping data is excluded until its source is resolved.").font(.footnote).foregroundStyle(.orange)
                         }
-                        nutritionCard
-                        if resolved.hasConflict || resolved.candidates.count > 1 {
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("Nutrition sources").font(.headline)
-                                Text("Overlapping sources are never added together.").font(.footnote).foregroundStyle(.secondary)
-                                if resolved.hasConflict {
-                                    Text("Overlapping data is excluded until its source is resolved.").font(.footnote).foregroundStyle(.orange)
-                                }
-                                ForEach(resolved.candidates, id: \.self) { source in
-                                    Label(LocalizedStringKey(source.titleKey), systemImage: resolved.selection == source ? "checkmark.circle.fill" : "circle")
-                                }
-                            }.padding(20).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 22))
+                        ForEach(resolved.candidates, id: \.self) { source in
+                            Label(LocalizedStringKey(source.titleKey), systemImage: resolved.selection == source ? "checkmark.circle.fill" : "circle")
                         }
-                        Button {
-                            if model.snapshot.isConnected { Task { await model.refreshIfConnected() } }
-                            else { showHealth = true }
-                        } label: {
-                            Label(model.snapshot.isConnected ? "Sync Apple Health" : "Connect Apple Health", systemImage: model.snapshot.isConnected ? "arrow.triangle.2.circlepath" : "heart")
-                                .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 8)
-                        }
-                        .buttonStyle(.borderedProminent).tint(HomeStyle.buttonGreen).controlSize(.large)
-                        .disabled(model.isWorking || model.storageNeedsRecovery)
-                        if model.snapshot.configuration != nil { healthCard; activityCard }
-                        mealsSection
+                    }.padding(20).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 22))
+                }
+                if !model.snapshot.isConnected {
+                    Button { showHealth = true } label: {
+                        Label("Connect Apple Health", systemImage: "heart")
+                            .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 8)
                     }
-                    .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 24)
-                    .frame(maxWidth: 600).frame(maxWidth: .infinity)
+                    .buttonStyle(.borderedProminent).tint(HomeStyle.buttonGreen).controlSize(.large)
+                    .disabled(model.isWorking || model.storageNeedsRecovery)
                 }
-                .background(Color(uiColor: .systemGroupedBackground))
-                .refreshable {
-                    await model.refreshIfConnected()
-                    await weights.sync(account: account, health: model)
-                    await nutrition.refresh(account: account)
-                }
-                .simultaneousGesture(DragGesture(minimumDistance: 24).onEnded { value in
-                    let horizontal = value.translation.width
-                    let vertical = value.translation.height
-                    guard abs(horizontal) > abs(vertical), abs(horizontal) > 50 else { return }
-                    changeSelectedDay(by: horizontal < 0 ? -1 : 1)
-                })
+                if model.snapshot.configuration != nil { healthCard; activityCard }
+                mealsSection
             }
-            .navigationTitle("Today")
-            .toolbar { ToolbarItem(placement: .topBarTrailing) {
-                Button { showSettings = true } label: { Image(systemName: "slider.horizontal.3") }.accessibilityLabel("Settings").accessibilityIdentifier("tracking.settings")
-            } }
-            .sheet(isPresented: $showHealth) { HealthConnectionView() }
-            .sheet(isPresented: $showSettings) { AppSettingsView() }
+            .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 24)
+            .frame(maxWidth: 600).frame(maxWidth: .infinity)
         }
+        .refreshable {
+            await model.refreshIfConnected()
+            await weights.sync(account: account, health: model)
+            await nutrition.refresh(account: account)
+        }
+        .frame(maxHeight: .infinity)
+        .accessibilityIdentifier("today.day.\(dayID)")
     }
 
-    private var dayHeader: some View {
+    private var dayStatus: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(selectedDate, format: .dateTime.weekday(.wide).day().month(.wide).locale(locale)).font(.subheadline).foregroundStyle(.secondary)
             if isClosed { Label("Day closed", systemImage: "checkmark.circle").font(.caption) }
             if nutrition.isRefreshing {
                 HStack { ProgressView(); Text("Syncing diary…").font(.caption) }
@@ -140,23 +221,16 @@ private struct TodayView: View {
         }
     }
 
-    private func changeSelectedDay(by offset: Int) {
-        let calendar = nutrition.snapshot.profile.calendar
-        guard let nextDate = calendar.date(byAdding: .day, value: offset, to: selectedDate) else { return }
-        if offset > 0, nutrition.snapshot.profile.dayID(for: nextDate) > nutrition.snapshot.profile.dayID(for: .now) { return }
-        withAnimation(.easeInOut(duration: 0.2)) { selectedDate = nextDate }
-    }
-
     private var nutritionCard: some View {
         VStack(alignment: .leading, spacing: 22) {
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Today's nutrition").font(.subheadline.weight(.semibold))
+                    Text("Daily nutrition").font(.subheadline.weight(.semibold))
                     percentageBadge
                 }
             } else {
                 HStack {
-                    Label("Today's nutrition", systemImage: "leaf").font(.subheadline.weight(.semibold))
+                    Label("Daily nutrition", systemImage: "leaf").font(.subheadline.weight(.semibold))
                     Spacer()
                     percentageBadge
                 }
@@ -310,7 +384,7 @@ private struct TodayView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     HStack { Text(verbatim: entry.draft.name).font(.headline); Spacer(); Text(entry.draft.amount, format: .number); Text(LocalizedStringKey(entry.draft.unit.titleKey)).font(.caption) }
                     HStack { Text(verbatim: entry.draft.mealName); Text(LocalizedStringKey(entry.draft.preparation.titleKey)); Text(LocalizedStringKey(entry.draft.source.titleKey)) }.font(.caption).foregroundStyle(.secondary)
-                    NutrientValuesRows(values: entry.values).font(.caption)
+                    FoodMacroRows(values: entry.values).font(.caption)
                 }.padding(18).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20))
             }
         }

@@ -24,9 +24,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		000000000000000000000120 /* nutrition-tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "nutrition-tracker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A10000000000000000000001 /* NutritionTrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = NutritionTrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B10000000000000000000001 /* NutritionTrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = NutritionTrackerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000120 /* Bocado.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bocado.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000001 /* BocadoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = BocadoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B10000000000000000000001 /* BocadoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = BocadoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -79,9 +79,9 @@
 		000000000000000000000020 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				000000000000000000000120 /* nutrition-tracker.app */,
-				A10000000000000000000001 /* NutritionTrackerTests.xctest */,
-				B10000000000000000000001 /* NutritionTrackerUITests.xctest */,
+				000000000000000000000120 /* Bocado.app */,
+				A10000000000000000000001 /* BocadoTests.xctest */,
+				B10000000000000000000001 /* BocadoUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -89,9 +89,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		000000000000000100000000 /* NutritionTracker */ = {
+		000000000000000100000000 /* Bocado */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "NutritionTracker" */;
+			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "Bocado" */;
 			buildPhases = (
 				000000000000000120000000 /* Sources */,
 				000000000000000130000000 /* Frameworks */,
@@ -102,14 +102,14 @@
 			fileSystemSynchronizedGroups = (
 				000000000000000000000010 /* nutrition-tracker */,
 			);
-			name = NutritionTracker;
-			productName = NutritionTracker;
-			productReference = 000000000000000000000120 /* nutrition-tracker.app */;
+			name = Bocado;
+			productName = Bocado;
+			productReference = 000000000000000000000120 /* Bocado.app */;
 			productType = "com.apple.product-type.application";
 		};
-		A10000000000000000000008 /* NutritionTrackerTests */ = {
+		A10000000000000000000008 /* BocadoTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A10000000000000000000009 /* Build configuration list for PBXNativeTarget "NutritionTrackerTests" */;
+			buildConfigurationList = A10000000000000000000009 /* Build configuration list for PBXNativeTarget "BocadoTests" */;
 			buildPhases = (
 				A10000000000000000000003 /* Sources */,
 				A10000000000000000000004 /* Frameworks */,
@@ -123,14 +123,14 @@
 			fileSystemSynchronizedGroups = (
 				A10000000000000000000002 /* NutritionTrackerTests */,
 			);
-			name = NutritionTrackerTests;
+			name = BocadoTests;
 			productName = NutritionTrackerTests;
-			productReference = A10000000000000000000001 /* NutritionTrackerTests.xctest */;
+			productReference = A10000000000000000000001 /* BocadoTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		B10000000000000000000008 /* NutritionTrackerUITests */ = {
+		B10000000000000000000008 /* BocadoUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B10000000000000000000009 /* Build configuration list for PBXNativeTarget "NutritionTrackerUITests" */;
+			buildConfigurationList = B10000000000000000000009 /* Build configuration list for PBXNativeTarget "BocadoUITests" */;
 			buildPhases = (
 				B10000000000000000000003 /* Sources */,
 				B10000000000000000000004 /* Frameworks */,
@@ -144,9 +144,9 @@
 			fileSystemSynchronizedGroups = (
 				B10000000000000000000002 /* NutritionTrackerUITests */,
 			);
-			name = NutritionTrackerUITests;
+			name = BocadoUITests;
 			productName = NutritionTrackerUITests;
-			productReference = B10000000000000000000001 /* NutritionTrackerUITests.xctest */;
+			productReference = B10000000000000000000001 /* BocadoUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -172,7 +172,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 000000000000000010000000 /* Build configuration list for PBXProject "NutritionTracker" */;
+			buildConfigurationList = 000000000000000010000000 /* Build configuration list for PBXProject "Bocado" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -187,9 +187,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				000000000000000100000000 /* NutritionTracker */,
-				A10000000000000000000008 /* NutritionTrackerTests */,
-				B10000000000000000000008 /* NutritionTrackerUITests */,
+				000000000000000100000000 /* Bocado */,
+				A10000000000000000000008 /* BocadoTests */,
+				B10000000000000000000008 /* BocadoUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -233,18 +233,18 @@
 /* Begin PBXTargetDependency section */
 		A10000000000000000000007 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 000000000000000100000000 /* NutritionTracker */;
+			target = 000000000000000100000000 /* Bocado */;
 			targetProxy = A10000000000000000000006 /* PBXContainerItemProxy */;
 		};
 		B10000000000000000000007 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 000000000000000100000000 /* NutritionTracker */;
+			target = 000000000000000100000000 /* Bocado */;
 			targetProxy = B10000000000000000000006 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		000000000000000011000000 /* Debug configuration for PBXProject "NutritionTracker" */ = {
+		000000000000000011000000 /* Debug configuration for PBXProject "Bocado" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -308,7 +308,7 @@
 			};
 			name = Debug;
 		};
-		000000000000000012000000 /* Release configuration for PBXProject "NutritionTracker" */ = {
+		000000000000000012000000 /* Release configuration for PBXProject "Bocado" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -364,32 +364,38 @@
 			};
 			name = Release;
 		};
-		000000000000000111000000 /* Debug configuration for PBXNativeTarget "NutritionTracker" */ = {
+		000000000000000111000000 /* Debug configuration for PBXNativeTarget "Bocado" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "nutrition-tracker/NutritionTracker.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "nutrition-tracker/Bocado.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2KHYMP6SN7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Nutrition Tracker";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Nutrition Tracker reads your weight, activity and nutrition data from Apple Health to show your history and progress.";
+				INFOPLIST_KEY_CFBundleDisplayName = Bocado;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Bocado reads your weight, activity and nutrition data from Apple Health to show your history and progress.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Bocado saves food diary calories and nutrients to Apple Health when nutrition sync is enabled.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.peter7z.NutritionTracker;
-				PRODUCT_NAME = "nutrition-tracker";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pedrozunino.bocado;
+				PRODUCT_MODULE_NAME = nutrition_tracker;
+				PRODUCT_NAME = Bocado;
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -405,32 +411,38 @@
 			};
 			name = Debug;
 		};
-		000000000000000112000000 /* Release configuration for PBXNativeTarget "NutritionTracker" */ = {
+		000000000000000112000000 /* Release configuration for PBXNativeTarget "Bocado" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "nutrition-tracker/NutritionTracker.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "nutrition-tracker/Bocado.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2KHYMP6SN7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Nutrition Tracker";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Nutrition Tracker reads your weight, activity and nutrition data from Apple Health to show your history and progress.";
+				INFOPLIST_KEY_CFBundleDisplayName = Bocado;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Bocado reads your weight, activity and nutrition data from Apple Health to show your history and progress.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Bocado saves food diary calories and nutrients to Apple Health when nutrition sync is enabled.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.peter7z.NutritionTracker;
-				PRODUCT_NAME = "nutrition-tracker";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pedrozunino.bocado;
+				PRODUCT_MODULE_NAME = nutrition_tracker;
+				PRODUCT_NAME = Bocado;
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -446,7 +458,7 @@
 			};
 			name = Release;
 		};
-		A1000000000000000000000A /* Debug configuration for PBXNativeTarget "NutritionTrackerTests" */ = {
+		A1000000000000000000000A /* Debug configuration for PBXNativeTarget "BocadoTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -454,18 +466,18 @@
 				DEVELOPMENT_TEAM = 2KHYMP6SN7;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.peter7z.NutritionTrackerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pedrozunino.bocado.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/nutrition-tracker.app/nutrition-tracker";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bocado.app/Bocado";
 			};
 			name = Debug;
 		};
-		A1000000000000000000000B /* Release configuration for PBXNativeTarget "NutritionTrackerTests" */ = {
+		A1000000000000000000000B /* Release configuration for PBXNativeTarget "BocadoTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -473,85 +485,85 @@
 				DEVELOPMENT_TEAM = 2KHYMP6SN7;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.peter7z.NutritionTrackerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pedrozunino.bocado.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/nutrition-tracker.app/nutrition-tracker";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bocado.app/Bocado";
 			};
 			name = Release;
 		};
-		B1000000000000000000000A /* Debug configuration for PBXNativeTarget "NutritionTrackerUITests" */ = {
+		B1000000000000000000000A /* Debug configuration for PBXNativeTarget "BocadoUITests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 2KHYMP6SN7;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.peter7z.NutritionTrackerUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pedrozunino.bocado.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = NutritionTracker;
+				TEST_TARGET_NAME = Bocado;
 			};
 			name = Debug;
 		};
-		B1000000000000000000000B /* Release configuration for PBXNativeTarget "NutritionTrackerUITests" */ = {
+		B1000000000000000000000B /* Release configuration for PBXNativeTarget "BocadoUITests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 2KHYMP6SN7;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.peter7z.NutritionTrackerUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pedrozunino.bocado.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = NutritionTracker;
+				TEST_TARGET_NAME = Bocado;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		000000000000000010000000 /* Build configuration list for PBXProject "NutritionTracker" */ = {
+		000000000000000010000000 /* Build configuration list for PBXProject "Bocado" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000011000000 /* Debug configuration for PBXProject "NutritionTracker" */,
-				000000000000000012000000 /* Release configuration for PBXProject "NutritionTracker" */,
+				000000000000000011000000 /* Debug configuration for PBXProject "Bocado" */,
+				000000000000000012000000 /* Release configuration for PBXProject "Bocado" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		000000000000000110000000 /* Build configuration list for PBXNativeTarget "NutritionTracker" */ = {
+		000000000000000110000000 /* Build configuration list for PBXNativeTarget "Bocado" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000111000000 /* Debug configuration for PBXNativeTarget "NutritionTracker" */,
-				000000000000000112000000 /* Release configuration for PBXNativeTarget "NutritionTracker" */,
+				000000000000000111000000 /* Debug configuration for PBXNativeTarget "Bocado" */,
+				000000000000000112000000 /* Release configuration for PBXNativeTarget "Bocado" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		A10000000000000000000009 /* Build configuration list for PBXNativeTarget "NutritionTrackerTests" */ = {
+		A10000000000000000000009 /* Build configuration list for PBXNativeTarget "BocadoTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A1000000000000000000000A /* Debug configuration for PBXNativeTarget "NutritionTrackerTests" */,
-				A1000000000000000000000B /* Release configuration for PBXNativeTarget "NutritionTrackerTests" */,
+				A1000000000000000000000A /* Debug configuration for PBXNativeTarget "BocadoTests" */,
+				A1000000000000000000000B /* Release configuration for PBXNativeTarget "BocadoTests" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		B10000000000000000000009 /* Build configuration list for PBXNativeTarget "NutritionTrackerUITests" */ = {
+		B10000000000000000000009 /* Build configuration list for PBXNativeTarget "BocadoUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B1000000000000000000000A /* Debug configuration for PBXNativeTarget "NutritionTrackerUITests" */,
-				B1000000000000000000000B /* Release configuration for PBXNativeTarget "NutritionTrackerUITests" */,
+				B1000000000000000000000A /* Debug configuration for PBXNativeTarget "BocadoUITests" */,
+				B1000000000000000000000B /* Release configuration for PBXNativeTarget "BocadoUITests" */,
 			);
 			defaultConfigurationName = Release;
 		};

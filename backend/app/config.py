@@ -20,7 +20,7 @@ class Settings:
     public_url: str = os.getenv('NUTRITION_PUBLIC_URL', 'http://localhost:8000')
     oauth_redirects: str = os.getenv('OAUTH_REDIRECT_URIS', 'https://chatgpt.com/connector_platform_oauth_redirect')
 
-    apple_app_id: str = os.getenv('APPLE_APP_ID', 'com.peter7z.NutritionTracker')
+    apple_app_id: str = os.getenv('APPLE_APP_ID', 'com.pedrozunino.bocado')
     apple_service_id: str = os.getenv('APPLE_SERVICE_ID', '')
     apple_team_id: str = os.getenv('APPLE_TEAM_ID', '')
     apple_key_id: str = os.getenv('APPLE_KEY_ID', '')

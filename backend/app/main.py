@@ -17,7 +17,7 @@ from pydantic import ValidationError
 from .config import Settings
 from .store import INTEGRITY_ERRORS,Store,canonical,digest,state
 from .models import AuthInput,SyncInput,ChatInput,EntryDraft
-from .nutrition import context_for,validate_payload,closed_day,NUTRIENTS
+from .nutrition import context_for,validate_payload,closed_day,NUTRIENTS,NUTRIENT_UNITS
 from .assistant import ResponsesClient,AIError,guard_output
 
 Image.MAX_IMAGE_PIXELS=20_000_000
@@ -307,6 +307,7 @@ def create_app(settings=None,ai=None):
             old=replay(db,owner,rid,route,wire)
             if old is not None: return old
             context,records=context_for(db,owner,body.day.isoformat())
+            context['nutrient_units']=NUTRIENT_UNITS
             image=None
             if body.attachment_id:
                 attachment=db.execute('SELECT image FROM attachments WHERE id=? AND user_id=?',(str(body.attachment_id),owner)).fetchone()
@@ -378,7 +379,7 @@ def create_app(settings=None,ai=None):
             latency=int((time.monotonic()-started)*1000)
             cost=(input_tokens*settings.input_price+output_tokens*settings.output_price)/1_000_000
             totals=context['totals']
-            formatted=' · '.join(f'{key}: {str(round(value,1)) + (" kcal" if key=="energy" else " g") if value is not None else "unknown"}' for key,value in totals.items() if key!='saturatedFat')
+            formatted=' · '.join(f'{key}: {round(value,1)} {NUTRIENT_UNITS[key]}' for key,value in totals.items() if value is not None) or 'no nutrient totals available'
             message=output.message+'\n\nAcumulado real / Actual consumed: '+formatted
             result={'request_id':rid,'message':message,'intent':output.intent,'proposals':[p.model_dump(mode='json',exclude={'product_id','product_version','recipe_id','recipe_version'}) for p in output.proposals],'totals':totals,'usage':dict(input_tokens=input_tokens,output_tokens=output_tokens,estimated_cost_usd=cost,latency_ms=latency)}
             result['goal_proposal']=output.goal_proposal.model_dump(mode='json') if output.goal_proposal else None

@@ -67,6 +67,64 @@ private final class AccountURLProtocol: URLProtocol, @unchecked Sendable {
         XCTAssertEqual(account.session?.user_id, "owner")
         XCTAssertNotNil(account.errorKey)
     }
+    func testExpiredStoredSessionIsRemovedBeforeAppCanOpen() {
+        let persistence = TestSessionPersistence()
+        persistence.value = ServerSession(token: "expired", user_id: "owner", expires_at: "2000-01-01T00:00:00Z")
+        let account = AccountSession(persistence: persistence)
+        XCTAssertNil(account.session)
+        XCTAssertNil(persistence.value)
+        XCTAssertEqual(account.errorKey, "Your session expired. Sign in again.")
+    }
+    func testExpiredStoredSessionDoesNotOpenAppWhenKeychainRemovalFails() {
+        let persistence = TestSessionPersistence()
+        persistence.value = ServerSession(token: "expired", user_id: "owner", expires_at: "2000-01-01T00:00:00Z")
+        persistence.failClear = true
+        let account = AccountSession(persistence: persistence)
+        XCTAssertNil(account.session)
+        XCTAssertNotNil(persistence.value)
+        XCTAssertNotNil(account.errorKey)
+    }
+    func testBackendFractionalTimestampExpiresStoredSession() {
+        let persistence = TestSessionPersistence()
+        persistence.value = ServerSession(token: "expired", user_id: "owner", expires_at: "2000-01-01T00:00:00.123456+00:00")
+        let account = AccountSession(persistence: persistence)
+        XCTAssertNil(account.session)
+        XCTAssertNil(persistence.value)
+    }
+    func testInvalidStoredExpirationRequiresLogin() {
+        let persistence = TestSessionPersistence()
+        persistence.value = ServerSession(token: "invalid", user_id: "owner", expires_at: "invalid-date")
+        XCTAssertNil(AccountSession(persistence: persistence).session)
+        XCTAssertNil(persistence.value)
+    }
+    func testRejectedSessionBlocksAppEvenWhenKeychainRemovalFails() async {
+        let (account, persistence) = setup()
+        persistence.failClear = true
+        AccountURLProtocol.handler = { _ in (401, "{}") }
+        await account.refreshProfile()
+        XCTAssertNil(account.session)
+        XCTAssertNotNil(persistence.value)
+        XCTAssertEqual(account.errorKey, "Could not securely remove your session.")
+    }
+    func testWeightRequestRejectionAlsoRequiresLogin() async {
+        let (account, persistence) = setup()
+        AccountURLProtocol.handler = { _ in (401, "{}") }
+        do {
+            let _: AccountProfile = try await account.weightRequest("v1/health/weights")
+            XCTFail("Expected session rejection")
+        } catch { }
+        XCTAssertNil(account.session)
+        XCTAssertNil(persistence.value)
+    }
+    func testRevokedSessionCannotUnlockAppWhenLogoutKeychainRemovalFails() async {
+        let (account, persistence) = setup()
+        persistence.failClear = true
+        AccountURLProtocol.handler = { _ in (200, #"{"ok":true}"#) }
+        await account.signOut()
+        XCTAssertNil(account.session)
+        XCTAssertNotNil(persistence.value)
+        XCTAssertEqual(account.errorKey, "Could not securely remove your session.")
+    }
     func testExpiredSessionClearsKeychainAndIdentity() async {
         let (account, persistence) = setup()
         AccountURLProtocol.handler = { _ in (401, "{}") }
