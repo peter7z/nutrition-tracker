@@ -182,7 +182,7 @@ private struct DailyNutritionView: View {
                         }
                     }.padding(20).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 22))
                 }
-                if !model.snapshot.isConnected {
+                if !model.snapshot.isConnected && model.snapshot.lastSyncDate == nil {
                     Button { showHealth = true } label: {
                         Label("Connect Apple Health", systemImage: "heart")
                             .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 8)
