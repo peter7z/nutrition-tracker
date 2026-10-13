@@ -13,6 +13,10 @@ catálogo de alimentos ni otra llamada a un modelo desde las herramientas.
 - Usar `get_profile` para reconocer la cuenta y `get_day` para consultar el día,
   la zona horaria, las entradas, versiones, revisión y totales reales. No usar
   la conversación como sustituto del historial guardado.
+- Cuando el usuario pida ver o resumir las calorías o nutrientes de un día,
+  llamar también `show_day_summary` con la misma fecha, después de `get_day`,
+  para mostrar la tarjeta inline de calorías, objetivo y macros. No llamarla
+  para preguntas puntuales que no pidan un resumen.
 - Interpretar fechas como «hoy» en la zona horaria de la cuenta y enviar fechas
   concretas; todo consumo lleva fecha/hora con offset. Aclarar cambios de día
   o zona cuando afecten qué entrada se registra.
