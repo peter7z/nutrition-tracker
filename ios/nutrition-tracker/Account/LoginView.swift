@@ -15,7 +15,7 @@ struct LoginView: View {
                         .frame(width: 100, height: 100)
                         .background(Color("NutritionGreen").opacity(0.12), in: RoundedRectangle(cornerRadius: 30))
                         .accessibilityHidden(true)
-                    Text(verbatim: "Bocado")
+                    Text(verbatim: "Bocado Log")
                         .font(.system(.largeTitle, design: .rounded, weight: .bold))
                         .accessibilityAddTraits(.isHeader)
                     Text("Your nutrition, day by day.")
@@ -25,7 +25,7 @@ struct LoginView: View {
                     Text("Sign in to get started")
                         .font(.title2.weight(.semibold))
                         .accessibilityAddTraits(.isHeader)
-                    Text("Keep your food diary and progress together. Use the same account in Bocado and ChatGPT.")
+                    Text("Keep your food diary and progress together. Use the same account in Bocado Log and ChatGPT.")
                         .foregroundStyle(.secondary)
                     SignInWithAppleButton(.signIn) { request in
                         request.requestedScopes = [.email]

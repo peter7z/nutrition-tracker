@@ -1,4 +1,4 @@
-# Nutrition Tracker backend
+# Bocado Log backend
 
 FastAPI, Postgres en Render y SQLite local, migraciones versionadas, login por contraseña y sesiones revocables. Las comidas guardadas y los datos de HealthKit permanecen disponibles en el dispositivo; registrar o consultar comidas mediante Chat requiere este servicio remoto configurado y conexión. El backend añade sincronización privada, conversación persistente y OpenAI Responses. No hay respuesta de IA simulada offline, una clave incluida en la app y el deploy de pruebas se documenta en [Render](../docs/render.md).
 

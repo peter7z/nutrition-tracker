@@ -1,6 +1,6 @@
 # Diario remoto en iOS
 
-iOS descarga `GET /v1/state` con la sesión de Nutrition Tracker almacenada en
+iOS descarga `GET /v1/state` con la sesión de Bocado Log almacenada en
 Keychain. Esa cuenta debe ser la misma que se conectó al plugin de ChatGPT.
 No se utiliza el token OAuth del MCP ni acceso directo a Supabase.
 

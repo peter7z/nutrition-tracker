@@ -6,7 +6,7 @@ permite entrar directamente; una sesión vencida o rechazada vuelve al login.
 Ajustes → Cuenta de Bocado muestra la cuenta y permite cerrar sesión.
 El backend valida el JWT firmado por Apple con sus claves públicas, issuer,
 audience, expiración y nonce de un desafío de cinco minutos, consumido una
-sola vez. El token de Nutrition Tracker se guarda en Keychain, únicamente
+sola vez. El token de Bocado Log se guarda en Keychain, únicamente
 accesible con el dispositivo desbloqueado y sin migración a otros equipos.
 Cerrar sesión revoca el token en el servidor antes de eliminarlo del equipo;
 sin conexión se mantiene para reintentar. Al cerrar sesión se vuelve al login
@@ -73,7 +73,7 @@ App ID, Services ID y key. Esta primera entrega no persiste refresh tokens de
 Apple: la revocación directa en Apple, notificaciones server-to-server y la
 revocación de la autorización Apple al eliminar la cuenta requieren una fase
 adicional antes de distribución pública. La eliminación existente del backend
-sí elimina la identidad, las sesiones y los datos de Nutrition Tracker.
+sí elimina la identidad, las sesiones y los datos de Bocado Log.
 
 [Configuración oficial web](https://developer.apple.com/help/account/capabilities/configure-sign-in-with-apple-for-the-web) ·
 [Verificación de identidad](https://developer.apple.com/documentation/signinwithapple/authenticating-users-with-sign-in-with-apple).

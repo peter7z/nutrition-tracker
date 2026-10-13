@@ -160,9 +160,9 @@ class PluginOAuth:
             if app.state.apple_identity.web_enabled:
                 apple_button = f'<form method="post" action="/oauth/apple/start"><input type="hidden" name="flow" value="{html.escape(flow)}"><input type="hidden" name="csrf" value="{csrf}"><button>Continuar con Apple y autorizar</button></form>'
             page = f''' <!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>Conectar Nutrition Tracker</title><body><main><h1>Conectar Nutrition Tracker</h1>
-<p>Autorizar a {html.escape(name)} con tu cuenta de Nutrition Tracker.</p><ul>{permissions}</ul>
-<p>Tu contraseña se envía únicamente a Nutrition Tracker. No se comparte con ChatGPT. No se conecta Apple Health desde esta pantalla.</p>
+<title>Conectar Bocado Log</title><body><main><h1>Conectar Bocado Log</h1>
+<p>Autorizar a {html.escape(name)} con tu cuenta de Bocado Log.</p><ul>{permissions}</ul>
+<p>Tu contraseña se envía únicamente a Bocado Log. No se comparte con ChatGPT. No se conecta Apple Health desde esta pantalla.</p>
 {apple_button}
 <form method="post" action="/oauth/connect"><input type="hidden" name="flow" value="{html.escape(flow)}">
 <input type="hidden" name="csrf" value="{csrf}"><p><label>Email <input type="email" name="email" required autocomplete="username"></label></p>

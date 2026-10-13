@@ -118,6 +118,8 @@
         requestAnimationFrame(reportHeight);
       }
 
+      window.renderBocadoLogSummary = render;
+
       const initial = window.openai?.toolOutput;
       if (initial) render(initial);
       window.addEventListener('message', (event) => {
@@ -132,5 +134,8 @@
         }
       }, { passive: true });
     })();
+  </script>
+  <script type="module">
+    /*__BOCADO_LOG_APP__*/
   </script>
 </div>

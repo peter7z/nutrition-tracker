@@ -141,7 +141,7 @@ private struct NutritionHealthValue {
 
     // Persisted metadata stays stable across app renames so existing samples are recognized.
     private static let sourceKey = "NutritionTrackerGeneratedBy"
-    private static let sourceValue = "Nutrition Tracker"
+    private static let sourceValue = "Bocado Log"
     private static let recordKey = "NutritionTrackerRecordKey"
     private static let fingerprintKey = "NutritionTrackerFingerprint"
 

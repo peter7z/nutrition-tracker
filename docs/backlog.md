@@ -1,4 +1,4 @@
-# Nutrition Tracker — backlog companion iOS + plugin ChatGPT
+# Bocado Log — backlog companion iOS + plugin ChatGPT
 
 Fecha: **10 de octubre de 2026**. Repositorio: `peter7z/nutrition-tracker`.
 
@@ -57,7 +57,7 @@ Separar explícitamente las responsabilidades y migrar la arquitectura anterior 
 
 Criterios de aceptación:
 
-- [ ] ios/ contiene HealthKit, caché, visualización y configuración; backend/ es la fuente persistente del tracking; plugin/ alojará manifiesto, instrucciones y futuras extensiones. El servidor MCP es una pieza del plugin.
+- [ ] ios/ contiene HealthKit, caché, visualización y configuración; backend/ es la fuente persistente del tracking; bocado-log/ alojará manifiesto, instrucciones y futuras extensiones. El servidor MCP es una pieza del plugin.
 - [ ] iOS no crea/edita comidas, peso, actividad, metas ni cierres. Solo puede importar/sincronizar Salud y realizar operaciones técnicas de cuenta/consentimiento. El tracking se modifica desde ChatGPT mediante el plugin.
 - [ ] Conservar registros existentes, versiones, procedencia y recibos; migración recuperable, aislamiento por propietario y reconciliación sin duplicar resúmenes. Documentar cambios respecto de la implementación actual.
 - [ ] Contrato de datos compartido entre MCP, API de lectura iOS y futuras vistas del plugin; autenticación consistente, HTTPS, migraciones y entornos reproducibles. No incluir claves de IA en iOS ni exigir Responses API para el flujo principal.
@@ -222,9 +222,9 @@ Visualizar evolución con datos de Salud y registros creados desde el plugin.
 Criterios de aceptación:
 
 - [ ] Swift Charts con rangos y detalle: peso, media móvil de 7 días, kcal/macros y actividad; cantidad de muestras/cobertura visible y huecos sin inventar observaciones.
-- [ ] Conservar múltiples pesajes y documentar selección diaria; fuentes Salud/plugin/planilla identificadas y superposición reconciliada sin doble conteo.
+- [ ] Conservar múltiples pesajes y documentar selección diaria; fuentes Salud/bocado-log/planilla identificadas y superposición reconciliada sin doble conteo.
 - [ ] Actividad separada de ingesta; las gráficas y listas no contienen controles para crear, corregir o borrar tracking.
-- [ ] Mismas series y reglas de agregación que herramientas del plugin/futuros widgets. Validar zonas horarias, valores desconocidos, iPhone pequeño/iPad, VoiceOver y Dynamic Type.
+- [ ] Mismas series y reglas de agregación que herramientas del bocado-log/futuros widgets. Validar zonas horarias, valores desconocidos, iPhone pequeño/iPad, VoiceOver y Dynamic Type.
 
 ### [NUT-13 — Revisión semanal en ChatGPT y metas versionadas por plugin](https://github.com/peter7z/nutrition-tracker/issues/13)
 
@@ -373,7 +373,7 @@ Entregar un plugin utilizable, no solamente un servidor MCP suelto.
 
 Criterios de aceptación:
 
-- [ ] Paquete del plugin con identidad/descripción, manifiestos y configuración MCP, instrucciones/skills, documentación de instalación y estructura plugin/ versionada en el monorepo.
+- [ ] Paquete del plugin con identidad/descripción, manifiestos y configuración MCP, instrucciones/skills, documentación de instalación y estructura bocado-log/ versionada en el monorepo.
 - [ ] Conectar e instalar de forma privada en ChatGPT con cuenta/host compatibles verificados; probar discovery, OAuth, lectura y escritura desde una conversación real. No confundir Inspector con aceptación del plugin.
 - [ ] Documentar surfaces/planes/permisos realmente probados (incluido móvil/voz si se pretende usarlos); no prometer compatibilidad ni publicación pública sin verificarla.
 - [ ] Preparar contratos/resultados structuredContent y organización para futuras ChatGPT Extensions NUT-21. Publicación en catálogo, revisión y widgets no son requisitos para el primer plugin privado.
@@ -402,7 +402,7 @@ Estas referencias guían los tickets; no prueban que la cuenta, el host móvil/v
 
 ## Implementación inicial del plugin — 10 de octubre de 2026
 
-NUT-16/NUT-17/NUT-20 avanzan con el paquete `plugin/`, skill de tracking,
+NUT-16/NUT-17/NUT-20 avanzan con el paquete `bocado-log/`, skill de tracking,
 MCP Streamable HTTP en `/mcp` y OAuth persistido (DCR, S256 PKCE, resource,
 permisos lectura/escritura, vencimiento/rotación/revocación). NUT-08 entrega
 `record_food`, `update_food`, `delete_food` con las validaciones existentes,

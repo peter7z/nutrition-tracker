@@ -730,7 +730,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cuenta de Bocado"
+            "value" : "Cuenta de Bocado Log"
           }
         }
       }
@@ -1709,7 +1709,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu diario de comidas y tu progreso, juntos. Usá la misma cuenta en Bocado y ChatGPT."
+            "value" : "Tu diario de comidas y tu progreso, juntos. Usá la misma cuenta en Bocado Log y ChatGPT."
           }
         }
       }
@@ -2691,7 +2691,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Cerrar sesión en Bocado?"
+            "value" : "¿Cerrar sesión en Bocado Log?"
           }
         }
       }
@@ -3019,7 +3019,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Subí las mediciones de peso y sus fechas desde Salud a tu cuenta de Bocado. Estarán disponibles en la web y en ChatGPT. No se suben comidas, actividad ni otros datos de Salud."
+            "value" : "Subí las mediciones de peso y sus fechas desde Salud a tu cuenta de Bocado Log. Estarán disponibles en la web y en ChatGPT. No se suben comidas, actividad ni otros datos de Salud."
           }
         }
       }
