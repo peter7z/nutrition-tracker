@@ -117,7 +117,7 @@ def install_plugin(app, store, settings, sync, password_hash, auth_limit):
     def day_summary_widget() -> str:
         return (Path(__file__).parent / 'web' / 'nutrition-day-widget.html').read_text(encoding='utf-8')
 
-    @mcp.tool(annotations=read_annotation,meta=security())
+    @mcp.tool(annotations=read_annotation,meta=security()|DAY_SUMMARY_META)
     def get_day(day:date) -> dict[str, Any]:
         """Read recorded food, server-calculated calories, macros and micronutrients, weights, goals, revision and nutrient_units for a date. Unknown nutrients stay null. Never creates records."""
         return day_snapshot(principal(),day)
