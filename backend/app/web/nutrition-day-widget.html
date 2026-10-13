@@ -59,7 +59,7 @@
 
       function render(result) {
         const output = result?.structuredContent ?? result;
-        const day = output?.day_summary;
+        const day = output?.day_summary ?? output;
         if (!day || typeof day !== 'object') return;
         const totals = day.totals ?? {};
         const goals = day.goals ?? {};
