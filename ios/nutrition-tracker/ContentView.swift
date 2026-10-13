@@ -215,7 +215,7 @@ private struct DailyNutritionView: View {
                 HStack { ProgressView(); Text("Syncing Apple Health…").font(.caption) }
             } else if let selection = resolved.selection {
                 Text(LocalizedStringKey(selection.titleKey)).font(.caption).foregroundStyle(.secondary)
-            } else {
+            } else if !model.snapshot.isConnected && model.snapshot.lastSyncDate == nil {
                 Text("Connect Health to start with your real data.").font(.caption).foregroundStyle(.secondary)
             }
         }
