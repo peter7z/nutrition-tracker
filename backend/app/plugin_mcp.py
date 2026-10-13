@@ -112,14 +112,31 @@ def install_plugin(app, store, settings, sync, password_hash, auth_limit):
         local_day = consumed_at.astimezone(ZoneInfo(snapshot['time_zone'])).date()
         return snapshot if local_day == consumed_at.date() else day_snapshot(owner, local_day)
 
-    @mcp.resource(DAY_SUMMARY_URI, name='Bocado Log daily summary',
-        description='Inline daily calories, goal progress, and nutrient totals after recording or correcting a food.',
-        mime_type='text/html;profile=mcp-app')
-    def day_summary_widget() -> str:
+    def render_day_summary_widget() -> str:
         ui_dir = Path(__file__).parent / 'web'
         page = (ui_dir / 'nutrition-day-widget.html').read_text(encoding='utf-8')
         app_script = (ui_dir / 'nutrition-day-app.bundle.js').read_text(encoding='utf-8')
         return page.replace('/*__BOCADO_LOG_APP__*/', app_script)
+
+    @mcp.resource(DAY_SUMMARY_URI, name='Bocado Log daily summary',
+        description='Inline daily calories, goal progress, and nutrient totals after recording or correcting a food.',
+        mime_type='text/html;profile=mcp-app')
+    def day_summary_widget() -> str:
+        return render_day_summary_widget()
+
+    # Keep cached tool/resource descriptors working across the v1/v2 -> v3
+    # UI refresh. ChatGPT can retain an older entrypoint URI after reconnects.
+    @mcp.resource('ui://bocado-log/day-summary-v1.html', name='Bocado Log daily summary (compatibility)',
+        description='Compatibility alias for cached Bocado Log app entrypoints.',
+        mime_type='text/html;profile=mcp-app')
+    def day_summary_widget_v1() -> str:
+        return render_day_summary_widget()
+
+    @mcp.resource('ui://bocado-log/day-summary-v2.html', name='Bocado Log daily summary (compatibility)',
+        description='Compatibility alias for cached Bocado Log app entrypoints.',
+        mime_type='text/html;profile=mcp-app')
+    def day_summary_widget_v2() -> str:
+        return render_day_summary_widget()
 
     @mcp.tool(annotations=read_annotation,meta=security())
     def get_day(day:date) -> dict[str, Any]:

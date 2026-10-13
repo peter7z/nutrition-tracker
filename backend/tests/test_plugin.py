@@ -133,6 +133,11 @@ def test_food_receipt_idempotency_correction_delete_and_server_totals(client):
     assert 'renderBocadoLogSummary' in html and 'Nutrition Tracker' not in html
     assert '--day-text: light-dark(#202124, #f5f5f7)' in html and 'context?.styles?.variables' not in html
     assert 'notifyIntrinsicHeight' in html
+    assert html.lstrip().lower().startswith('<!doctype html>')
+    for old_uri in ('ui://bocado-log/day-summary-v1.html', 'ui://bocado-log/day-summary-v2.html'):
+        old_resource=rpc(client,token,'resources/read',{'uri':old_uri})['result']['contents'][0]
+        assert old_resource['mimeType']=='text/html;profile=mcp-app'
+        assert '<!doctype html>' in old_resource['text'].lower()
     assert 'ui' not in day_reader['_meta']
     assert day_renderer['_meta']['ui']['resourceUri']=='ui://bocado-log/day-summary-v3.html'
     for descriptor in tools:
