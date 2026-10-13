@@ -35,3 +35,12 @@ como no disponibles; la tarjeta no vuelve a calcular los totales.
 Antes de escribir, consultar `get_day`. Reintentar con el mismo
 `operation_id` y los mismos argumentos devuelve el recibo original sin
 duplicar registros. Una revisión desactualizada falla sin guardar cambios.
+
+## Identidad del recurso de UI
+
+La conexión existente de ChatGPT usa `ui://nutrition-tracker/day-summary-v1.html`.
+Es el único recurso HTML: siempre entrega la interfaz actual de Bocado Log.
+El URI es una identidad estable, no la versión del diseño; no crear recursos
+v2/v3 ni aliases al actualizar la interfaz. Todas las herramientas con UI
+referencian el mismo recurso. Solo `open_tracker` es exclusivo de la interfaz;
+las herramientas de resumen y registro permanecen disponibles al modelo.
