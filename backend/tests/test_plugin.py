@@ -128,18 +128,20 @@ def test_food_receipt_idempotency_correction_delete_and_server_totals(client):
     assert sidebar['_meta']['ui']['visibility']==['app']
     opened=tool(client,token,'open_tracker')['structuredContent']
     assert opened['day'] and 'totals' in opened
-    resource=rpc(client,token,'resources/read',{'uri':'ui://bocado-log/day-summary-v3.html'})['result']
+    resource=rpc(client,token,'resources/read',{'uri':'ui://nutrition-tracker/day-summary-v1.html'})['result']
     html=resource['contents'][0]['text']
     assert 'renderBocadoLogSummary' in html and 'Nutrition Tracker' not in html
     assert '--day-text: light-dark(#202124, #f5f5f7)' in html and 'context?.styles?.variables' not in html
     assert 'notifyIntrinsicHeight' in html
     assert html.lstrip().lower().startswith('<!doctype html>')
-    for old_uri in ('ui://bocado-log/day-summary-v1.html', 'ui://bocado-log/day-summary-v2.html'):
-        old_resource=rpc(client,token,'resources/read',{'uri':old_uri})['result']['contents'][0]
-        assert old_resource['mimeType']=='text/html;profile=mcp-app'
-        assert '<!doctype html>' in old_resource['text'].lower()
+    resources=rpc(client,token,'resources/list')['result']['resources']
+    assert [r['uri'] for r in resources]==['ui://nutrition-tracker/day-summary-v1.html']
+    for name in ('show_day_summary', 'record_food', 'update_food'):
+        descriptor=next(t for t in tools if t['name']==name)
+        assert descriptor['_meta']['ui']['resourceUri']=='ui://nutrition-tracker/day-summary-v1.html'
+        assert 'visibility' not in descriptor['_meta']['ui']
     assert 'ui' not in day_reader['_meta']
-    assert day_renderer['_meta']['ui']['resourceUri']=='ui://bocado-log/day-summary-v3.html'
+    assert day_renderer['_meta']['ui']['resourceUri']=='ui://nutrition-tracker/day-summary-v1.html'
     for descriptor in tools:
         assert descriptor['_meta']['securitySchemes'][0]['type']=='oauth2'
         assert 'outputSchema' in descriptor
