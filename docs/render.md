@@ -73,7 +73,7 @@ por hash; los refresh rotan, y account delete elimina tokens por cascada.
 
 Las herramientas tienen scopes y annotations explícitas. La API previa y
 MCP usan cuentas compartidas, pero sus tokens no son intercambiables.
-Paquete, instalación y límites: [plugin/README.md](../plugin/README.md).
+Paquete, instalación y límites: [bocado-log/README.md](../bocado-log/README.md).
 
 
 ### Verificación pública — 10 de octubre de 2026

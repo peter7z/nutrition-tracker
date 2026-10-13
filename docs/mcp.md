@@ -1,4 +1,4 @@
-# MCP de Nutrition Tracker
+# MCP de Bocado Log
 
 Transporte HTTP: `/mcp`, autenticado por OAuth. Las consultas requieren
 `tracking:read`; las escrituras además requieren `tracking:write`.

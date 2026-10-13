@@ -1,9 +1,9 @@
 ---
-name: nutrition-tracking
-description: Consultar el historial y progreso de Nutrition Tracker o registrar y corregir comidas consumidas desde ChatGPT, estimando calorías y macros automáticamente.
+name: bocado-log
+description: Consultar el historial y progreso de Bocado Log o registrar y corregir comidas consumidas desde ChatGPT, estimando calorías y macros automáticamente.
 ---
 
-Usar las herramientas de Nutrition Tracker para consultar datos reales y guardar
+Usar las herramientas de Bocado Log para consultar datos reales y guardar
 lo que el usuario explícitamente consumió o pidió registrar. ChatGPT interpreta
 texto, voz o fotos y estima nutrientes; el servidor valida y persiste. No hay
 catálogo de alimentos ni otra llamada a un modelo desde las herramientas.
@@ -64,7 +64,7 @@ catálogo de alimentos ni otra llamada a un modelo desde las herramientas.
 
 ## Conexión y límites de esta versión
 
-La conexión OAuth abre Nutrition Tracker para login/creación de cuenta y
+La conexión OAuth abre Bocado Log para login/creación de cuenta y
 consentimiento de lectura/escritura. No pedir contraseñas, tokens o claves en el
 chat. Ante permisos insuficientes, indicar reconectar con el permiso necesario.
 

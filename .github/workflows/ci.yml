@@ -1,4 +1,4 @@
-name: Nutrition Tracker validation
+name: Bocado Log validation
 
 on:
   pull_request:

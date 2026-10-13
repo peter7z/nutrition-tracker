@@ -5,7 +5,7 @@ struct AccountSection: View {
     @State private var confirmSignOut = false
 
     var body: some View {
-        Section("Bocado account") {
+        Section("Bocado Log account") {
             if account.session != nil {
                 if let email = account.email { LabeledContent("Account", value: email) }
                 else { Text("Signed in") }
@@ -21,7 +21,7 @@ struct AccountSection: View {
         .task {
             await account.refreshProfile()
         }
-        .alert("Sign out of Bocado?", isPresented: $confirmSignOut) {
+        .alert("Sign out of Bocado Log?", isPresented: $confirmSignOut) {
             Button("Sign out", role: .destructive) { Task {
                 await account.signOut()
             } }

@@ -37,7 +37,7 @@ def create_app(settings=None,ai=None):
     settings=settings or Settings()
     store=Store(settings.database)
     provider=ai or ResponsesClient(settings)
-    app=FastAPI(title='Nutrition Tracker',version='1.0.0',docs_url='/docs' if settings.environment=='development' else None,redoc_url=None,openapi_url='/openapi.json' if settings.environment=='development' else None)
+    app=FastAPI(title='Bocado Log',version='1.0.0',docs_url='/docs' if settings.environment=='development' else None,redoc_url=None,openapi_url='/openapi.json' if settings.environment=='development' else None)
     app.state.store=store
     auth_attempts=defaultdict(deque)
 

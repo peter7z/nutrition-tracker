@@ -1,7 +1,7 @@
-# Nutrition Tracker — plugin privado 0.1.0
+# Bocado Log — plugin privado 0.2.0
 
 Paquete portable con `plugin.json`, `mcp.json` e instrucciones en
-`skills/nutrition-tracking/SKILL.md`. La pieza remota vive en el backend del
+`skills/bocado-log/SKILL.md`. La pieza remota vive en el backend del
 monorepo y comparte Postgres, propietarios, validaciones y cálculos con la API.
 
 ## Conectar
@@ -12,7 +12,7 @@ En ChatGPT Plugins, agregar un MCP propio con:
 - OAuth con registro dinámico (DCR); sin client secret.
 - Scopes: `tracking:read tracking:write`.
 
-Completar login o creación de cuenta en Nutrition Tracker y autorizar los
+Completar login o creación de cuenta en Bocado Log y autorizar los
 permisos. La contraseña nunca se entrega al chat. Si el host ofrece importar
 paquetes locales, importar esta carpeta para incluir también las instrucciones.
 Conectar solo la URL valida el MCP, no acredita la instalación del paquete.
@@ -23,12 +23,14 @@ exacta mediante `OAUTH_REDIRECT_URIS`, separadas por comas. Nunca usar wildcards
 para callbacks propios. OAuth publica discovery, PKCE S256, resource, scopes,
 access tokens opacos de una hora, refresh rotatorio y revocación persistida.
 
-Herramientas: `get_profile`, `get_day`, `show_day_summary`, `get_progress`, `record_food`,
+Herramientas: `get_profile`, `get_day`, `show_day_summary`, `get_progress`, `open_tracker`, `record_food`,
 `update_food`, `delete_food`, `record_closed_day`. ChatGPT estima el snapshot;
 no hay catálogo ni inferencia de OpenAI en el servidor. Las mutaciones devuelven
 recibos y exigen revisión/versiones. Al registrar o corregir una comida, el MCP
 entrega los totales autoritativos del día y vincula una tarjeta MCP Apps inline
-con calorías, progreso del objetivo disponible, macros y fibra.
+con calorías, progreso del objetivo disponible, macros y fibra. La entrada
+global `open_tracker` abre el resumen diario de solo lectura desde el sidebar.
+Este cambio debe desplegarse y reconectarse en ChatGPT para que aparezca.
 
 ## Verificación y alcance
 

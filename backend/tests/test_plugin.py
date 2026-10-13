@@ -88,7 +88,7 @@ def test_oauth_discovery_pkce_replay_refresh_and_revocation(client):
     assert client.post('/token',data=form|{'resource':'https://evil.example/mcp'}).json()['error']=='invalid_target'
     initialize=rpc(client,tokens['access_token'],'initialize',{'protocolVersion':'2025-06-18',
         'capabilities':{},'clientInfo':{'name':'test','version':'1'}})
-    assert initialize['result']['serverInfo']['name']=='Nutrition Tracker'
+    assert initialize['result']['serverInfo']['name']=='Bocado Log'
     profile=tool(client,tokens['access_token'],'get_profile')['structuredContent']
     assert profile['email']=='plugin@example.com'
     refresh={'grant_type':'refresh_token','client_id':client_id,'refresh_token':tokens['refresh_token'],'resource':RESOURCE}
@@ -119,11 +119,20 @@ def test_read_only_scope_and_owner_isolation(client):
 def test_food_receipt_idempotency_correction_delete_and_server_totals(client):
     tokens,_,_=connect(client);token=tokens['access_token']
     tools=rpc(client,token,'tools/list')['result']['tools']
-    assert {t['name'] for t in tools}=={'get_profile','get_day','show_day_summary','get_progress','record_food','update_food','delete_food','record_closed_day'}
+    assert {t['name'] for t in tools}=={'get_profile','get_day','show_day_summary','get_progress','open_tracker','record_food','update_food','delete_food','record_closed_day'}
     day_reader=next(t for t in tools if t['name']=='get_day')
     day_renderer=next(t for t in tools if t['name']=='show_day_summary')
+    sidebar=next(t for t in tools if t['name']=='open_tracker')
+    assert sidebar['title']=='Bocado Log'
+    assert sidebar['_meta']['openai/ui']['entrypoints']==[{'type':'global'}]
+    assert sidebar['_meta']['ui']['visibility']==['app']
+    opened=tool(client,token,'open_tracker')['structuredContent']
+    assert opened['day'] and 'totals' in opened
+    resource=rpc(client,token,'resources/read',{'uri':'ui://bocado-log/day-summary-v1.html'})['result']
+    html=resource['contents'][0]['text']
+    assert 'renderBocadoLogSummary' in html and 'Nutrition Tracker' not in html
     assert 'ui' not in day_reader['_meta']
-    assert day_renderer['_meta']['ui']['resourceUri']=='ui://nutrition-tracker/day-summary-v1.html'
+    assert day_renderer['_meta']['ui']['resourceUri']=='ui://bocado-log/day-summary-v1.html'
     for descriptor in tools:
         assert descriptor['_meta']['securitySchemes'][0]['type']=='oauth2'
         assert 'outputSchema' in descriptor

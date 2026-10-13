@@ -1,4 +1,4 @@
-# Nutrition Tracker — especificación de producto
+# Bocado Log — especificación de producto
 
 Decisión de producto: **10 de octubre de 2026**. Repositorio: `peter7z/nutrition-tracker`.
 
@@ -6,7 +6,7 @@ Este documento define el nuevo enfoque y reemplaza el diseño de una app iOS con
 
 ## Qué estamos construyendo
 
-Nutrition Tracker tiene una app companion iOS y un **plugin de ChatGPT** que comparten datos mediante un backend. La app ayuda a sincronizar Apple Health y a consultar gráficas, progreso e historial. Por ahora no se usa para registrar comidas, peso, ejercicio ni metas.
+Bocado Log tiene una app companion iOS y un **plugin de ChatGPT** que comparten datos mediante un backend. La app ayuda a sincronizar Apple Health y a consultar gráficas, progreso e historial. Por ahora no se usa para registrar comidas, peso, ejercicio ni metas.
 
 Toda entrada y corrección de tracking se realiza conversando con ChatGPT y usando el plugin. El plugin incluye herramientas MCP e instrucciones de uso; eventualmente tendrá widgets renderizados mediante **ChatGPT Extensions**, como tarjetas de calorías, peso y tendencias. El MCP es parte de esa integración, no la totalidad del producto.
 
@@ -90,9 +90,9 @@ Revocar detiene futuras cargas y acceso del plugin a Salud; se ofrece borrar esa
 
 ## Plugin y futuras ChatGPT Extensions
 
-La entrega inicial es un plugin privado instalable y comprobado en ChatGPT, con herramientas de lectura y escritura y vinculación de cuenta. Un servidor que funciona en MCP Inspector no basta como aceptación del plugin.
+El paquete privado Bocado Log ofrece herramientas de lectura y escritura con vinculación de cuenta. El servidor publica una extensión MCP Apps y una entrada global de solo lectura para abrir el resumen diario desde el sidebar de ChatGPT. La importación del paquete y la comprobación de esa entrada en una conversación real todavía requieren validación en el host.
 
-El paquete reserva una estructura para instrucciones/skills, configuración MCP y futuras extensiones visuales. Los contratos devuelven datos estructurados reutilizables; los widgets no tendrán una base paralela ni recalcularán distinto a iOS.
+El paquete `bocado-log/` contiene identidad, instrucciones/skills y configuración MCP. La tarjeta diaria inline y el resumen que abre el sidebar reutilizan los contratos del backend. Las vistas ampliadas de progreso siguen en el roadmap; no tendrán una base paralela ni cálculos distintos a iOS.
 
 La fase posterior incluye:
 
