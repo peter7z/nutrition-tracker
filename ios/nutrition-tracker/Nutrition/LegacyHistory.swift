@@ -10,6 +10,7 @@ struct LegacyHistory {
     static func stored() -> LegacyHistory {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
+            // This is the historical service used by the original app.
             kSecAttrService as String: "com.peter7z.NutritionTracker.remote-session",
             kSecAttrAccount as String: "session",
             kSecReturnData as String: true,

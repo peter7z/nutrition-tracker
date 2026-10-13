@@ -99,6 +99,34 @@ extension HealthMetric {
             case .carbohydrates: identifier = .dietaryCarbohydrates
             case .fat: identifier = .dietaryFatTotal
             case .saturatedFat: identifier = .dietaryFatSaturated
+            case .fiber: identifier = .dietaryFiber
+            case .vitaminA: identifier = .dietaryVitaminA
+            case .thiamin: identifier = .dietaryThiamin
+            case .riboflavin: identifier = .dietaryRiboflavin
+            case .niacin: identifier = .dietaryNiacin
+            case .pantothenicAcid: identifier = .dietaryPantothenicAcid
+            case .vitaminB6: identifier = .dietaryVitaminB6
+            case .biotin: identifier = .dietaryBiotin
+            case .vitaminB12: identifier = .dietaryVitaminB12
+            case .vitaminC: identifier = .dietaryVitaminC
+            case .vitaminD: identifier = .dietaryVitaminD
+            case .vitaminE: identifier = .dietaryVitaminE
+            case .vitaminK: identifier = .dietaryVitaminK
+            case .folate: identifier = .dietaryFolate
+            case .calcium: identifier = .dietaryCalcium
+            case .chloride: identifier = .dietaryChloride
+            case .iron: identifier = .dietaryIron
+            case .magnesium: identifier = .dietaryMagnesium
+            case .phosphorus: identifier = .dietaryPhosphorus
+            case .potassium: identifier = .dietaryPotassium
+            case .sodium: identifier = .dietarySodium
+            case .zinc: identifier = .dietaryZinc
+            case .chromium: identifier = .dietaryChromium
+            case .copper: identifier = .dietaryCopper
+            case .iodine: identifier = .dietaryIodine
+            case .manganese: identifier = .dietaryManganese
+            case .molybdenum: identifier = .dietaryMolybdenum
+            case .selenium: identifier = .dietarySelenium
             case .workout: throw HealthOperationError.invalidConfiguration
             }
             guard let type = HKObjectType.quantityType(forIdentifier: identifier) else { throw HealthOperationError.unavailable }
@@ -112,6 +140,11 @@ extension HealthMetric {
         case .steps: .count()
         case .activeEnergy, .restingEnergy, .dietaryEnergy: .kilocalorie()
         case .exerciseMinutes, .workout: .minute()
+        case .vitaminA, .biotin, .vitaminB12, .vitaminD, .vitaminK, .folate, .chromium, .iodine, .molybdenum, .selenium:
+            .gramUnit(with: .micro)
+        case .thiamin, .riboflavin, .niacin, .pantothenicAcid, .vitaminB6, .vitaminC, .vitaminE, .calcium, .chloride,
+             .iron, .magnesium, .phosphorus, .potassium, .sodium, .zinc, .copper, .manganese:
+            .gramUnit(with: .milli)
         default: .gram()
         }
     }

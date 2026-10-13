@@ -24,15 +24,18 @@ para callbacks propios. OAuth publica discovery, PKCE S256, resource, scopes,
 access tokens opacos de una hora, refresh rotatorio y revocación persistida.
 
 Herramientas: `get_profile`, `get_day`, `get_progress`, `record_food`,
-`update_food`, `delete_food`. ChatGPT estima el snapshot; no hay catálogo ni
-inferencia de OpenAI en el servidor. Las mutaciones devuelven recibos y exigen
-revisión/versiones. Los widgets se incorporarán mediante Extensions después.
+`update_food`, `delete_food`, `record_closed_day`. ChatGPT estima el snapshot;
+no hay catálogo ni inferencia de OpenAI en el servidor. Las mutaciones devuelven
+recibos y exigen revisión/versiones. Al registrar o corregir una comida, el MCP
+entrega los totales autoritativos del día y vincula una tarjeta MCP Apps inline
+con calorías, progreso del objetivo disponible, macros y fibra.
 
 ## Verificación y alcance
 
 Pruebas de protocolo real, OAuth, aislamiento de usuarios, permisos,
 idempotencia, corrección/borrado y totales contra SQLite/Postgres. Las pruebas
-HTTP y del SDK no sustituyen una conversación en ChatGPT. La instalación del
+HTTP y del SDK no sustituyen una conversación en ChatGPT. La tarjeta MCP Apps
+está implementada en el servidor; su renderizado real, la instalación del
 paquete, la conexión con una cuenta real y móvil/voz se deben verificar en el
 host antes de declararlos entregados. No hay publicación en catálogo.
 

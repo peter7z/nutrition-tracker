@@ -10,6 +10,7 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import create_app
 from app.config import Settings
+from app.nutrition import NUTRIENTS
 
 BASE='http://localhost:8000'
 CALLBACK='https://chatgpt.com/connector_platform_oauth_redirect'
@@ -71,7 +72,7 @@ def tool(client,token,name,args=None):
 def food():
     return {'name':'Banana','meal':'Merienda','consumed_at':'2026-10-10T12:00:00-03:00',
         'portion_description':'Una banana, 150 g','source':'estimate','assumptions':'Peso estimado',
-        'nutrients':{'energy':133.5,'protein':1.65,'carbohydrates':34.2,'fat':0.45,'saturatedFat':None}}
+        'nutrients':{'energy':133.5,'protein':1.65,'carbohydrates':34.2,'fat':0.45,'saturatedFat':None,'fiber':3.9}}
 
 
 def test_oauth_discovery_pkce_replay_refresh_and_revocation(client):
@@ -118,7 +119,7 @@ def test_read_only_scope_and_owner_isolation(client):
 def test_food_receipt_idempotency_correction_delete_and_server_totals(client):
     tokens,_,_=connect(client);token=tokens['access_token']
     tools=rpc(client,token,'tools/list')['result']['tools']
-    assert {t['name'] for t in tools}=={'get_profile','get_day','get_progress','record_food','update_food','delete_food'}
+    assert {t['name'] for t in tools}=={'get_profile','get_day','get_progress','record_food','update_food','delete_food','record_closed_day'}
     for descriptor in tools:
         assert descriptor['_meta']['securitySchemes'][0]['type']=='oauth2'
         assert 'outputSchema' in descriptor
@@ -130,6 +131,7 @@ def test_food_receipt_idempotency_correction_delete_and_server_totals(client):
     day=tool(client,token,'get_day',{'day':'2026-10-10'})['structuredContent']
     assert len(day['entries'])==1 and day['totals']['energy']==133.5
     assert day['totals']['saturatedFat'] is None
+    assert day['totals']['fiber']==3.9
     hypothetical=tool(client,token,'record_food',args|{'consumption_text':'¿Y si como una banana?'})
     assert hypothetical['isError']
     for text in ('Voy a comer una banana', '¿Qué tiene una banana?', 'How much protein is in a banana?'):
@@ -209,3 +211,81 @@ def test_wrong_pkce_and_audience_never_issue_token(client):
         payload=json.loads(row['payload']);payload['expires_at']=0
         db.execute('UPDATE oauth_codes SET payload=? WHERE hash=?',(json.dumps(payload),hashed(code)))
     assert client.post('/token',data=form|{'code_verifier':verifier}).status_code==400
+
+
+def test_closed_day_totals_atomic_replay_scope_and_frozen(client):
+    tokens,_,_=connect(client);token=tokens['access_token']
+    read,_,_=connect(client,email='reader@example.com',scopes='tracking:read')
+    saved=tool(client,token,'record_food',{'operation_id':str(uuid.uuid4()),'base_revision':0,
+        'consumption_text':'Comí una banana','food':food()})['structuredContent']
+    nutrients={'energy':2200,'protein':140,'carbohydrates':250,'fat':70,'saturatedFat':15,'fiber':30}
+    args={'operation_id':str(uuid.uuid4()),'base_revision':1,'day':'2026-10-10',
+        'consumption_text':'Guardar el día completo que consumí','nutrients':nutrients}
+    assert tool(client,read['access_token'],'record_closed_day',args)['isError']
+    for invalid in (-1,True,'20'):
+        assert tool(client,token,'record_closed_day',args|{'nutrients':{'fiber':invalid}})['isError']
+    assert tool(client,token,'record_closed_day',args|{'base_revision':5})['isError']
+    assert tool(client,token,'record_closed_day',args|{'consumption_text':'Si como eso mañana'})['isError']
+    first=tool(client,token,'record_closed_day',args)['structuredContent']
+    assert first['saved'] and first['closed'] and first['revision']==2
+    assert tool(client,token,'record_closed_day',args)['structuredContent']==first
+    day=tool(client,token,'get_day',{'day':'2026-10-10'})['structuredContent']
+    expected_totals={key:nutrients.get(key) for key in NUTRIENTS}
+    assert day['closed'] and day['totals']==expected_totals and len(day['entries'])==1
+    assert not day['needs_reconciliation']
+    assert tool(client,token,'get_progress',{'start_day':'2026-10-10','end_day':'2026-10-10'})['structuredContent']['days'][0]['totals']==expected_totals
+    assert tool(client,token,'record_closed_day',args|{'operation_id':str(uuid.uuid4()),'base_revision':2})['isError']
+    assert tool(client,token,'update_food',{'operation_id':str(uuid.uuid4()),'base_revision':2,
+        'entry_id':saved['entry_id'],'expected_version':1,'correction_text':'Eran dos bananas','food':food()})['isError']
+    assert tool(client,token,'get_day',{'day':'2026-10-10'})['structuredContent']['revision']==2
+    other=tool(client,read['access_token'],'get_day',{'day':'2026-10-10'})['structuredContent']
+    assert not other['closed'] and other['totals']['energy'] is None
+    unknown=args|{'operation_id':str(uuid.uuid4()),'base_revision':2,'day':'2026-10-09','nutrients':{'energy':1800}}
+    assert tool(client,token,'record_closed_day',unknown)['structuredContent']['saved']
+    assert tool(client,token,'get_day',{'day':'2026-10-09'})['structuredContent']['totals']['fiber'] is None
+
+
+def test_companion_state_reads_mcp_food_and_closure_for_same_account(client):
+    tokens,_,_=connect(client)
+    token=tokens['access_token']
+    session=client.post('/v1/auth/login',json={'email':'plugin@example.com','password':'synthetic plugin password'}).json()
+    headers={'Authorization':'Bearer '+session['token']}
+    assert client.get('/v1/state').status_code==401
+    saved=tool(client,token,'record_food',{'operation_id':str(uuid.uuid4()),'base_revision':0,
+        'consumption_text':'Comí una banana','food':food()})['structuredContent']
+    state=client.get('/v1/state',headers=headers).json()
+    assert state['revision']==1 and len(state['records'])==1
+    entry=state['records'][0]
+    assert entry['id']==saved['entry_id'] and entry['version']==1
+    assert entry['payload']['draft']['nutrition']['fiber']==3.9
+    assert entry['payload']['draft']['consumedAt'].endswith('-03:00')
+    closed=tool(client,token,'record_closed_day',{'operation_id':str(uuid.uuid4()),'base_revision':1,
+        'day':'2026-10-10','consumption_text':'Guardar el total consumido del día','nutrients':{'energy':2200,'fiber':30}})
+    assert closed['structuredContent']['saved']
+    state=client.get('/v1/state',headers=headers).json()
+    assert state['revision']==2 and {r['kind'] for r in state['records']}=={'entry','historical','day'}
+    day=next(r['payload'] for r in state['records'] if r['kind']=='day')
+    assert day['isClosed'] and day['id']=='2026-10-10'
+    assert day['summaries'][-1]['totals']['energy']['known']==2200
+    assert day['summaries'][-1]['totals']['fiber']['known']==30
+    assert day['summaries'][-1]['closedAt']
+    other=client.post('/v1/auth/signup',json={'email':'companion-other@example.com','password':'synthetic plugin password'}).json()
+    assert client.get('/v1/state',headers={'Authorization':'Bearer '+other['token']}).json()['records']==[]
+
+
+def test_mcp_reads_only_connected_accounts_uploaded_health_weight(client):
+    first,_,_=connect(client)
+    other,_,_=connect(client,email='weight-other@example.com')
+    session=client.post('/v1/auth/login',json={'email':'plugin@example.com','password':'synthetic plugin password'}).json()
+    headers={'Authorization':'Bearer '+session['token']}
+    version=client.post('/v1/health/weight/consent',headers=headers,json={'enabled':True}).json()['version']
+    response=client.post('/v1/health/weight/sync',headers=headers,json={'request_id':str(uuid.uuid4()),
+        'consent_version':version,'samples':[{'sample_id':str(uuid.uuid4()),'recorded_at':'2026-10-12T08:00:00-03:00','kilograms':80.5}], 'deleted_ids':[]})
+    assert response.status_code==200
+    day=tool(client,first['access_token'],'get_day',{'day':'2026-10-12'})['structuredContent']
+    assert len(day['weights'])==1 and day['weights'][0]['kilograms']==80.5
+    assert day['weights'][0]['source']=='appleHealth'
+    assert day['health_sync_available'] and day['health_sync_metrics']==['weight']
+    assert tool(client,other['access_token'],'get_day',{'day':'2026-10-12'})['structuredContent']['weights']==[]
+    progress=tool(client,first['access_token'],'get_progress',{'start_day':'2026-10-12','end_day':'2026-10-12'})['structuredContent']
+    assert progress['days'][0]['weights']==day['weights']

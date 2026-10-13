@@ -34,7 +34,7 @@ class Store:
         if self.postgres:
             with self.connect() as db:
                 db.execute('CREATE TABLE IF NOT EXISTS migrations(version INTEGER PRIMARY KEY)')
-                for version, name in ((1, '001_initial.sql'), (2, '002_global_spend.sql'), (3, '003_plugin_oauth.sql'), (4, '004_apple_identity.sql')):
+                for version, name in ((1, '001_initial.sql'), (2, '002_global_spend.sql'), (3, '003_plugin_oauth.sql'), (4, '004_apple_identity.sql'), (5, '005_health_weights.sql')):
                     if not db.execute('SELECT 1 FROM migrations WHERE version=?', (version,)).fetchone():
                         script = (pathlib.Path(__file__).parent.parent / 'migrations/postgres' / name).read_text()
                         db.connection.execute(script)
@@ -55,6 +55,9 @@ class Store:
             if not db.execute('SELECT 1 FROM migrations WHERE version=4').fetchone():
                 db.executescript((pathlib.Path(__file__).parent.parent / 'migrations/004_apple_identity.sql').read_text())
                 db.execute('INSERT INTO migrations VALUES(4)')
+            if not db.execute('SELECT 1 FROM migrations WHERE version=5').fetchone():
+                db.executescript((pathlib.Path(__file__).parent.parent / 'migrations/005_health_weights.sql').read_text())
+                db.execute('INSERT INTO migrations VALUES(5)')
         os.chmod(path,0o600)
 
     @contextmanager
@@ -88,5 +91,7 @@ def digest(value):
 def state(db, owner):
     revision = db.execute('SELECT revision FROM users WHERE id=?', (owner,)).fetchone()['revision']
     records = [dict(id=r['id'],kind=r['kind'],version=r['version'],payload=json.loads(r['payload'])) for r in db.execute('SELECT * FROM records WHERE user_id=? AND deleted=0 ORDER BY id',(owner,))]
+    from .health_weights import weight_records
+    records.extend(weight_records(db,owner))
     messages = [dict(id=r['id'],request_id=r['request_id'],role=r['role'],content=r['content'],day=r['day'],created_at=r['created_at'],proposals=json.loads(r['proposals'])) for r in db.execute('SELECT * FROM messages WHERE user_id=? ORDER BY created_at,id',(owner,))]
     return dict(revision=revision, records=records, messages=messages)

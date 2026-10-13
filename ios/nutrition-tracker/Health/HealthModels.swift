@@ -2,7 +2,11 @@ import Foundation
 
 enum HealthMetric: String, CaseIterable, Codable, Identifiable {
     case weight, steps, activeEnergy, restingEnergy, exerciseMinutes, workout
-    case dietaryEnergy, protein, carbohydrates, fat, saturatedFat
+    case dietaryEnergy, protein, carbohydrates, fat, saturatedFat, fiber
+    case vitaminA, thiamin, riboflavin, niacin, pantothenicAcid, vitaminB6, biotin, vitaminB12
+    case vitaminC, vitaminD, vitaminE, vitaminK, folate
+    case calcium, chloride, iron, magnesium, phosphorus, potassium, sodium, zinc
+    case chromium, copper, iodine, manganese, molybdenum, selenium
 
     var id: String { rawValue }
     var titleKey: String {
@@ -18,6 +22,34 @@ enum HealthMetric: String, CaseIterable, Codable, Identifiable {
         case .carbohydrates: "Carbs"
         case .fat: "Fat"
         case .saturatedFat: "Saturated fat"
+        case .fiber: "Fiber"
+        case .vitaminA: "Vitamin A"
+        case .thiamin: "Thiamin (B1)"
+        case .riboflavin: "Riboflavin (B2)"
+        case .niacin: "Niacin (B3)"
+        case .pantothenicAcid: "Pantothenic acid (B5)"
+        case .vitaminB6: "Vitamin B6"
+        case .biotin: "Biotin (B7)"
+        case .vitaminB12: "Vitamin B12"
+        case .vitaminC: "Vitamin C"
+        case .vitaminD: "Vitamin D"
+        case .vitaminE: "Vitamin E"
+        case .vitaminK: "Vitamin K"
+        case .folate: "Folate"
+        case .calcium: "Calcium"
+        case .chloride: "Chloride"
+        case .iron: "Iron"
+        case .magnesium: "Magnesium"
+        case .phosphorus: "Phosphorus"
+        case .potassium: "Potassium"
+        case .sodium: "Sodium"
+        case .zinc: "Zinc"
+        case .chromium: "Chromium"
+        case .copper: "Copper"
+        case .iodine: "Iodine"
+        case .manganese: "Manganese"
+        case .molybdenum: "Molybdenum"
+        case .selenium: "Selenium"
         }
     }
     var unit: String {
@@ -26,11 +58,19 @@ enum HealthMetric: String, CaseIterable, Codable, Identifiable {
         case .steps: ""
         case .activeEnergy, .restingEnergy, .dietaryEnergy: "kcal"
         case .exerciseMinutes, .workout: "min"
+        case .vitaminA, .biotin, .vitaminB12, .vitaminD, .vitaminK, .folate, .chromium, .iodine, .molybdenum, .selenium: "mcg"
+        case .thiamin, .riboflavin, .niacin, .pantothenicAcid, .vitaminB6, .vitaminC, .vitaminE, .calcium, .chloride, .iron, .magnesium, .phosphorus, .potassium, .sodium, .zinc, .copper, .manganese: "mg"
         default: "g"
         }
     }
-    var isNutrition: Bool { [.dietaryEnergy, .protein, .carbohydrates, .fat, .saturatedFat].contains(self) }
+    var isNutrition: Bool { Self.nutritionMetrics.contains(self) }
     var isCumulative: Bool { self != .weight && self != .workout }
+    static let nutritionMetrics: Set<HealthMetric> = [
+        .dietaryEnergy, .protein, .carbohydrates, .fat, .saturatedFat, .fiber,
+        .vitaminA, .thiamin, .riboflavin, .niacin, .pantothenicAcid, .vitaminB6, .biotin, .vitaminB12,
+        .vitaminC, .vitaminD, .vitaminE, .vitaminK, .folate, .calcium, .chloride, .iron, .magnesium,
+        .phosphorus, .potassium, .sodium, .zinc, .chromium, .copper, .iodine, .manganese, .molybdenum, .selenium
+    ]
 }
 
 struct HealthImportConfiguration: Codable, Equatable {

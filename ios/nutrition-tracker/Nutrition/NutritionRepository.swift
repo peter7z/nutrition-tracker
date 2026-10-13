@@ -60,7 +60,7 @@ enum NutritionBackup {
         for day in snapshot.days {
             guard validDay(day.id), day.version > 0 else { throw NutritionError.invalidData }
             for summary in day.summaries {
-                let totals = [summary.totals.energy, summary.totals.protein, summary.totals.carbohydrates, summary.totals.fat, summary.totals.saturatedFat]
+                let totals = [summary.totals.energy, summary.totals.protein, summary.totals.carbohydrates, summary.totals.fat, summary.totals.saturatedFat, summary.totals.fiber, summary.totals.vitaminA, summary.totals.thiamin, summary.totals.riboflavin, summary.totals.niacin, summary.totals.pantothenicAcid, summary.totals.vitaminB6, summary.totals.biotin, summary.totals.vitaminB12, summary.totals.vitaminC, summary.totals.vitaminD, summary.totals.vitaminE, summary.totals.vitaminK, summary.totals.folate, summary.totals.calcium, summary.totals.chloride, summary.totals.iron, summary.totals.magnesium, summary.totals.phosphorus, summary.totals.potassium, summary.totals.sodium, summary.totals.zinc, summary.totals.chromium, summary.totals.copper, summary.totals.iodine, summary.totals.manganese, summary.totals.molybdenum, summary.totals.selenium]
                 guard summary.version > 0, summary.closedAt.timeIntervalSince1970.isFinite,
                       summary.totals.entryCount >= 0,
                       totals.allSatisfy({ $0.known.isFinite && $0.known >= 0 && $0.knownCount >= 0 && $0.missingCount >= 0 }),
@@ -81,7 +81,7 @@ enum NutritionBackup {
         for weight in snapshot.weights {
             guard weight.kilograms.isFinite && weight.kilograms > 0 && weight.kilograms < 1_000,
                   weight.notes.count <= 20_000,
-                  weight.source == .manual ? weight.importBatchID == nil : snapshot.importBatches.contains(where: { $0.id == weight.importBatchID }) else { throw NutritionError.invalidData }
+                  weight.source != .spreadsheet ? weight.importBatchID == nil : snapshot.importBatches.contains(where: { $0.id == weight.importBatchID }) else { throw NutritionError.invalidData }
         }
         for activity in snapshot.activities {
             guard !activity.kind.isEmpty, activity.durationMinutes.map({ $0.isFinite && $0 >= 0 }) != false,

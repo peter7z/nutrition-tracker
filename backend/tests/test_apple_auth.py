@@ -23,7 +23,7 @@ def setup(tmp_path, request):
     with TestClient(app,base_url='http://localhost:8000') as client: yield client, app, key
 
 def token(key,challenge_nonce,**changes):
-    claims={'iss':'https://appleid.apple.com','aud':'com.peter7z.NutritionTracker','sub':'apple-subject',
+    claims={'iss':'https://appleid.apple.com','aud':'com.pedrozunino.bocado','sub':'apple-subject',
         'iat':int(time.time()),'exp':int(time.time())+300,'nonce':challenge_nonce,
         'email':'apple@example.com','email_verified':'true'}|changes
     return jwt.encode(claims,key,algorithm='RS256',headers={'kid':'test'})
@@ -97,7 +97,7 @@ def test_apple_web_login_joins_ios_owner_and_issues_plugin_code(setup,monkeypatc
     private=ec.generate_private_key(ec.SECP256R1()).private_bytes(serialization.Encoding.PEM,
         serialization.PrivateFormat.PKCS8,serialization.NoEncryption()).decode()
     apple=app.state.apple_identity
-    apple.settings=replace(apple.settings,apple_service_id='com.peter7z.NutritionTracker.web',
+    apple.settings=replace(apple.settings,apple_service_id='com.pedrozunino.bocado.web',
         apple_team_id='test-team',apple_key_id='test-key',apple_private_key=private)
     callback='https://chatgpt.com/connector_platform_oauth_redirect'
     registered=client.post('/register',json={'redirect_uris':[callback],'token_endpoint_auth_method':'none',

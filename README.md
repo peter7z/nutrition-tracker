@@ -1,4 +1,4 @@
-# Nutrition Tracker
+# Nutrition Tracker · Bocado iOS
 
 Monorepo de un companion iOS para Apple Health y visualización de progreso, un backend compartido y un **plugin de ChatGPT** para consultar y registrar tracking. Apple Health mantiene la primera prioridad: [NUT-01](https://github.com/peter7z/nutrition-tracker/issues/1).
 
@@ -23,7 +23,7 @@ La decisión completa, los flujos y límites están en [especificación de produ
 2. Seleccionar el esquema compartido `NutritionTracker` y un simulador iPhone con iOS 18 o superior.
 3. Ejecutar con Run. La app también declara soporte iPad.
 
-Configuración: bundle ID `com.peter7z.NutritionTracker`, nombre visible `Nutrition Tracker`; la versión/build vigentes se toman del proyecto Xcode. Se conserva el equipo de firma original `2KHYMP6SN7`; otros colaboradores deben elegir su equipo para dispositivos. HealthKit debe habilitarse también para ese App ID/perfil al firmar. El simulador no valida permisos ni datos reales del usuario.
+Configuración: bundle ID `com.pedrozunino.bocado`, nombre visible `Bocado`; la versión/build vigentes se toman del proyecto Xcode. Se conserva el equipo de firma original `2KHYMP6SN7`; otros colaboradores deben elegir su equipo para dispositivos. HealthKit debe habilitarse también para ese App ID/perfil al firmar. El simulador no valida permisos ni datos reales del usuario.
 
 Compilación reproducible sin firma:
 
@@ -53,7 +53,7 @@ No se solicitan permisos de Salud en las pruebas; el cliente se reemplaza por fi
 
 ## Apple Health
 
-La lectura local sigue siendo la primera tarea y puede funcionar sin login ni servidor. Se eligen tipos/rango, se revisa el historial y se mantiene una copia local con procedencia y cursores, sin escribir en Salud.
+La app exige iniciar sesión con Apple antes de acceder a Hoy, Progreso o Ajustes. Con una sesión vigente, la lectura local de Salud funciona sin conexión al servidor. Se eligen tipos/rango, se revisa el historial y se mantiene una copia local con procedencia y cursores.
 
 Para que el plugin consulte Salud, el nuevo alcance agrega consentimiento de sincronización al backend, tipos/rango limitados, revocación y scopes específicos. Esa sincronización remota todavía requiere implementación; no equivale al envío agregado por consulta del enfoque anterior. Ver NUT-18 y [producto](docs/product.md#sincronización-y-privacidad-de-salud).
 

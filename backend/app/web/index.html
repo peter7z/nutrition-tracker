@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Nutrition Tracker · Diario</title>
+  <link rel="stylesheet" href="/web/assets/style.css">
+  <script src="/web/assets/diary.js" defer></script>
+</head>
+<body>
+  <main>
+    <header><div><p class="eyebrow">NUTRITION TRACKER</p><h1>Tu diario</h1><p>Las comidas y los totales que guardaste desde ChatGPT.</p></div><button id="logout" hidden>Cerrar sesión</button></header>
+    <p id="status" role="status" aria-live="polite"></p>
+    <section id="login" class="card">
+      <h2>Entrá con tu cuenta</h2>
+      <p>Usá el email y la contraseña de la cuenta conectada a ChatGPT.</p>
+      <form id="login-form">
+        <label>Email<input name="email" type="email" autocomplete="username" required maxlength="254"></label>
+        <label>Contraseña<input name="password" type="password" autocomplete="current-password" required></label>
+        <button type="submit" class="primary">Ver mis datos</button>
+      </form>
+    </section>
+    <section id="diary" hidden>
+      <div class="toolbar"><div><strong id="account"></strong><p id="freshness"></p></div><div class="date-controls"><button id="previous" aria-label="Día anterior">←</button><label>Fecha<input id="day" type="date" required></label><button id="next" aria-label="Día siguiente">→</button><button id="refresh">Actualizar</button></div></div>
+      <div class="day-heading"><h2 id="day-title"></h2><span id="closed" class="badge"></span></div>
+      <p id="source"></p>
+      <div id="totals" class="totals"></div>
+      <p id="warning" class="notice" hidden></p>
+      <section class="card"><h2>Comidas registradas <span id="meal-count"></span></h2><div id="meals"></div></section>
+      <section class="card"><h2>Peso</h2><div id="weights"></div></section>
+      <p class="footnote">Los resúmenes de días completos y los totales de Salud no crean comidas. Los datos desconocidos aparecen como —.</p>
+    </section>
+  </main>
+</body>
+</html>

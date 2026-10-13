@@ -6,7 +6,20 @@ from zoneinfo import ZoneInfo
 from pydantic import ValidationError
 from .models import EntryDraft,Product,Recipe,Profile,Weight,Activity,Historical,Resolution
 
-NUTRIENTS=('energy','protein','carbohydrates','fat','saturatedFat')
+MICRONUTRIENTS=(
+    'vitaminA','thiamin','riboflavin','niacin','pantothenicAcid','vitaminB6','biotin','vitaminB12',
+    'vitaminC','vitaminD','vitaminE','vitaminK','folate','calcium','chloride','iron','magnesium',
+    'phosphorus','potassium','sodium','zinc','chromium','copper','iodine','manganese','molybdenum','selenium',
+)
+NUTRIENTS=('energy','protein','carbohydrates','fat','saturatedFat','fiber',*MICRONUTRIENTS)
+NUTRIENT_UNITS={
+    'energy':'kcal','protein':'g','carbohydrates':'g','fat':'g','saturatedFat':'g','fiber':'g',
+    'vitaminA':'mcg','thiamin':'mg','riboflavin':'mg','niacin':'mg','pantothenicAcid':'mg',
+    'vitaminB6':'mg','biotin':'mcg','vitaminB12':'mcg','vitaminC':'mg','vitaminD':'mcg',
+    'vitaminE':'mg','vitaminK':'mcg','folate':'mcg','calcium':'mg','chloride':'mg','iron':'mg',
+    'magnesium':'mg','phosphorus':'mg','potassium':'mg','sodium':'mg','zinc':'mg','chromium':'mcg',
+    'copper':'mg','iodine':'mcg','manganese':'mg','molybdenum':'mcg','selenium':'mcg',
+}
 
 def safe_payload(payload):
     def walk(v):
@@ -101,6 +114,8 @@ def context_for(db,owner,day):
     def same_day(payload):
         return datetime.fromisoformat(payload['recordedAt'].replace('Z','+00:00')).astimezone(zone).date().isoformat()==day
     weights=[{'id':r['id'],'recorded_at':r['payload']['recordedAt'],'kilograms':r['payload']['kilograms']} for r in records if r['kind']=='weight' and same_day(r['payload'])]
+    from .health_weights import weight_records
+    weights.extend({'id':r['id'],'recorded_at':r['payload']['recordedAt'],'kilograms':r['payload']['kilograms'],'source':'appleHealth'} for r in weight_records(db,owner) if same_day(r['payload']))
     activities=[{'id':r['id'],'recorded_at':r['payload']['recordedAt'],'kind':r['payload']['kind'],'duration_minutes':r['payload'].get('durationMinutes'),'active_kcal':r['payload'].get('activeEnergy')} for r in records if r['kind']=='activity' and same_day(r['payload'])]
     return dict(weights=weights[-10:],activities=activities[-10:],closed=bool(frozen),intake_selection=selection or ('historical' if historical and not entries else 'manual'),needs_reconciliation=needs_reconciliation,historical_summary=historical[0] if len(historical)==1 else None,day=day,time_zone=zone.key,entries=entries[-50:],totals=totals,goals=goals[-1] if goals else None,preferences=profile.get('preferences',{})), records
 

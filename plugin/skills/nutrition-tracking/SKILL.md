@@ -24,6 +24,12 @@ catálogo de alimentos ni otra llamada a un modelo desde las herramientas.
   no valores por 100 g. Usar `source=estimate` salvo que una etiqueta aportada
   por el usuario permita `source=label`. Mantener nutrientes desconocidos como
   `null`; no inventar ceros. Incluir tamaño/ingredientes y supuestos breves.
+- El modelo también admite los micronutrientes de Apple Health: vitamina A,
+  tiamina (B1), riboflavina (B2), niacina (B3), ácido pantoténico (B5),
+  vitaminas B6, B12, C, D, E y K, biotina, folato, calcio, cloruro, hierro,
+  magnesio, fósforo, potasio, sodio, zinc, cromo, cobre, yodo, manganeso,
+  molibdeno y selenio. Usar las unidades que devuelve `get_day` en
+  `nutrient_units` (`mg` o `mcg`); no estimar valores inciertos.
 - «¿Y si como…?», recomendaciones, recetas para cocinar y planes futuros son
   consulta/estimación: no llamar herramientas de escritura. Diferenciar la
   proyección de los totales registrados que devuelve el servidor.
@@ -42,8 +48,10 @@ catálogo de alimentos ni otra llamada a un modelo desde las herramientas.
    llamar `update_food` con su ID y versión. Si hay varios candidatos, aclarar
    cuál; no crear una entrada nueva por una corrección ni corregir otra cuenta.
 4. Mostrar «guardado» únicamente si la herramienta devuelve `saved=true` y un
-   recibo. Consultar `get_day` para mostrar los nuevos totales; no calcular ni
-   afirmar totales reales a partir del texto del chat.
+   recibo. Para `record_food` y `update_food`, usar el `day_summary` devuelto
+   para mostrar los totales y objetivos del servidor en la tarjeta MCP Apps. Si
+   no viene `day_summary`, consultar `get_day`; nunca calcular ni afirmar
+   totales reales a partir del texto del chat.
 5. Si hay conflicto de revisión/versión, releer el día antes de intentar una
    nueva operación. Si el resultado es incierto por un fallo de red, reintentar
    con el mismo UUID y exactamente los mismos argumentos para evitar duplicados.
@@ -56,8 +64,16 @@ La conexión OAuth abre Nutrition Tracker para login/creación de cuenta y
 consentimiento de lectura/escritura. No pedir contraseñas, tokens o claves en el
 chat. Ante permisos insuficientes, indicar reconectar con el permiso necesario.
 
-`get_progress` consulta hasta 90 días. La sincronización del peso desde Apple
-Health, registrar peso/actividad por herramientas específicas, cerrar días,
-metas, deshacer y widgets de ChatGPT Extensions siguen pendientes. No afirmar
-que hay datos sincronizados de Salud cuando no se entregaron. iOS no registra
-comidas; conserva su función de consulta, gráficas y sincronización de Salud.
+`get_progress` consulta hasta 90 días e incluye los pesos de Apple Health que
+el usuario autorizó y subió desde iOS. La fuente de esos pesos es `appleHealth`.
+No afirmar que hay mediciones de Salud si el servidor no las entrega. Solo peso
+tiene carga remota; otras métricas de Salud siguen pendientes.
+
+`record_closed_day` guarda los totales consumidos de una fecha y la cierra, sin
+crear comidas ni sumar ese resumen a las comidas existentes. Acepta calorías,
+macros, grasa saturada, fibra y los micronutrientes indicados por
+`nutrient_units`; valores desconocidos permanecen null.
+
+Registrar peso/actividad por herramientas específicas, reabrir días, metas y
+deshacer siguen pendientes. iOS consulta datos y sincroniza peso; el registro
+de comidas sigue ocurriendo en ChatGPT.

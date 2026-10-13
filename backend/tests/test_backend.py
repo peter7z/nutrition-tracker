@@ -250,7 +250,7 @@ def test_migration_restart_and_database_backup_restore_preserve_owned_records(se
     path=app.state.store.path
     restarted=Store(path)
     with restarted.connect() as db:
-        assert db.execute('SELECT COUNT(*) FROM migrations').fetchone()[0]==4
+        assert db.execute('SELECT COUNT(*) FROM migrations').fetchone()[0]==5
         owner=db.execute("SELECT id FROM users WHERE email='a@example.com'").fetchone()[0]
         before=state(db,owner)
     if restarted.postgres:

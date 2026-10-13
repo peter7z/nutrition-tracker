@@ -2,6 +2,7 @@ import Charts
 import SwiftUI
 
 private enum ProgressWeightRange: Int, CaseIterable, Identifiable {
+    case days7 = 7
     case days30 = 30
     case days90 = 90
     case days365 = 365
@@ -9,9 +10,10 @@ private enum ProgressWeightRange: Int, CaseIterable, Identifiable {
     var id: Int { rawValue }
     var title: String {
         switch self {
-        case .days30: "30 days"
+        case .days7: "Week"
+        case .days30: "Month"
         case .days90: "90 days"
-        case .days365: "1 year"
+        case .days365: "Year"
         }
     }
 }
@@ -46,18 +48,25 @@ private struct ResolvedActivityDay: Identifiable {
     var isUnresolved: Bool { hasConflict && selected == nil }
 }
 
-private struct SegmentedWeightAverage: Identifiable {
-    let point: MovingWeightAverage
-    let segment: Int
-    var id: Date { point.date }
+private struct ProgressWeightInput: Equatable {
+    let observations: [WeightObservation]
+    let choices: [String: WeightConflictChoice]
+    let timeZone: TimeZone
 }
 
 struct TrackingProgressView: View {
+    @Environment(HealthWeightUpload.self) private var weightUpload
+    @Environment(AccountSession.self) private var account
     @Environment(NutritionStore.self) private var nutrition
     @Environment(HealthSyncModel.self) private var health
     @Environment(\.legacyHistory) private var history
     @Environment(\.locale) private var locale
-    @State private var selectedRange: ProgressWeightRange = .days90
+    @State private var selectedRange: ProgressWeightRange = .days30
+    @State private var selectedWeightDate: Date?
+    @State private var weightScrollPosition: Date?
+    @State private var weightTimeline = ProgressWeightTimeline()
+
+    private let weightColor = Color("NutritionGreen")
 
     private var calendar: Calendar { nutrition.snapshot.profile.calendar }
     private var now: Date { .now }
@@ -76,7 +85,7 @@ struct TrackingProgressView: View {
     }
 
     private var weightObservations: [WeightObservation] {
-        let local = nutrition.snapshot.weights.map { value in
+        let local = TrackingBridge.accountWeights(manual: nutrition.snapshot, health: health.snapshot).map { value in
             WeightObservation(
                 id: weightID(value), date: value.recordedAt, kg: value.kilograms,
                 source: "tracking:\(value.source.rawValue)"
@@ -90,53 +99,90 @@ struct TrackingProgressView: View {
         }
         return (local + imported).filter {
             let day = calendar.startOfDay(for: $0.date)
-            return day >= rangeStart && day <= today
+            return day <= today
         }
     }
 
-    private var weightResolution: WeightResolution {
+    private var weightInput: ProgressWeightInput {
         let choices = nutrition.snapshot.weightConflictSelections.mapValues { selected in
             selected == "__exclude__" ? WeightConflictChoice.exclude : .include(observationID: selected)
         }
-        return analytics.resolveWeights(weightObservations, choices: choices)
+        return ProgressWeightInput(observations: weightObservations, choices: choices, timeZone: calendar.timeZone)
     }
 
-    private var rangeStart: Date {
-        calendar.date(byAdding: .day, value: -(selectedRange.rawValue - 1), to: today) ?? today
+    private var weightResolution: WeightResolution { weightTimeline.resolution }
+
+    private var weightWindow: ProgressChartWindow {
+        ProgressChartWindow(days: selectedRange.rawValue, position: weightScrollPosition,
+                            earliest: weightResolution.rawObservations.first?.date, today: today, calendar: calendar)
+    }
+
+    private var rangeStart: Date { weightWindow.start }
+    private var rangeEnd: Date { weightWindow.end }
+
+    private var chartScrollPosition: Binding<Date> {
+        Binding(get: { weightScrollPosition ?? weightWindow.latestStart }, set: { weightScrollPosition = $0 })
+    }
+
+    private var weightDomain: ClosedRange<Double> {
+        let values = rangedWeights.map(\.observation.kg) + rangedAverages.map(\.averageKg)
+        if values.isEmpty, let nearest = weightResolution.dailyWeights.min(by: {
+            abs($0.date.timeIntervalSince(rangeStart)) < abs($1.date.timeIntervalSince(rangeStart))
+        }) {
+            return ProgressChartScale.weightDomain(values: [nearest.observation.kg])
+        }
+        return ProgressChartScale.weightDomain(values: values)
+    }
+
+    private var highlightedWeight: DailyWeight? {
+        guard let selectedWeightDate else { return nil }
+        return rangedWeights.min { abs(chartDate($0.date).timeIntervalSince(selectedWeightDate)) < abs(chartDate($1.date).timeIntervalSince(selectedWeightDate)) }
+    }
+
+    private func chartDate(_ date: Date) -> Date {
+        calendar.date(bySettingHour: 12, minute: 0, second: 0, of: date) ?? date
+    }
+
+    private var weightAxisStride: Int {
+        switch selectedRange {
+        case .days7: 1
+        case .days30: 7
+        case .days90: 21
+        case .days365: 3
+        }
     }
 
     private var rangedWeights: [DailyWeight] {
-        weightResolution.dailyWeights.filter { $0.date >= rangeStart && $0.date <= today }
+        weightResolution.dailyWeights.filter { weightWindow.contains($0.date) }
     }
 
     private var rangedRawWeights: [WeightObservation] {
         weightResolution.rawObservations.filter {
             let day = calendar.startOfDay(for: $0.date)
-            return day >= rangeStart && day <= today
+            return weightWindow.contains(day)
         }
     }
 
     private var rangedAverages: [MovingWeightAverage] {
-        analytics.movingAverages(for: weightResolution).filter { $0.date >= rangeStart && $0.date <= today }
+        weightTimeline.averages.filter { weightWindow.contains($0.date) }
     }
 
     private var segmentedAverages: [SegmentedWeightAverage] {
-        var previous: Date?
-        var segment = 0
-        return rangedAverages.sorted { $0.date < $1.date }.map { point in
-            if let previous,
-               calendar.dateComponents([.day], from: previous, to: point.date).day != 1 {
-                segment += 1
-            }
-            previous = point.date
-            return SegmentedWeightAverage(point: point, segment: segment)
-        }
+        let bufferStart = calendar.date(byAdding: .day, value: -7, to: rangeStart) ?? rangeStart
+        let bufferEnd = calendar.date(byAdding: .day, value: 7, to: rangeEnd) ?? rangeEnd
+        return weightTimeline.segmentedAverages.filter { $0.point.date >= bufferStart && $0.point.date < bufferEnd }
+    }
+
+    private var chartWeights: [DailyWeight] {
+        let bufferStart = calendar.date(byAdding: .day, value: -7, to: rangeStart) ?? rangeStart
+        let bufferEnd = calendar.date(byAdding: .day, value: 7, to: rangeEnd) ?? rangeEnd
+        return weightResolution.dailyWeights.filter { $0.date >= bufferStart && $0.date < bufferEnd }
     }
 
     private var rangedWeightConflicts: [WeightConflictGroup] {
         weightResolution.conflictGroups.filter {
             weightResolution.unresolvedConflictGroupIDs.contains($0.id)
-                && $0.observations.contains { calendar.startOfDay(for: $0.date) >= rangeStart && calendar.startOfDay(for: $0.date) <= today }
+                && $0.observations.contains { weightWindow.contains(calendar.startOfDay(for: $0.date)) }
         }
     }
 
@@ -283,54 +329,55 @@ struct TrackingProgressView: View {
                 weeklyReviewSection
             }
             .listStyle(.insetGrouped)
+            .refreshable {
+                await health.refreshIfConnected()
+                await weightUpload.sync(account: account, health: health)
+                await nutrition.refresh(account: account)
+            }
             .navigationTitle("Progress")
+            .onChange(of: weightInput, initial: true) { _, input in
+                weightTimeline = ProgressWeightTimeline(analytics: ProgressAnalytics(timeZone: input.timeZone),
+                                                        observations: input.observations, choices: input.choices)
+            }
         }
     }
 
     private var weightSection: some View {
         Section {
-            Picker("Range", selection: $selectedRange) {
-                ForEach(ProgressWeightRange.allCases) { range in Text(LocalizedStringKey(range.title)).tag(range) }
-            }
-            .pickerStyle(.segmented)
-
-            if rangedWeights.isEmpty {
-                progressEmptyState(
-                    title: "No weight data in this range",
-                    description: "Connect Apple Health or review your saved readings.",
-                    systemImage: "scalemass"
-                )
-            } else {
-                Chart {
-                    ForEach(rangedWeights) { point in
-                        PointMark(x: .value("Date", point.date), y: .value("Weight", point.observation.kg))
-                            .foregroundStyle(by: .value("Series", "Daily weight"))
-                            .symbolSize(38)
-                            .accessibilityLabel("Daily weight")
-                            .accessibilityValue("\(point.observation.kg.formatted(.number.precision(.fractionLength(1)).locale(locale))) kilograms")
-                    }
-                    ForEach(segmentedAverages) { item in
-                        LineMark(
-                            x: .value("Date", item.point.date),
-                            y: .value("7-day mean", item.point.averageKg),
-                            series: .value("Contiguous days", item.segment)
-                        )
-                            .foregroundStyle(by: .value("Series", "7-day mean"))
-                            .lineStyle(StrokeStyle(lineWidth: 3))
-                            .interpolationMethod(.linear)
-                            .accessibilityLabel("7-day moving average")
-                    }
+            VStack(alignment: .leading, spacing: 22) {
+                weightChartHeader
+                Picker("Range", selection: $selectedRange) {
+                    ForEach(ProgressWeightRange.allCases) { range in Text(LocalizedStringKey(range.title)).tag(range) }
                 }
-                .chartForegroundStyleScale([
-                    "Daily weight": Color(red: 0.18, green: 0.50, blue: 0.39),
-                    "7-day mean": Color(red: 0.35, green: 0.42, blue: 0.72)
-                ])
-                .chartLegend(position: .bottom, alignment: .leading)
-                .chartYAxisLabel("kg")
-                .frame(height: 230)
-                .accessibilityLabel("Daily weight and 7-day moving average")
-                .listRowInsets(EdgeInsets(top: 12, leading: 8, bottom: 12, trailing: 8))
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier("progress.weight.range")
+                .onChange(of: selectedRange) { oldRange, newRange in
+                    selectedWeightDate = nil
+                    guard let position = weightScrollPosition else { return }
+                    let oldWindow = ProgressChartWindow(days: oldRange.rawValue, position: position,
+                                                       earliest: weightResolution.rawObservations.first?.date, today: today, calendar: calendar)
+                    let newStart = calendar.date(byAdding: .day, value: -newRange.rawValue, to: oldWindow.end)
+                    weightScrollPosition = ProgressChartWindow(days: newRange.rawValue, position: newStart,
+                                                              earliest: weightResolution.rawObservations.first?.date, today: today, calendar: calendar).start
+                }
+
+                weightPeriodHeader
+
+                if weightResolution.dailyWeights.isEmpty {
+                    progressEmptyState(
+                        title: "No weight data in this range",
+                        description: "Connect Apple Health or review your saved readings.",
+                        systemImage: "scalemass"
+                    )
+                } else {
+                    weightChart
+                    weightChartLegend
+                    Text("Swipe to explore history · Tap a reading for details")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
             }
+            .padding(.vertical, 8)
+            .listRowSeparator(.hidden)
 
             LabeledContent("Weight coverage") {
                 Text("\(rangedWeights.count) days · \(rangedRawWeights.count) raw readings")
@@ -339,16 +386,193 @@ struct TrackingProgressView: View {
             Text("The daily point uses the latest valid reading that day. The moving average uses only available daily readings in the prior seven calendar days.")
                 .font(.footnote).foregroundStyle(.secondary)
 
-            if rangedRawWeights.isEmpty {
-                Text("No saved weight readings.").foregroundStyle(.secondary)
-            } else {
-                ForEach(rangedRawWeights.sorted { $0.date > $1.date }) { observation in
-                    weightRecordRow(observation)
+            DisclosureGroup("Weight readings") {
+                if rangedRawWeights.isEmpty {
+                    Text("No saved weight readings.").foregroundStyle(.secondary)
+                } else {
+                    ForEach(rangedRawWeights.sorted { $0.date > $1.date }) { observation in
+                        weightRecordRow(observation)
+                    }
                 }
             }
             NavigationLink("View original Apple Health records") { HealthHistoryView() }
         } header: { Text("Weight") } footer: {
             Text("All saved measurements are read-only here.")
+        }
+    }
+
+    private var weightChartHeader: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(LocalizedStringKey(highlightedWeight == nil ? "Latest weight" : "Selected weight"))
+                .font(.subheadline).foregroundStyle(.secondary)
+            if let point = highlightedWeight ?? rangedWeights.last {
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .firstTextBaseline) {
+                        weightHeadline(point)
+                        Spacer(minLength: 16)
+                        weightChange
+                    }
+                    VStack(alignment: .leading, spacing: 8) {
+                        weightHeadline(point)
+                        weightChange
+                    }
+                }
+                Text(point.date, format: .dateTime.day().month(.abbreviated).year())
+                    .font(.caption).foregroundStyle(.secondary)
+            } else if !weightResolution.dailyWeights.isEmpty {
+                Text("No weight data in this range").font(.headline)
+            }
+        }
+    }
+
+    private var weightPeriodHeader: some View {
+        HStack(alignment: .firstTextBaseline) {
+            (Text(rangeStart, format: .dateTime.day().month(.abbreviated))
+             + Text(" – ")
+             + Text(weightWindow.lastDay, format: .dateTime.day().month(.abbreviated).year()))
+                .font(.caption).foregroundStyle(.secondary)
+                .accessibilityIdentifier("progress.weight.period")
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 8)
+            if !weightWindow.isLatest {
+                Button("Latest") {
+                    selectedWeightDate = nil
+                    withAnimation(.easeInOut(duration: 0.25)) { weightScrollPosition = weightWindow.latestStart }
+                }
+                .font(.caption.weight(.semibold))
+                .buttonStyle(.borderless)
+                .accessibilityIdentifier("progress.weight.latest")
+            }
+        }
+    }
+
+    private func weightHeadline(_ point: DailyWeight) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 5) {
+            Text(point.observation.kg, format: .number.precision(.fractionLength(1)))
+                .font(.system(.largeTitle, design: .rounded, weight: .semibold))
+                .monospacedDigit()
+                .accessibilityIdentifier("progress.weight.value")
+            Text("kg").font(.title3).foregroundStyle(.secondary)
+        }
+    }
+
+    @ViewBuilder private var weightChange: some View {
+        if let first = rangedWeights.first, let last = rangedWeights.last, rangedWeights.count > 1 {
+            let change = last.observation.kg - first.observation.kg
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Change in range").font(.caption).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text("\(change.formatted(.number.sign(strategy: .always()).precision(.fractionLength(1)).locale(locale))) kg")
+                    .font(.subheadline.weight(.semibold)).monospacedDigit()
+            }
+        }
+    }
+
+    private var weightChart: some View {
+        let domain = weightDomain
+        return Chart {
+            ForEach(segmentedAverages) { item in
+                AreaMark(
+                    x: .value("Date", chartDate(item.point.date)),
+                    yStart: .value("Baseline", domain.lowerBound),
+                    yEnd: .value("7-day mean", item.point.averageKg),
+                    series: .value("Mean segment", item.segment)
+                )
+                .foregroundStyle(LinearGradient(colors: [weightColor.opacity(0.18), weightColor.opacity(0.01)], startPoint: .top, endPoint: .bottom))
+                .accessibilityHidden(true)
+                LineMark(
+                    x: .value("Date", chartDate(item.point.date)),
+                    y: .value("7-day mean", item.point.averageKg),
+                    series: .value("Mean segment", item.segment)
+                )
+                .foregroundStyle(weightColor)
+                .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
+                .interpolationMethod(.linear)
+                .accessibilityLabel("7-day moving average")
+                .accessibilityValue("\(item.point.averageKg.formatted(.number.precision(.fractionLength(1)).locale(locale))) kilograms")
+            }
+            ForEach(chartWeights) { point in
+                PointMark(x: .value("Date", chartDate(point.date)), y: .value("Weight", point.observation.kg))
+                    .foregroundStyle(Color.secondary.opacity(0.65))
+                    .symbolSize(selectedRange == .days365 ? 16 : 30)
+                    .accessibilityLabel(Text(point.date, format: .dateTime.day().month().year()))
+                    .accessibilityValue("\(point.observation.kg.formatted(.number.precision(.fractionLength(1)).locale(locale))) kilograms")
+            }
+            if let point = highlightedWeight {
+                RuleMark(x: .value("Date", chartDate(point.date)))
+                    .foregroundStyle(weightColor.opacity(0.35))
+                    .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
+                    .accessibilityHidden(true)
+                PointMark(x: .value("Date", chartDate(point.date)), y: .value("Weight", point.observation.kg))
+                    .foregroundStyle(weightColor)
+                    .symbolSize(80)
+                    .accessibilityHidden(true)
+            }
+        }
+        .chartYScale(domain: domain)
+        .chartXScale(domain: weightWindow.historyStart...(calendar.date(byAdding: .day, value: 1, to: today) ?? today))
+        .chartScrollableAxes(.horizontal)
+        .chartXVisibleDomain(length: weightWindow.duration)
+        .chartScrollPosition(x: chartScrollPosition)
+        .chartScrollTargetBehavior(.valueAligned(matching: DateComponents(hour: 0, minute: 0, second: 0), majorAlignment: .page))
+        .chartXSelection(value: $selectedWeightDate)
+        .chartGesture { proxy in
+            SpatialTapGesture().onEnded { proxy.selectXValue(at: $0.location.x) }
+        }
+        .onChange(of: weightScrollPosition) { _, _ in selectedWeightDate = nil }
+        .chartLegend(.hidden)
+        .chartYAxis {
+            AxisMarks(position: .trailing, values: .automatic(desiredCount: 4)) {
+                AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [3, 4]))
+                    .foregroundStyle(Color.secondary.opacity(0.2))
+                AxisValueLabel(format: FloatingPointFormatStyle<Double>.number.precision(.fractionLength(1)))
+                    .font(.caption2)
+            }
+        }
+        .chartXAxis {
+            AxisMarks(values: .stride(by: selectedRange == .days365 ? .month : .day, count: weightAxisStride, calendar: calendar)) { value in
+                if let date = value.as(Date.self) {
+                    AxisValueLabel {
+                        Group {
+                            if selectedRange == .days7 {
+                                Text(date, format: .dateTime.weekday(.abbreviated))
+                            } else if selectedRange == .days365 {
+                                Text(date, format: .dateTime.month(.abbreviated))
+                            } else {
+                                Text(date, format: .dateTime.day().month(.abbreviated))
+                            }
+                        }
+                        .font(.caption2).fixedSize()
+                    }
+                }
+            }
+        }
+        .frame(height: 220)
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        .accessibilityLabel("Daily weight and 7-day moving average")
+        .accessibilityIdentifier("progress.weight.chart")
+        .id(selectedRange)
+    }
+
+    private var weightChartLegend: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 18) { dailyWeightLegend; meanWeightLegend }
+            VStack(alignment: .leading, spacing: 10) { dailyWeightLegend; meanWeightLegend }
+        }
+        .font(.caption).foregroundStyle(.secondary)
+    }
+
+    private var dailyWeightLegend: some View {
+        HStack(spacing: 6) {
+            Circle().fill(Color.secondary.opacity(0.65)).frame(width: 6, height: 6)
+            Text("Daily weight").fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var meanWeightLegend: some View {
+        HStack(spacing: 6) {
+            Capsule().fill(weightColor).frame(width: 18, height: 3)
+            Text("7-day mean").fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -600,7 +824,7 @@ struct TrackingProgressView: View {
     private func weightSourceName(for id: String) -> String {
         guard let reference = weightReferences[id] else { return "Imported" }
         return switch reference {
-        case let .local(value): value.source == .manual ? "Manual" : "Spreadsheet"
+        case let .local(value): value.source == .appleHealth ? "Apple Health" : value.source == .manual ? "Manual" : "Spreadsheet"
         case let .health(value): value.sourceName
         }
     }

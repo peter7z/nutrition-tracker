@@ -8,7 +8,7 @@ La [especificación de producto](product.md) define el enfoque vigente: **iOS si
 
 Sin registro manual/conversacional de tracking en iOS, cámara propia para comida, catálogo de alimentos ni carga manual de macros. ChatGPT estima nutrientes; el backend valida, persiste y calcula totales; iOS consulta. La escritura técnica para sincronizar Salud y la configuración de cuenta/consentimiento no habilitan edición de tracking en la app.
 
-**Apple Health sigue como primera y máxima prioridad, NUT-01.** Su lectura local funciona sin backend/login; compartir datos con backend/plugin requiere un consentimiento adicional definido en NUT-18.
+**Apple Health sigue como primera y máxima prioridad, NUT-01.** La app requiere iniciar sesión; con una sesión vigente, su lectura local funciona sin conexión al backend. Compartir datos con backend/plugin requiere un consentimiento adicional definido en NUT-18.
 
 ## Estado y migración
 
@@ -40,7 +40,7 @@ P0 forma la base del nuevo producto; P1 completa y valida sus flujos; P2 no bloq
 
 P0 · ios,healthkit · Dependencias: ninguna.
 
-La app importa datos existentes de Salud y permite consultarlos localmente. La lectura local no exige login ni backend.
+La app importa datos existentes de Salud y permite consultarlos localmente. La app exige una sesión vigente; la lectura local no depende de una conexión al backend.
 
 Criterios de aceptación:
 

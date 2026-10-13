@@ -8,7 +8,13 @@
         "en": {
           "stringUnit": {
             "state": "new",
-            "value": "Nutrition Tracker"
+            "value": "Bocado"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bocado"
           }
         }
       }
@@ -20,7 +26,13 @@
         "en": {
           "stringUnit": {
             "state": "new",
-            "value": "nutrition-tracker"
+            "value": "Bocado"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bocado"
           }
         }
       }
@@ -31,13 +43,30 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nutrition Tracker reads your weight, activity and nutrition data from Apple Health to show your history and progress."
+            "value": "Bocado reads your weight, activity and nutrition data from Apple Health to show your history and progress."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nutrition Tracker lee tus datos de peso, actividad y nutrición de Apple Health para mostrar tu historial y progreso."
+            "value": "Bocado lee tus datos de peso, actividad y nutrición de Apple Health para mostrar tu historial y progreso."
+          }
+        }
+      }
+    },
+    "NSHealthUpdateUsageDescription": {
+      "comment": "Privacy - Health Update Usage Description",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bocado saves the calories and nutrients from your food diary to Apple Health when you enable nutrition sync."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bocado guarda en Apple Health las calorías y los nutrientes de tu diario cuando activás la sincronización de nutrición."
           }
         }
       }

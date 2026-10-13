@@ -6,16 +6,18 @@ import secrets
 import time
 import uuid
 from collections import defaultdict,deque
-from datetime import datetime,timedelta,timezone
+from datetime import date,datetime,timedelta,timezone
+from pathlib import Path
 from fastapi import Depends,FastAPI,File,Request,UploadFile
-from fastapi.responses import JSONResponse,Response
+from fastapi.responses import FileResponse,JSONResponse,Response
+from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from PIL import Image,ImageOps,UnidentifiedImageError
 from pydantic import ValidationError
 from .config import Settings
 from .store import INTEGRITY_ERRORS,Store,canonical,digest,state
 from .models import AuthInput,SyncInput,ChatInput,EntryDraft
-from .nutrition import context_for,validate_payload,closed_day,NUTRIENTS
+from .nutrition import context_for,validate_payload,closed_day,NUTRIENTS,NUTRIENT_UNITS
 from .assistant import ResponsesClient,AIError,guard_output
 
 Image.MAX_IMAGE_PIXELS=20_000_000
@@ -97,7 +99,7 @@ def create_app(settings=None,ai=None):
     @app.get('/healthz')
     def healthz():
         with store.connect() as db: db.execute('SELECT 1').fetchone()
-        return {'status':'ok','schema_version':4}
+        return {'status':'ok','schema_version':5}
 
     @app.post('/v1/auth/signup',status_code=201)
     def signup(body:AuthInput,request:Request):
@@ -133,6 +135,29 @@ def create_app(settings=None,ai=None):
     @app.get('/v1/state')
     def get_state(owner=Depends(identity)):
         with store.connect() as db: return state(db,owner)
+
+    @app.get('/web',include_in_schema=False)
+    @app.get('/',include_in_schema=False)
+    def web_diary():
+        return FileResponse(Path(__file__).parent/'web'/'index.html',headers={
+            'Content-Security-Policy':"default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'",
+            'Referrer-Policy':'no-referrer'})
+
+    app.mount('/web/assets',StaticFiles(directory=Path(__file__).parent/'web'),name='web-assets')
+
+    @app.get('/v1/diary')
+    def get_diary(day:date | None=None,owner=Depends(identity)):
+        from zoneinfo import ZoneInfo
+        with store.connect() as db:
+            if day is None:
+                profile,_=context_for(db,owner,'1900-01-01')
+                day=now().astimezone(ZoneInfo(profile['time_zone'])).date()
+            context,_=context_for(db,owner,day.isoformat())
+            for entry in context['entries']:
+                draft=EntryDraft.model_validate(entry['draft'])
+                entry['totals']={key:getattr(draft.nutrition,key)*draft.multiplier() if getattr(draft.nutrition,key) is not None else None for key in NUTRIENTS}
+            revision=db.execute('SELECT revision FROM users WHERE id=?',(owner,)).fetchone()['revision']
+        return {'revision':revision,**context}
 
     def replay(db,owner,request_id,route,body):
         old=db.execute('SELECT * FROM requests WHERE user_id=? AND id=? AND route=?',(owner,request_id,route)).fetchone()
@@ -194,6 +219,7 @@ def create_app(settings=None,ai=None):
                         recompute_closure=True
                 if recompute_closure:
                     day=outgoing.get('id',outgoing.get('day',outgoing.get('date')))
+                    if closed_day(db,owner,day): raise APIError('day_closed_reopen_required',409)
                     day_context,_=context_for(db,owner,day)
                     rows=list(db.execute("SELECT * FROM records WHERE user_id=? AND kind='entry'",(owner,)))
                     aggregate={key:{'known':0,'knownCount':0,'missingCount':0} for key in NUTRIENTS}
@@ -224,6 +250,7 @@ def create_app(settings=None,ai=None):
                     aggregate['entryCount']=count
                     summaries=[dict(v) for v in outgoing['summaries']]
                     summaries[-1]['totals']=aggregate; summaries[-1]['entryVersions']=versions
+                    summaries[-1].setdefault('closedAt',stamp())
                     outgoing['summaries']=summaries
                 payload=canonical(outgoing) if op.action=='upsert' else existing['payload']
                 db.execute('INSERT INTO records VALUES(?,?,?,?,?,?) ON CONFLICT(user_id,id) DO UPDATE SET version=excluded.version,payload=excluded.payload,deleted=excluded.deleted',(owner,eid,op.kind,version+1,payload,int(op.action=='delete')))
@@ -280,6 +307,7 @@ def create_app(settings=None,ai=None):
             old=replay(db,owner,rid,route,wire)
             if old is not None: return old
             context,records=context_for(db,owner,body.day.isoformat())
+            context['nutrient_units']=NUTRIENT_UNITS
             image=None
             if body.attachment_id:
                 attachment=db.execute('SELECT image FROM attachments WHERE id=? AND user_id=?',(str(body.attachment_id),owner)).fetchone()
@@ -324,7 +352,7 @@ def create_app(settings=None,ai=None):
                 limitations=[]
                 if complete<10: limitations.append('Fewer than ten complete closed nutrition days in this fourteen-day window.')
                 if any(n<3 for n in weights_by_week): limitations.append('At least three observed weight days are required in each seven-day week.')
-                if any(any(v is None for k,v in row['totals'].items() if k!='saturatedFat') for row in daily): limitations.append('Some daily nutrition values are unknown or require source reconciliation.')
+                if any(any(v is None for k,v in row['totals'].items() if k not in ('saturatedFat','fiber')) for row in daily): limitations.append('Some daily nutrition values are unknown or require source reconciliation.')
                 coverage={'window_days':14,'complete_days':complete,'weight_observed_days':observed_days,'complete_days_by_week':complete_by_week,'weight_days_by_week':weights_by_week,'goal_adjustment_allowed':allowed,'limitations':limitations}
                 context['review']={**coverage,'daily_totals':daily,'weights':[{'day':d,'kilograms':v} for d,v in sorted(weight_values.items())],'activities':[{'day':record_day(a),'kind':a['kind'],'duration_minutes':a.get('durationMinutes'),'active_kcal':a.get('activeEnergy')} for a in activities[-100:]],'health_daily_activity':[a.model_dump(mode='json') for a in consented.daily_activity] if consented else [],'minimum_complete_days':10,'minimum_weight_days':6,'minimum_weight_days_per_week':3}
             if not settings.openai_key and isinstance(provider,ResponsesClient): raise APIError('ai_not_configured',503)
@@ -351,7 +379,7 @@ def create_app(settings=None,ai=None):
             latency=int((time.monotonic()-started)*1000)
             cost=(input_tokens*settings.input_price+output_tokens*settings.output_price)/1_000_000
             totals=context['totals']
-            formatted=' · '.join(f'{key}: {str(round(value,1)) + (" kcal" if key=="energy" else " g") if value is not None else "unknown"}' for key,value in totals.items() if key!='saturatedFat')
+            formatted=' · '.join(f'{key}: {round(value,1)} {NUTRIENT_UNITS[key]}' for key,value in totals.items() if value is not None) or 'no nutrient totals available'
             message=output.message+'\n\nAcumulado real / Actual consumed: '+formatted
             result={'request_id':rid,'message':message,'intent':output.intent,'proposals':[p.model_dump(mode='json',exclude={'product_id','product_version','recipe_id','recipe_version'}) for p in output.proposals],'totals':totals,'usage':dict(input_tokens=input_tokens,output_tokens=output_tokens,estimated_cost_usd=cost,latency_ms=latency)}
             result['goal_proposal']=output.goal_proposal.model_dump(mode='json') if output.goal_proposal else None
@@ -399,6 +427,8 @@ def create_app(settings=None,ai=None):
     apple = AppleIdentity(store, settings)
     app.state.apple_identity = apple
     apple.routes(app, make_session, identity, auth_limit)
+    from .health_weights import install_weight_routes
+    install_weight_routes(app,store,identity,APIError)
     from .plugin_mcp import install_plugin
     install_plugin(app, store, settings, sync, password_hash, auth_limit)
     return app

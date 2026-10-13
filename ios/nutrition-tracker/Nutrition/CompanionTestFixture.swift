@@ -2,6 +2,20 @@
 import Foundation
 
 enum CompanionTestFixture {
+    static func progress(on date: Date) -> NutritionSnapshot {
+        var snapshot = history(on: date)
+        let calendar = snapshot.profile.calendar
+        let today = calendar.startOfDay(for: date)
+        snapshot.weights = (0..<45).compactMap { offset in
+            // Include a gap to exercise segmented means without invented days.
+            guard !(10...12).contains(offset),
+                  let day = calendar.date(byAdding: .day, value: -offset, to: today) else { return nil }
+            let variation = sin(Double(offset) * 1.4) * 0.15
+            return ManualWeightEntry(id: UUID(), recordedAt: day, kilograms: 75.5 + Double(offset) * 0.035 + variation)
+        }
+        return snapshot
+    }
+
     static func history(on date: Date) -> NutritionSnapshot {
         var snapshot = NutritionSnapshot()
         let day = snapshot.profile.dayID(for: date)
