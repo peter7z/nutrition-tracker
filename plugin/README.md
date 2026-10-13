@@ -23,7 +23,7 @@ exacta mediante `OAUTH_REDIRECT_URIS`, separadas por comas. Nunca usar wildcards
 para callbacks propios. OAuth publica discovery, PKCE S256, resource, scopes,
 access tokens opacos de una hora, refresh rotatorio y revocación persistida.
 
-Herramientas: `get_profile`, `get_day`, `get_progress`, `record_food`,
+Herramientas: `get_profile`, `get_day`, `show_day_summary`, `get_progress`, `record_food`,
 `update_food`, `delete_food`, `record_closed_day`. ChatGPT estima el snapshot;
 no hay catálogo ni inferencia de OpenAI en el servidor. Las mutaciones devuelven
 recibos y exigen revisión/versiones. Al registrar o corregir una comida, el MCP
