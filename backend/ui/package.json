@@ -1,0 +1,1 @@
+{"private":true,"scripts":{"build":"esbuild ../app/web/nutrition-day-app.js --bundle --format=esm --minify --outfile=../app/web/nutrition-day-app.bundle.js","test":"node dashboard.test.cjs"},"devDependencies":{"@modelcontextprotocol/ext-apps":"1.2.2","esbuild":"0.28.2","playwright":"1.64.1"}}

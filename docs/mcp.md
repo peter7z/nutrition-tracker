@@ -44,3 +44,32 @@ El URI es una identidad estable, no la versión del diseño; no crear recursos
 v2/v3 ni aliases al actualizar la interfaz. Todas las herramientas con UI
 referencian el mismo recurso y permanecen disponibles al modelo y la interfaz.
 `open_tracker` además declara el entrypoint global de ChatGPT.
+
+## Panel interactivo (14 de octubre de 2026)
+
+`open_tracker` devuelve el día actual según la zona de la cuenta y los últimos
+30 días de progreso. La misma UI conserva la tarjeta inline para respuestas
+que no incluyen `dashboard`. El panel permite cambiar de fecha con flechas,
+calendario o Hoy, expandir notas de comidas, consultar el peso del día y explorar
+la evolución en ventanas de 7, 30 y 90 días. Los puntos del gráfico muestran
+mediciones individuales; los días sin peso no se convierten en ceros.
+La media de calorías usa únicamente días con un total conocido y conciliado,
+y se etiqueta como consumo registrado, no como cobertura completa.
+
+Los controles consultan `get_day` y `get_progress` mediante el puente MCP Apps.
+No guardan registros. Un fallo de consulta conserva la última vista y muestra
+un mensaje de reintento. El URI del recurso sigue siendo el mismo.
+
+Para regenerar el bundle y ejecutar pruebas de interacción:
+
+```sh
+cd backend/ui
+npm ci
+npm run build
+npx playwright install chromium
+npm test
+```
+
+Las pruebas incluyen navegación, rangos, selección de puntos, texto no confiable,
+estados vacío/error, móvil, modo oscuro y un host MCP Apps simulado. La validación
+en ese host no acredita por sí sola el comportamiento en ChatGPT.

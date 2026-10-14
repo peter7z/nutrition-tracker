@@ -23,21 +23,21 @@
     :root[data-theme="light"] { color-scheme: light; }
     :root[data-theme="dark"] { color-scheme: dark; }
     * { box-sizing: border-box; }
-    body { margin: 0; padding: 4px 8px; color: var(--day-text); background: transparent; }
-    .card { max-width: 520px; padding: 10px; border: 1px solid var(--day-border); border-radius: 14px; background: var(--day-card); }
+    body { margin: 0; padding: 16px; color: var(--day-text); background: transparent; }
+    .card { max-width: 980px; padding: 22px; border: 1px solid var(--day-border); border-radius: 14px; background: var(--day-card); }
     .top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-    h1 { margin: 0; font-size: 15px; font-weight: 650; }
+    h1 { margin: 0; font-size: 20px; font-weight: 650; }
     .date, .muted { color: var(--day-muted); font-size: 12px; }
     .calories { display: flex; align-items: baseline; gap: 6px; margin-top: 8px; }
-    .calories strong { color: var(--day-success); font-size: 28px; line-height: 1; letter-spacing: -.04em; }
+    .calories strong { color: var(--day-success); font-size: 48px; line-height: 1; letter-spacing: -.04em; }
     .calories span { color: var(--day-muted); font-size: 13px; }
     .progress-track { height: 6px; margin-top: 8px; overflow: hidden; border-radius: 99px; background: var(--day-tile); }
     .progress-fill { height: 100%; width: 0; border-radius: inherit; background: var(--day-success); transition: width .2s ease; }
     .goal-line { margin-top: 5px; color: var(--day-muted); font-size: 12px; }
     .nutrients { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 10px; }
     .metric { min-width: 0; padding: 6px; border-radius: 9px; background: var(--day-tile); }
-    .metric-label { color: var(--day-muted); font-size: 11px; }
-    .metric-value { margin-top: 3px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+    .metric-label { color: var(--day-muted); font-size: 13px; }
+    .metric-value { margin-top: 3px; font-size: 19px; font-weight: 600; white-space: nowrap; }
     .metric:nth-child(1) { border-top: 2px solid #5b9bf5; }
     .metric:nth-child(2) { border-top: 2px solid #e5a63b; }
     .metric:nth-child(3) { border-top: 2px solid #e57987; }
@@ -45,7 +45,53 @@
     .foot { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; }
     .notice { margin-top: 8px; padding: 7px 8px; border-radius: 9px; background: var(--day-warning-bg); color: var(--day-warning-text); font-size: 12px; }
     @media (max-width: 420px) { .nutrients { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+    [hidden] { display: none !important; }
+    .shell { max-width: 980px; margin: 0 auto; }
+    .toolbar, .nav, .ranges { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .toolbar { justify-content:space-between; margin-bottom:20px; }
+    .eyebrow { color:var(--day-success); font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+    .intro { margin:5px 0 0; font-size:28px; letter-spacing:-.04em; }
+    button, input { font:inherit; color:var(--day-text); background:var(--day-card); border:1px solid var(--day-border); border-radius:10px; padding:10px 13px; }
+    button { cursor:pointer; min-height:42px; }
+    button:hover { background:var(--day-tile); }
+    button:focus-visible, input:focus-visible, summary:focus-visible { outline:3px solid var(--day-success); outline-offset:3px; }
+    button[aria-pressed="true"] { background:var(--day-success); color:light-dark(white,#11291e); border-color:transparent; }
+    button:disabled { opacity:.45; cursor:wait; }
+    .tabs { background:var(--day-tile); padding:4px; border-radius:14px; display:flex; gap:4px; }
+    .tabs button { border:0; background:transparent; }
+    .tabs button[aria-pressed="true"] { background:var(--day-card); color:var(--day-text); box-shadow:0 1px 5px #0001; }
+    .daynav { margin:0 0 14px; justify-content:space-between; }
+    .grid { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(220px,1fr); gap:16px; margin-top:16px; }
+    .panel { padding:22px; border:1px solid var(--day-border); border-radius:18px; background:var(--day-card); min-width:0; }
+    .panel h2 { font-size:17px; margin:0 0 14px; }
+    .big { font-size:36px; letter-spacing:-.04em; font-weight:650; }
+    .sub { color:var(--day-muted); font-size:13px; line-height:1.6; }
+    .meal { padding:14px 0; border-top:1px solid var(--day-border); }
+    .meal strong { font-size:15px; font-weight:600; }
+    .meal summary { cursor:pointer; }
+    .meal p { white-space:pre-wrap; overflow-wrap:anywhere; }
+    .chart { width:100%; height:220px; display:block; overflow:visible; margin-top:12px; }
+    .chart text { fill:var(--day-muted); font:11px -apple-system,BlinkMacSystemFont,sans-serif; }
+    .chart .point { fill:var(--day-success); stroke:var(--day-card); stroke-width:2; cursor:pointer; }
+    .chart .point:focus { outline:none; stroke:var(--day-text); stroke-width:3; }
+    .history { display:flex; gap:7px; overflow-x:auto; margin-top:18px; padding:3px; }
+    .history button { flex:0 0 56px; display:grid; gap:7px; padding:10px 6px; font-size:12px; }
+    .history i { height:5px; border-radius:8px; background:var(--day-border); }
+    .history .logged i { background:var(--day-success); }
+    .status { margin:10px 0; color:var(--day-muted); font-size:13px; }
+    .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:20px; }
+    .stats strong { display:block; font-size:23px; margin-bottom:5px; }
+    .chart-info { min-height:24px; color:var(--day-success); font-size:14px; }
+    @media(max-width:620px) { body { padding:8px; } .grid { grid-template-columns:1fr; } .panel,.card { padding:16px; } .intro { font-size:24px; } .stats { gap:8px; } .daynav { align-items:flex-start; } }
   </style>
+  <div class="shell">
+  <header id="dashboard-header" hidden>
+    <div class="toolbar"><div><span class="eyebrow">Tu diario</span><h1 class="intro">Cada día cuenta.</h1></div><div class="tabs"><button id="tab-day" aria-pressed="true">Día</button><button id="tab-progress" aria-pressed="false">Progreso</button></div></div>
+    <div class="nav daynav"><div class="nav"><button id="previous" aria-label="Día anterior">←</button><input id="day-picker" type="date" aria-label="Elegir fecha"><button id="next" aria-label="Día siguiente">→</button><button id="today">Hoy</button></div><button id="refresh">Actualizar</button></div>
+    <p class="status" id="status" role="status"></p>
+  </header>
+  <section id="day-view">
   <article class="card" aria-live="polite" aria-busy="true">
     <div class="top"><h1 id="title">Resumen del día</h1><span class="date" id="date"></span></div>
     <div class="calories"><strong id="energy">—</strong><span>kcal</span></div>
@@ -62,6 +108,17 @@
     <div id="notice" class="notice" hidden></div>
     <div class="foot"><span class="muted" id="entries"></span><span class="muted" id="source"></span></div>
   </article>
+  <div class="grid" id="day-detail" hidden><section class="panel"><h2>Lo que comiste</h2><div id="meal-list"></div></section><section class="panel"><h2>Peso del día</h2><div id="day-weight" class="big">—</div><div id="weight-source" class="sub"></div><p class="sub">Las mediciones de Apple Health aparecen cuando se sincronizan desde Bocado en iOS.</p></section></div>
+  </section>
+  <section id="progress-view" class="panel" hidden>
+    <div class="toolbar"><h2 style="margin:0">Tu evolución</h2><div class="ranges" aria-label="Período"><button data-range="7" aria-pressed="false">7 días</button><button data-range="30" aria-pressed="true">30 días</button><button data-range="90" aria-pressed="false">90 días</button></div></div>
+    <div id="latest-weight" class="big">—</div><div id="weight-caption" class="sub"></div>
+    <svg id="weight-chart" class="chart" viewBox="0 0 700 220" role="group" aria-label="Evolución del peso en kilogramos"></svg>
+    <div id="chart-info" class="chart-info" aria-live="polite"></div>
+    <div id="progress-stats" class="stats"></div>
+    <p class="sub">Consumo registrado por día · tocá una fecha para abrir su diario.</p><div id="day-history" class="history"></div>
+  </section>
+  </div>
   <script>
     (() => {
       const root = document.getElementById('nutrition-day-widget');
@@ -100,10 +157,18 @@
       function render(result) {
         const output = result?.structuredContent ?? result;
         const day = output?.day_summary ?? output;
-        if (!day || typeof day !== 'object') return;
+        if (!day || typeof day !== 'object' || !day.day) return;
+        currentDay = day.day;
+        if (day.dashboard) dashboard = true;
+        if (day.progress) progress = day.progress;
+        $('dashboard-header').hidden = !dashboard;
+        $('day-detail').hidden = !dashboard;
+        $('day-picker').value = day.day;
+        renderDetails(day);
+        if (progress) renderProgress();
         const totals = day.totals ?? {};
         const goals = day.goals ?? {};
-        const target = Number(goals.energy ?? goals.goals?.energy ?? goals.targets?.energy);
+        const target = Number(goals.energy ?? goals.nutrition?.energy ?? goals.goals?.energy ?? goals.targets?.energy);
         const energy = totals.energy;
         if (day.day) {
           const [year, month, date] = day.day.split('-').map(Number);
@@ -143,10 +208,88 @@
         requestAnimationFrame(reportHeight);
       }
 
-      window.renderBocadoLogSummary = render;
+      let dashboard = false, currentDay = null, progress = null, range = 30, busy = false;
+      const shift = (day, offset) => { const d = new Date(`${day}T12:00:00Z`); d.setUTCDate(d.getUTCDate() + offset); return d.toISOString().slice(0,10); };
+      const shortDate = day => new Intl.DateTimeFormat(locale, {day:'numeric', month:'short', timeZone:'UTC'}).format(new Date(`${day}T12:00:00Z`));
+      const textNode = (tag, text, className) => { const node = document.createElement(tag); node.textContent = text; if(className) node.className = className; return node; };
+      function renderDetails(day) {
+        const list = $('meal-list'); list.replaceChildren();
+        const entries = [...(day.entries || [])].sort((a,b) => String(a.draft?.consumedAt).localeCompare(String(b.draft?.consumedAt)));
+        if (!entries.length) list.append(textNode('p', day.intake_selection === 'historical' ? 'Hay un resumen histórico para este día, sin comidas individuales.' : 'Todavía no hay comidas registradas para este día.', 'sub'));
+        for (const entry of entries) {
+          const d = entry.draft || {}, detail = document.createElement('details'); detail.className = 'meal';
+          const summary = document.createElement('summary'); summary.append(textNode('strong', d.name || 'Comida'));
+          const time = new Intl.DateTimeFormat(locale,{hour:'2-digit',minute:'2-digit', timeZone:day.time_zone || 'America/Montevideo'}).format(new Date(d.consumedAt));
+          summary.append(textNode('div', `${time} · ${number(d.amount,1)} ${ {gram:'g',milliliter:'ml',serving:'porción(es)'}[d.unit] || ''} · ${d.mealName || ''}`, 'sub'));
+          detail.append(summary); detail.append(textNode('p', d.notes || 'Sin notas adicionales.', 'sub')); list.append(detail);
+        }
+        const weights = [...(day.weights || [])].sort((a,b) => a.recorded_at.localeCompare(b.recorded_at));
+        const last = weights.at(-1);
+        $('day-weight').textContent = last ? `${number(last.kilograms,1)} kg` : '—';
+        $('weight-source').textContent = last ? `${weights.length} ${weights.length === 1 ? 'medición' : 'mediciones'} · ${last.source === 'appleHealth' ? 'Apple Health' : 'Registro de peso'}` : 'Sin mediciones para esta fecha';
+      }
+      function renderProgress() {
+        const rows = progress.days || [], points = rows.flatMap(row => (row.weights || []).map(w => ({...w,day:row.day}))).filter(w => w.kilograms != null && Number.isFinite(Number(w.kilograms))).sort((a,b) => a.recorded_at.localeCompare(b.recorded_at));
+        const last = points.at(-1), first = points[0];
+        $('latest-weight').textContent = last ? `${number(last.kilograms,1)} kg` : 'Sin mediciones';
+        $('weight-caption').textContent = last ? `Último peso del período · ${shortDate(last.day)} · ${last.source === 'appleHealth' ? 'Apple Health' : 'Registro de peso'}` : 'Sin pesos registrados en este período.';
+        $('chart-info').textContent = points.length ? 'Tocá un punto para ver su medición.' : 'Sin datos suficientes para dibujar la evolución.';
+        const svg = $('weight-chart'); svg.replaceChildren();
+        const ns = 'http://www.w3.org/2000/svg';
+        const el = (tag, attrs, text) => { const e = document.createElementNS(ns,tag); for(const [k,v] of Object.entries(attrs)) e.setAttribute(k,String(v)); if(text) e.textContent=text; svg.append(e); return e; };
+        if(points.length) {
+          const values = points.map(p => Number(p.kilograms)), lo = Math.min(...values)-.5, hi = Math.max(...values)+.5;
+          const start = new Date(`${progress.start_day}T00:00:00Z`).getTime(), end = new Date(`${shift(progress.end_day,1)}T00:00:00Z`).getTime();
+          const x = p => 48 + Math.min(1, Math.max(0,(new Date(p.recorded_at).getTime()-start)/(end-start)))*636, y = p => 175-(Number(p.kilograms)-lo)/(hi-lo)*155;
+          for(let i=0;i<3;i++){const v=lo+(hi-lo)*i/2, yy=175-i*77.5; el('line',{x1:48,x2:684,y1:yy,y2:yy,stroke:'var(--day-border)','stroke-dasharray':'3 5'});el('text',{x:0,y:yy+4},number(v,1));}
+          // Connect measured points only; missing days never become zero weights.
+          if(points.length>1) el('polyline',{points:points.map(p=>`${x(p)},${y(p)}`).join(' '),fill:'none',stroke:'var(--day-success)','stroke-width':2.5});
+          for(const p of points){const caption=`${shortDate(p.day)} · ${number(p.kilograms,1)} kg`;const dot=el('circle',{cx:x(p),cy:y(p),r:5,class:'point',tabindex:0,role:'button','aria-label':caption});const title=document.createElementNS(ns,'title');title.textContent=caption;dot.append(title);const inspect=()=>{$('chart-info').textContent=caption;};dot.addEventListener('click',inspect);dot.addEventListener('focus',inspect);dot.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inspect();}});}
+          el('text',{x:48,y:210},shortDate(progress.start_day)); el('text',{x:684,y:210,'text-anchor':'end'},shortDate(progress.end_day));
+        }
+        const observed = rows.filter(r => r.totals?.energy != null && !r.needs_reconciliation);
+        const stats = $('progress-stats');stats.replaceChildren();
+        const delta = last && first && points.length>1 ? Number(last.kilograms)-Number(first.kilograms) : null;
+        for(const [value,label] of [[delta == null ? '—' : `${delta>0?'+':''}${number(delta,1)} kg`,'Cambio entre mediciones'],[`${observed.length}/${rows.length}`,'Días con calorías registradas'],[observed.length ? `${number(observed.reduce((n,r)=>n+Number(r.totals.energy),0)/observed.length)} kcal` : '—','Media de los días registrados']]){const tile=document.createElement('div');tile.append(textNode('strong',value),textNode('span',label,'sub'));stats.append(tile);}
+        const history=$('day-history');history.replaceChildren();
+        for(const row of rows){const b=document.createElement('button');b.type='button';b.className=row.totals?.energy != null ? 'logged' : '';b.setAttribute('aria-label',`${shortDate(row.day)}: ${row.needs_reconciliation ? 'pendiente de conciliación' : row.totals?.energy == null ? 'sin total disponible' : number(row.totals.energy)+' kcal registradas'}`);b.append(textNode('span',shortDate(row.day)),document.createElement('i'),textNode('span',row.needs_reconciliation ? '!' : number(row.totals?.energy)));b.addEventListener('click',()=>loadDay(row.day));history.append(b);}
+        requestAnimationFrame(reportHeight);
+      }
+      function view(name) {
+        $('day-view').hidden=name!=='day';$('progress-view').hidden=name!=='progress';
+        $('tab-day').setAttribute('aria-pressed',String(name==='day'));$('tab-progress').setAttribute('aria-pressed',String(name==='progress'));
+        requestAnimationFrame(reportHeight);
+      }
+      async function call(name,args) {
+        const result = window.bocadoCallTool ? await window.bocadoCallTool(name,args) : window.openai?.callTool ? await window.openai.callTool(name,args) : null;
+        if (!result || result.isError) throw new Error('read_failed');
+        if(result.structuredContent) return result.structuredContent;
+        const raw=result.content?.find(c=>c.type==='text')?.text;
+        return raw ? JSON.parse(raw) : result;
+      }
+      async function read(action) {
+        if(busy) return; busy=true; $('status').textContent='Actualizando…';
+        root.querySelectorAll('button,input').forEach(e=>e.disabled=true);
+        try { await action(); $('status').textContent='Datos actualizados'; }
+        catch { $('status').textContent='No se pudo actualizar. Tus datos anteriores se conservan; probá nuevamente.'; }
+        finally { busy=false;root.querySelectorAll('button,input').forEach(e=>e.disabled=false);$('day-picker').value=currentDay || '';reportHeight(); }
+      }
+      const today = () => new Intl.DateTimeFormat('en-CA',{timeZone:currentZone,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+      let currentZone='America/Montevideo';
+      async function loadDay(day) { await read(async()=>{const result=await call('get_day',{day}); if(!result.day) throw new Error('missing_day'); render(result);view('day');}); }
+      async function loadProgress(days=range) { await read(async()=>{ const end=today(); const result=await call('get_progress',{start_day:shift(end,1-days),end_day:end}); if(!Array.isArray(result.days)) throw new Error('missing_progress'); progress=result;range=days;root.querySelectorAll('[data-range]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.range)===range)));renderProgress();view('progress'); }); }
+      $('previous').onclick=()=>currentDay && loadDay(shift(currentDay,-1));
+      $('next').onclick=()=>currentDay && loadDay(shift(currentDay,1));
+      $('day-picker').onchange=e=>e.target.value && loadDay(e.target.value);
+      $('today').onclick=()=>loadDay(today());
+      $('tab-day').onclick=()=>view('day');
+      $('tab-progress').onclick=()=>progress ? view('progress') : loadProgress();
+      $('refresh').onclick=()=> $('progress-view').hidden ? loadDay(currentDay) : loadProgress();
+      root.querySelectorAll('[data-range]').forEach(b=>b.onclick=()=>loadProgress(Number(b.dataset.range)));
+      window.renderBocadoLogSummary = result => { const d=(result?.structuredContent ?? result)?.day_summary ?? (result?.structuredContent ?? result); if(d?.time_zone) currentZone=d.time_zone;render(result); };
 
       const initial = window.openai?.toolOutput;
-      if (initial) render(initial);
+      if (initial) window.renderBocadoLogSummary(initial);
       window.addEventListener('message', (event) => {
         if (event.source !== window.parent) return;
         const message = event.data;
@@ -155,7 +298,7 @@
           requestAnimationFrame(reportHeight);
         }
         if (message?.jsonrpc === '2.0' && message.method === 'ui/notifications/tool-result') {
-          render(message.params);
+          window.renderBocadoLogSummary(message.params);
         }
       }, { passive: true });
     })();

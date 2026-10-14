@@ -9,6 +9,8 @@ function applyTheme(context) {
 }
 
 app.ontoolresult = (result) => window.renderBocadoLogSummary?.(result);
-app.addEventListener('hostcontextchanged', (event) => applyTheme(event.detail));
+app.onhostcontextchanged = (context) => applyTheme(context);
 await app.connect();
+window.bocadoCallTool = (name, args) => app.callServerTool({ name, arguments: args });
+window.dispatchEvent(new Event('bocado:ready'));
 applyTheme(app.getHostContext());

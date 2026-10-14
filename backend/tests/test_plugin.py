@@ -128,6 +128,12 @@ def test_food_receipt_idempotency_correction_delete_and_server_totals(client):
     assert 'visibility' not in sidebar['_meta']['ui']
     opened=tool(client,token,'open_tracker')['structuredContent']
     assert opened['day'] and 'totals' in opened
+    assert opened['dashboard'] is True
+    assert len(opened['progress']['days']) == 30
+    assert opened['progress']['end_day'] == opened['day']
+    assert opened['revision'] == 0
+    assert all(row['entry_count'] == 0 and not row['weights'] for row in opened['progress']['days'])
+    assert tool(client,token,'get_day',{'day':opened['day']})['structuredContent']['revision'] == 0
     resource=rpc(client,token,'resources/read',{'uri':'ui://nutrition-tracker/day-summary-v1.html'})['result']
     html=resource['contents'][0]['text']
     assert 'renderBocadoLogSummary' in html and 'Nutrition Tracker' not in html

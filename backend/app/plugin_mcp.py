@@ -132,7 +132,7 @@ def install_plugin(app, store, settings, sync, password_hash, auth_limit):
         return day_snapshot(principal(),day)
 
     @mcp.tool(name='open_tracker', title='Bocado Log',
-        description='Open the read-only daily nutrition summary from ChatGPT navigation.',
+        description='Open the interactive read-only diary and weight dashboard from ChatGPT navigation.',
         annotations=read_annotation,
         meta=security() | DAY_SUMMARY_META | {
             'openai/ui': {'entrypoints': [{'type': 'global'}]}})
@@ -147,7 +147,9 @@ def install_plugin(app, store, settings, sync, password_hash, auth_limit):
             zone = ZoneInfo(profile.get('timeZoneIdentifier', 'America/Montevideo'))
         except Exception:
             zone = ZoneInfo('America/Montevideo')
-        return day_snapshot(owner, datetime.now(zone).date())
+        today = datetime.now(zone).date()
+        return {**day_snapshot(owner, today), 'dashboard': True,
+            'progress': progress_snapshot(owner, today - timedelta(days=29), today)}
 
     @mcp.tool(annotations=read_annotation,meta=security()|DAY_SUMMARY_META)
     def show_day_summary(day:date) -> dict[str, Any]:
@@ -159,12 +161,15 @@ def install_plugin(app, store, settings, sync, password_hash, auth_limit):
         """Read daily server nutrition totals and recorded weights for up to 90 days. Nutrient units are returned with the result. Missing values stay unknown; this does not import Apple Health or change data."""
         count=(end_day-start_day).days+1
         if not 1<=count<=90: raise ToolError('range_must_be_between_1_and_90_days')
-        owner=principal()
+        return progress_snapshot(principal(), start_day, end_day)
+
+    def progress_snapshot(owner, start_day, end_day):
+        count = (end_day - start_day).days + 1
         rows=[]
         with store.connect() as db:
             for offset in range(count):
                 snapshot=day_snapshot(owner,start_day+timedelta(days=offset),db)
-                rows.append({key:snapshot[key] for key in ('day','totals','weights','needs_reconciliation','intake_selection')})
+                rows.append({key:snapshot[key] for key in ('day','totals','weights','needs_reconciliation','intake_selection')} | {'entry_count': len(snapshot['entries'])})
         return {'start_day':start_day.isoformat(),'end_day':end_day.isoformat(),'days':rows,'health_sync_available':True,'health_sync_metrics':['weight'],'nutrient_units':NUTRIENT_UNITS}
 
     def reject_hypothetical(text):
@@ -209,7 +214,7 @@ def install_plugin(app, store, settings, sync, password_hash, auth_limit):
         historical={'id':str(historical_id),'dayID':day.isoformat(),'nutrients':nutrients.model_dump(),
             'isComplete':complete,'notes':consumption_text,'importBatchID':str(operation_id),'sourceRow':'MCP whole-day totals'}
         summary={'id':str(uuid5(NAMESPACE_URL,'closed-day-summary:'+str(operation_id))),
-            'version':1,'closedAt':datetime.now().astimezone().isoformat(),
+            'version':1,
             'completeness':'complete' if complete else 'incomplete',
             'intakeSource':'historical','goalVersionID':None,
             'totals':{key:{'known':getattr(nutrients,key) or 0,'knownCount':int(getattr(nutrients,key) is not None),'missingCount':int(getattr(nutrients,key) is None)} for key in NUTRIENT_UNITS},
