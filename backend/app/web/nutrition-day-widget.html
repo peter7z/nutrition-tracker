@@ -71,6 +71,7 @@
     .meal strong { font-size:15px; font-weight:600; }
     .meal summary { cursor:pointer; }
     .meal p { white-space:pre-wrap; overflow-wrap:anywhere; }
+    .meal .food-values { margin:5px 0; }
     .chart { width:100%; height:220px; display:block; overflow:visible; margin-top:12px; }
     .chart text { fill:var(--day-muted); font:11px -apple-system,BlinkMacSystemFont,sans-serif; }
     .chart .point { fill:var(--day-success); stroke:var(--day-card); stroke-width:2; cursor:pointer; }
@@ -140,8 +141,8 @@
       window.addEventListener('load', reportHeight, { once: true });
       const locale = (document.documentElement.lang || 'es-UY').toLowerCase().startsWith('es') ? 'es-UY' : 'en-US';
       const copy = locale.startsWith('es')
-        ? { title: 'Resumen del día', protein: 'Proteínas', carbohydrates: 'Carbohidratos', fat: 'Grasas', fiber: 'Fibra', progress: 'Progreso de calorías', pending: 'El total del día está pendiente de conciliación.', unavailable: 'El total de calorías no está disponible.', meals: (n) => `${n} ${n === 1 ? 'comida registrada' : 'comidas registradas'}`, goal: (used, target, pct) => `${used} de ${target} kcal · ${pct}% del objetivo`, manual: 'Consumo registrado', historical: 'Resumen del día' }
-        : { title: 'Daily summary', protein: 'Protein', carbohydrates: 'Carbs', fat: 'Fat', fiber: 'Fiber', progress: 'Calorie progress', pending: 'The daily total needs reconciliation.', unavailable: 'Daily calories are unavailable.', meals: (n) => `${n} ${n === 1 ? 'meal logged' : 'meals logged'}`, goal: (used, target, pct) => `${used} of ${target} kcal · ${pct}% of goal`, manual: 'Logged intake', historical: 'Daily summary' };
+        ? { title: 'Resumen del día', energy: 'Calorías', protein: 'Proteínas', carbohydrates: 'Carbohidratos', fat: 'Grasas', fiber: 'Fibra', progress: 'Progreso de calorías', pending: 'El total del día está pendiente de conciliación.', unavailable: 'El total de calorías no está disponible.', meals: (n) => `${n} ${n === 1 ? 'comida registrada' : 'comidas registradas'}`, goal: (used, target, pct) => `${used} de ${target} kcal · ${pct}% del objetivo`, manual: 'Consumo registrado', historical: 'Resumen del día' }
+        : { title: 'Daily summary', energy: 'Calories', protein: 'Protein', carbohydrates: 'Carbs', fat: 'Fat', fiber: 'Fiber', progress: 'Calorie progress', pending: 'The daily total needs reconciliation.', unavailable: 'Daily calories are unavailable.', meals: (n) => `${n} ${n === 1 ? 'meal logged' : 'meals logged'}`, goal: (used, target, pct) => `${used} of ${target} kcal · ${pct}% of goal`, manual: 'Logged intake', historical: 'Daily summary' };
       root.lang = locale;
       $('title').textContent = copy.title;
       $('protein-label').textContent = copy.protein;
@@ -221,7 +222,10 @@
           const summary = document.createElement('summary'); summary.append(textNode('strong', d.name || 'Comida'));
           const time = new Intl.DateTimeFormat(locale,{hour:'2-digit',minute:'2-digit', timeZone:day.time_zone || 'America/Montevideo'}).format(new Date(d.consumedAt));
           summary.append(textNode('div', `${time} · ${number(d.amount,1)} ${ {gram:'g',milliliter:'ml',serving:'porción(es)'}[d.unit] || ''} · ${d.mealName || ''}`, 'sub'));
-          detail.append(summary); detail.append(textNode('p', d.notes || 'Sin notas adicionales.', 'sub')); list.append(detail);
+          const totals = entry.totals || {};
+          const values = [[copy.energy,totals.energy,'kcal'],[copy.protein,totals.protein,'g'],[copy.carbohydrates,totals.carbohydrates,'g'],[copy.fat,totals.fat,'g'],[copy.fiber,totals.fiber,'g']];
+          detail.append(summary, textNode('p', values.map(([label,value,unit]) => `${label}: ${value == null ? '—' : number(value,1)} ${unit}`).join(' · '), 'sub food-values'));
+          detail.append(textNode('p', d.notes || 'Sin notas adicionales.', 'sub')); list.append(detail);
         }
         const weights = [...(day.weights || [])].sort((a,b) => a.recorded_at.localeCompare(b.recorded_at));
         const last = weights.at(-1);

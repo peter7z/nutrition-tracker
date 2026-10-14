@@ -30,6 +30,10 @@ recibos y exigen revisión/versiones. Al registrar o corregir una comida, el MCP
 entrega los totales autoritativos del día y vincula una tarjeta MCP Apps inline
 con calorías, progreso del objetivo disponible, macros y fibra. La entrada
 global `open_tracker` abre el resumen diario de solo lectura desde el sidebar.
+`record_food` acepta una lista `foods`: cada alimento guarda sus gramos y
+nutrientes como entrada independiente; el historial desplegable muestra kcal y
+macros por alimento. La API HTTP ofrece el mismo registro atómico en
+`POST /v1/foods`.
 Este cambio debe desplegarse y reconectarse en ChatGPT para que aparezca.
 
 ## Verificación y alcance

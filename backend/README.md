@@ -25,6 +25,8 @@ Contraseñas scrypt con sal por usuario, sesiones aleatorias de 384 bits, hash S
 
 Sync usa revisión del propietario, versión de registro, UUID de operación y request id. Un batch es atómico; conflicto devuelve 409 y exige revisión explícita, nunca last-write-wins silencioso. El orden de batch puede reabrir un día, corregir entradas y volver a cerrar. Entradas validan cantidad/nutrientes finitos no negativos, estado, unidad, fecha con zona, conversión de porciones/densidad explícita y procedencia. Se rechazan tipos Salud/copia de muestras: HealthKit permanece local.
 
+`POST /v1/foods` registra de forma atómica entre 1 y 20 alimentos separados. Cada elemento incluye `serving_size_grams` y los nutrientes totales de esa cantidad; la respuesta incluye cada entrada con cantidad en gramos, macros calculados y el resumen autoritativo del día. Todos los alimentos deben pertenecer al mismo día local. El endpoint usa los mismos UUIDs deterministas, revisión, recibo e idempotencia que `record_food` por MCP.
+
 Los totales de conversación se recalculan sobre snapshots de entradas del día en zona del perfil. Calorías de etiqueta se conservan aunque difieran de 4/4/9. Si una entrada no conoce un nutriente, el total correspondiente es desconocido; vacío también es desconocido. Historial de planilla permanece separado; si existen ingesta manual e histórica se exige resolución explícita antes del contexto de IA. Selección Salud requiere además resumen nutricional específicamente consentido para esa consulta. No se suma actividad al presupuesto de comida, ni se fabrican comidas a partir de un total histórico.
 
 ## Alcance actual del registro

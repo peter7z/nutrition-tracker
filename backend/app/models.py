@@ -113,6 +113,41 @@ class EntryDraft(StrictModel):
             if self.unit=='milliliter' and c.millilitersPerServing: return self.amount/c.millilitersPerServing
         raise ValueError('explicit conversion required')
 
+class FoodPortion(StrictModel):
+    """One food in a batch; nutrients describe this exact gram serving."""
+    name: str = Field(min_length=1,max_length=500)
+    meal: str = Field(min_length=1,max_length=500)
+    consumed_at: datetime
+    serving_size_grams: float = Field(gt=0,le=1000000,description='Grams of this food consumed.')
+    portion_description: str = Field(min_length=1,max_length=1000)
+    nutrients: Nutrition = Field(description='Total nutrients for this exact serving_size_grams, not values per 100 grams.')
+    source: Literal['estimate','label'] = 'estimate'
+    assumptions: str = Field(default='',max_length=2000)
+    @field_validator('serving_size_grams',mode='before')
+    @classmethod
+    def numeric(cls,v): return Nutrition.numeric(v)
+    @field_validator('consumed_at')
+    @classmethod
+    def timezone(cls,v): return EntryDraft.timezone(v)
+    @model_validator(mode='after')
+    def draft_is_valid(self):
+        if not self.name.strip() or not self.meal.strip() or not self.portion_description.strip():
+            raise ValueError('food details required')
+        self.to_draft()
+        return self
+    def to_draft(self):
+        return EntryDraft(name=self.name,mealName=self.meal,consumedAt=self.consumed_at,
+            amount=self.serving_size_grams,unit='gram',preparation='unspecified',
+            nutrition=self.nutrients,basis='perServing',
+            conversion=Conversion(gramsPerServing=self.serving_size_grams),source=self.source,
+            notes=self.portion_description+'\n'+self.assumptions)
+
+class FoodBatchInput(StrictModel):
+    operation_id: UUID
+    base_revision: int = Field(ge=0,strict=True)
+    consumption_text: str = Field(min_length=1,max_length=5000)
+    foods: list[FoodPortion] = Field(min_length=1,max_length=20)
+
 class Operation(StrictModel):
     operation_id: UUID
     action: Literal['upsert','delete']

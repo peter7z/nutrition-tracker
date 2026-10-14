@@ -24,10 +24,15 @@ catálogo de alimentos ni otra llamada a un modelo desde las herramientas.
   grasas para la porción consumida. No pedir al usuario los macros ni abrir un
   formulario. Si falta una cantidad, usar una porción habitual con el supuesto
   explicado; aclarar solo detalles que cambian materialmente la estimación.
-- `food.nutrients` contiene los totales de toda la porción descrita, en kcal y g,
-  no valores por 100 g. Usar `source=estimate` salvo que una etiqueta aportada
-  por el usuario permita `source=label`. Mantener nutrientes desconocidos como
-  `null`; no inventar ceros. Incluir tamaño/ingredientes y supuestos breves.
+- Llamar `record_food` una vez por comida y enviar `foods` con un elemento por
+  alimento. Cada elemento debe incluir `serving_size_grams` para guardar su
+  cantidad en el historial. `foods[i].nutrients` contiene los totales de esa
+  cantidad, en kcal y g, no valores por 100 g. Por ejemplo, arándanos de 125 g
+  y yogur de 100 g llevan nutrientes separados. Usar `source=estimate` salvo
+  que una etiqueta aportada por el usuario permita `source=label`. Mantener
+  nutrientes desconocidos como `null`; no inventar ceros. Incluir descripción y
+  supuestos breves. Todos los alimentos de una llamada deben ser del mismo día
+  local.
 - El modelo también admite los micronutrientes de Apple Health: vitamina A,
   tiamina (B1), riboflavina (B2), niacina (B3), ácido pantoténico (B5),
   vitaminas B6, B12, C, D, E y K, biotina, folato, calcio, cloruro, hierro,
@@ -49,8 +54,10 @@ catálogo de alimentos ni otra llamada a un modelo desde las herramientas.
    en cualquier retry. `base_revision` viene del servidor. Cada nuevo evento
    de consumo usa otro UUID aunque la comida sea igual.
 3. Para «eran 100 gramos», identificar exactamente una entrada del usuario y
-   llamar `update_food` con su ID y versión. Si hay varios candidatos, aclarar
-   cuál; no crear una entrada nueva por una corrección ni corregir otra cuenta.
+   llamar `update_food` con su ID y versión, actualizando también
+   `serving_size_grams` y los nutrientes de esa cantidad. Si hay varios
+   candidatos, aclarar cuál; no crear una entrada nueva por una corrección ni
+   corregir otra cuenta.
 4. Mostrar «guardado» únicamente si la herramienta devuelve `saved=true` y un
    recibo. Para `record_food` y `update_food`, usar el `day_summary` devuelto
    para mostrar los totales y objetivos del servidor en la tarjeta MCP Apps. Si

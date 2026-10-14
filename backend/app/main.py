@@ -8,6 +8,7 @@ import uuid
 from collections import defaultdict,deque
 from datetime import date,datetime,timedelta,timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 from fastapi import Depends,FastAPI,File,Request,UploadFile
 from fastapi.responses import FileResponse,JSONResponse,Response
 from fastapi.staticfiles import StaticFiles
@@ -16,9 +17,10 @@ from PIL import Image,ImageOps,UnidentifiedImageError
 from pydantic import ValidationError
 from .config import Settings
 from .store import INTEGRITY_ERRORS,Store,canonical,digest,state
-from .models import AuthInput,SyncInput,ChatInput,EntryDraft
+from .models import AuthInput,SyncInput,ChatInput,EntryDraft,FoodBatchInput
 from .nutrition import context_for,validate_payload,NUTRIENTS,NUTRIENT_UNITS
 from .assistant import ResponsesClient,AIError,guard_output
+from .food_logging import build_food_sync,is_hypothetical
 
 Image.MAX_IMAGE_PIXELS=20_000_000
 logger=logging.getLogger('nutrition')
@@ -299,6 +301,40 @@ def create_app(settings=None,ai=None):
             result=state(db,owner); result.pop('messages'); result['acknowledged_operation_ids']=ack
             db.execute('INSERT INTO requests VALUES(?,?,?,?,?)',(owner,rid,'sync',digest(wire),canonical(result)))
             return result
+
+    @app.post('/v1/foods')
+    def record_foods(body:FoodBatchInput,owner=Depends(identity)):
+        if is_hypothetical(body.consumption_text): raise APIError('hypothetical_not_recorded',422)
+        wire=build_food_sync(body.operation_id,body.base_revision,body.foods)
+        with store.connect() as db:
+            profile,_=context_for(db,owner,body.foods[0].consumed_at.date().isoformat())
+        zone=ZoneInfo(profile['time_zone'])
+        local_days={food.consumed_at.astimezone(zone).date().isoformat() for food in body.foods}
+        if len(local_days)!=1: raise APIError('foods_must_share_day',422)
+        day=next(iter(local_days))
+        result=sync(wire,owner)
+        records_by_id={record['id']:record for record in result['records'] if record['kind']=='entry'}
+        entries=[]
+        for operation in wire.operations:
+            record=records_by_id.get(str(operation.id))
+            if not record: raise APIError('food_receipt_unavailable',500)
+            draft=EntryDraft.model_validate(record['payload'].get('draft',record['payload']))
+            entries.append({'id':record['id'],'version':record['payload'].get('version',record['version']),
+                'draft':draft.model_dump(mode='json',exclude={'productID','productVersion','recipeID','recipeVersion'}),
+                'totals':{key:getattr(draft.nutrition,key)*draft.multiplier() if getattr(draft.nutrition,key) is not None else None for key in NUTRIENTS}})
+        with store.connect() as db:
+            context,_=context_for(db,owner,day)
+            revision=db.execute('SELECT revision FROM users WHERE id=?',(owner,)).fetchone()['revision']
+        for entry in context['entries']:
+            draft=EntryDraft.model_validate(entry['draft'])
+            entry['totals']={key:getattr(draft.nutrition,key)*draft.multiplier() if getattr(draft.nutrition,key) is not None else None for key in NUTRIENTS}
+        day_summary={key:context[key] for key in (
+            'day','time_zone','totals','goals','needs_reconciliation','intake_selection','entries')}
+        day_summary.update(nutrient_units=NUTRIENT_UNITS,revision=revision)
+        return {'saved':True,'operation_id':str(body.operation_id),
+            'entry_ids':[str(operation.id) for operation in wire.operations],
+            'entries':entries,'revision':revision,'receipt':result['acknowledged_operation_ids'],
+            'source':'nutrition-tracker-backend','day_summary':day_summary}
 
     @app.post('/v1/attachments',status_code=201)
     async def upload(file:UploadFile=File(...),owner=Depends(identity)):

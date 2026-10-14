@@ -8,7 +8,7 @@ Transporte HTTP: `/mcp`, autenticado por OAuth. Las consultas requieren
 | `get_profile` | Cuenta conectada. |
 | `get_day` | Comidas, totales y revisión de una fecha. |
 | `get_progress` | Totales y pesos para hasta 90 días. |
-| `record_food` | Agregar una comida consumida con sus nutrientes por porción. |
+| `record_food` | Agregar una o varias comidas consumidas como entradas separadas, con gramos y nutrientes por alimento. |
 | `update_food` | Corregir una comida por ID y versión. |
 | `delete_food` | Borrar una comida identificada y confirmada. |
 | `record_day_totals` | Guardar totales explícitos de todo el día como fuente histórica completa. |
@@ -24,6 +24,23 @@ registradas, pero no se suman al total suministrado. No sobrescribe resúmenes
 históricos existentes. Esto no crea un estado del día ni bloquea correcciones.
 Los snapshots se guardan automáticamente al registrar la primera comida del día
 siguiente y se versionan si luego cambia el historial.
+
+`record_food` recibe `foods`, una lista de 1 a 20 alimentos. Cada elemento lleva
+nombre, comida, fecha/hora, `serving_size_grams`, descripción de la porción,
+fuente y nutrientes totales de esa cantidad. Por ejemplo, arándanos de 125 g y
+yogur de 100 g son dos elementos y quedan como dos entradas del historial. Las
+macros de cada elemento describen su porción consumida, no valores por 100 g;
+los nutrientes se calculan y muestran por separado. `get_day`, `day_summary` y
+el historial desplegable de `open_tracker` incluyen gramos y totales por
+entrada. Los alimentos de un lote
+deben pertenecer al mismo día local. El argumento singular `food` se conserva
+para clientes anteriores.
+
+El endpoint HTTP `POST /v1/foods` acepta el mismo lote, más `operation_id`,
+`base_revision` y `consumption_text`, y lo guarda de forma atómica. Cada entrada
+del historial conserva la cantidad en gramos y devuelve `totals` calculados por
+el servidor. El endpoint general `POST /v1/sync` sigue aceptando varias
+operaciones para sincronización.
 
 `record_food` y `update_food` devuelven `day_summary` con los totales y metas
 autoritativos del día después de guardar. Esas herramientas enlazan el recurso

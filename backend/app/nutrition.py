@@ -83,6 +83,7 @@ def context_for(db,owner,day):
         if draft.consumedAt.astimezone(zone).date().isoformat()==day:
             provider_draft=draft.model_dump(mode='json',exclude={'productID','productVersion','recipeID','recipeVersion'})
             entries.append(dict(id=r['id'],version=r['payload'].get('version',r['version']),draft=provider_draft))
+    entries.sort(key=lambda entry:(datetime.fromisoformat(entry['draft']['consumedAt'].replace('Z','+00:00')).timestamp(),entry['id']))
     totals={key:None for key in NUTRIENTS}
     if entries:
         for key in NUTRIENTS:
