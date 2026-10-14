@@ -73,3 +73,13 @@ npm test
 Las pruebas incluyen navegación, rangos, selección de puntos, texto no confiable,
 estados vacío/error, móvil, modo oscuro y un host MCP Apps simulado. La validación
 en ese host no acredita por sí sola el comportamiento en ChatGPT.
+
+Validación del 14 de octubre: deploy Render `dep-db7qq6i5b2lc738u281g` live
+con `466ac2542d4f6409ad546169982b7c6e71c1b6eb`; healthcheck correcto y
+`open_tracker` consultado con la cuenta conectada. En ChatGPT web se verificó
+la apertura global, la gráfica y el cambio a siete días mediante tools/call.
+Pasaron 18 pruebas de plugin/peso y las pruebas de UI. La suite SQLite completa
+terminó con 70 aprobadas y ocho fallos anteriores; la base sin cambios tenía
+69 aprobadas y nueve fallos. Se corrigió el reintento de totales que devolvía
+un closedAt nuevo en cada respuesta. Los ocho fallos restantes corresponden
+a expectativas antiguas de cierre/snapshots y quedan pendientes.
