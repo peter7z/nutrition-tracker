@@ -3,7 +3,7 @@
   "mcpServers": {
     "bocado-log": {
       "type": "streamable-http",
-      "url": "https://nutrition-tracker-api-cljy.onrender.com/mcp",
+      "url": "https://bocado-api-929368612596.us-east1.run.app/mcp",
       "extensions": {
         "com.openai": {
           "auth": {

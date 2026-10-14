@@ -70,7 +70,7 @@ struct AccountProfile: Decodable { let user_id: String; let email: String }
     private let base: URL
 
     init(persistence: any SessionPersistence = KeychainSessionPersistence(), network: URLSession = .shared,
-         enabled: Bool = true, base: URL = URL(string: "https://nutrition-tracker-api-cljy.onrender.com")!) {
+         enabled: Bool = true, base: URL = URL(string: "https://bocado-api-929368612596.us-east1.run.app")!) {
         self.persistence = persistence; self.network = network; self.base = base; self.enabled = enabled
         do {
             let stored = enabled ? try persistence.load() : nil
