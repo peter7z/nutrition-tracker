@@ -124,8 +124,17 @@
     (() => {
       const root = document.getElementById('nutrition-day-widget');
       const $ = (id) => document.getElementById(id);
+      let heightTimer = 0, lastReportedHeight = 0;
       const reportHeight = () => {
-        window.openai?.notifyIntrinsicHeight?.(document.documentElement.scrollHeight);
+        window.clearTimeout(heightTimer);
+        heightTimer = window.setTimeout(() => requestAnimationFrame(() => {
+          const bodyStyle = getComputedStyle(document.body);
+          const bodyPadding = parseFloat(bodyStyle.paddingTop) + parseFloat(bodyStyle.paddingBottom);
+          const height = Math.ceil(root.getBoundingClientRect().height + bodyPadding);
+          if (!height || height === lastReportedHeight) return;
+          lastReportedHeight = height;
+          window.openai?.notifyIntrinsicHeight?.(height);
+        }), 80);
       };
       const applyHostContext = (context) => {
         const theme = context?.theme;
