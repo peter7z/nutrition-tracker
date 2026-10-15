@@ -13,21 +13,43 @@ Proyecto elegido: `bocado-511619`; cuenta de despliegue:
 la configuración activa de otros proyectos.
 
 
-## Publicar cambios de main
+## Despliegue automático desde GitHub
 
-Desde la raíz del repositorio, con `main` limpio, publicado y la sesión Google
-autorizada, ejecutar:
+Al hacer merge/push a `main`, `.github/workflows/ci.yml` ejecuta primero
+las pruebas SQLite/Postgres y, si pasan, el job `deploy` publica ese mismo SHA
+en Cloud Run. Los PR y otras ramas no despliegan. También se puede relanzar
+el workflow manualmente sobre `main` desde GitHub Actions.
+
+La autenticación usa [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines),
+sin claves JSON ni secretos permanentes en GitHub. Pool `bocado-github`,
+provider `github-main`, cuenta `bocado-github-deploy@bocado-511619.iam.gserviceaccount.com`.
+El provider verifica IDs numéricos de repositorio/propietario, rama `main`,
+workflow `ci.yml` y eventos `push`/`workflow_dispatch`. Solo el job de deploy
+puede solicitar el token OIDC. Las acciones de Google están fijadas por SHA.
+
+Permisos de la cuenta: crear/consultar builds y usar API; subir/leer fuentes
+en el bucket de Cloud Build; leer imágenes del repositorio `bocado-api`;
+consultar/actualizar solo el servicio `bocado-api`; actuar únicamente como
+`bocado-build` y `bocado-runtime`. No tiene lectura directa de secretos ni
+permisos de IAM o facturación. Los roles personalizados del proyecto son
+`bocadoGitHubBuildSubmitter`, `bocadoGitHubSourceUploader`,
+`bocadoGitHubServiceUpdater` y `bocadoGitHubActAs`.
+
+Los runs de `main` se serializan sin interrumpir una revisión en despliegue.
+El script comprueba el HEAD remoto antes y después del build: si apareció
+un commit más nuevo, omite la publicación obsoleta. La imagen y el servicio
+quedan etiquetados con el SHA publicado; se verifica `/health` al terminar.
+El job de iOS sigue deshabilitado para evitar cargos de runners macOS.
+
+Alternativa manual desde la raíz, con `main` limpio y publicado y la sesión
+Google autorizada:
 
 ```sh
 bash deploy/cloud-run.sh
 ```
 
-El script construye una imagen identificada por el SHA completo de `main`,
-actualiza el servicio existente sin reemplazar variables, secretos, IAM ni
-límites de gasto, envía el tráfico a la revisión nueva y verifica `/health`.
-No hay despliegue automático a Cloud Run por cada push: la publicación se
-hace con este comando después de validar los cambios. Render tiene
-`autoDeployTrigger: off` verificado por API; un push ya no lo despliega.
+Ambos caminos usan el mismo script y preservan variables, secretos, IAM,
+Supabase y límites de gasto. Render conserva `autoDeployTrigger: off`.
 
 ## Acceso requerido
 

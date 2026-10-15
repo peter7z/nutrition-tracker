@@ -10,6 +10,7 @@ build/
 
 # Local credentials and configuration
 .render
+gha-creds-*.json
 .env
 .env.*
 !.env.example

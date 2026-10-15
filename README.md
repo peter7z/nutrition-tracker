@@ -8,7 +8,7 @@ Monorepo de un companion iOS para Apple Health y visualización de progreso, un 
 
 La decisión completa, los flujos y límites están en [especificación de producto](docs/product.md); los tickets vigentes están en [backlog](docs/backlog.md).
 
-**Estado del código:** iOS consulta datos, muestra gráficas y sincroniza Salud. El backend tiene herramientas MCP, OAuth y un panel interactivo para el sidebar de ChatGPT con diario por fecha, comidas y evolución de peso (7/30/90 días), además de la tarjeta inline. La apertura y las consultas interactivas se verificaron en ChatGPT web el 14 de octubre de 2026; también siguen pendientes la lectura remota iOS y varias tareas de Salud. **El peso importado de Apple Health sí debe enviarse al servidor (NUT-18)**. El servicio oficial funciona en **Cloud Run**, con la base existente en **Supabase**. Ver [deploy y límites](docs/cloud-run.md).
+**Estado del código:** iOS consulta datos, muestra gráficas y sincroniza Salud. El backend tiene herramientas MCP, OAuth y un panel interactivo para el sidebar de ChatGPT con diario por fecha, comidas y evolución de peso (7/30/90 días), además de la tarjeta inline. La apertura y las consultas interactivas se verificaron en ChatGPT web el 14 de octubre de 2026; también siguen pendientes la lectura remota iOS y varias tareas de Salud. **El peso importado de Apple Health sí debe enviarse al servidor (NUT-18)**. El servicio oficial funciona en **Cloud Run**, con la base existente en **Supabase**. Los cambios en `main` se despliegan automáticamente después de pasar CI. Ver [deploy y límites](docs/cloud-run.md).
 
 ## Estructura del monorepo
 
