@@ -1,0 +1,13 @@
+# Upload only the runtime sources. In particular, no .env, credentials or data.
+*
+!Dockerfile
+!.dockerignore
+!entrypoint.py
+!requirements.txt
+!requirements-lock.txt
+!app/
+!app/**
+!migrations/
+!migrations/**
+**/__pycache__/**
+**/*.pyc

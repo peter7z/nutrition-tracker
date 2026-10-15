@@ -1,6 +1,8 @@
 # Bocado Log backend
 
-FastAPI, Postgres en Render y SQLite local, migraciones versionadas, login por contraseña y sesiones revocables. Las comidas guardadas y los datos de HealthKit permanecen disponibles en el dispositivo; registrar o consultar comidas mediante Chat requiere este servicio remoto configurado y conexión. El backend añade sincronización privada, conversación persistente y OpenAI Responses. No hay respuesta de IA simulada offline, una clave incluida en la app y el deploy de pruebas se documenta en [Render](../docs/render.md).
+Preparación de la migración de hosting: [Cloud Run con Supabase](../docs/cloud-run.md).
+
+FastAPI, Postgres en Supabase y SQLite local, migraciones versionadas, login por contraseña y sesiones revocables. Las comidas guardadas y los datos de HealthKit permanecen disponibles en el dispositivo; registrar o consultar comidas mediante Chat requiere este servicio remoto configurado y conexión. El backend añade sincronización privada, conversación persistente y OpenAI Responses. No hay respuesta de IA simulada offline ni una clave incluida en la app. Despliegue actual y estado de la migración: [Cloud Run](../docs/cloud-run.md); historial de pruebas: [Render](../docs/render.md).
 
 ## Desarrollo reproducible
 

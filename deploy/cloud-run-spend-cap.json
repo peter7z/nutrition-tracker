@@ -1,0 +1,19 @@
+{
+  "displayName": "Bocado Cloud Run monthly spend cap USD 5",
+  "budgetFilter": {
+    "projects": ["projects/bocado-511619"],
+    "services": ["services/152E-C115-5142"],
+    "creditTypesTreatment": "EXCLUDE_ALL_CREDITS",
+    "calendarPeriod": "MONTH"
+  },
+  "amount": {
+    "specifiedAmount": {"currencyCode": "USD", "units": "5", "nanos": 0}
+  },
+  "thresholdRules": [
+    {"thresholdPercent": 0.5},
+    {"thresholdPercent": 0.8},
+    {"thresholdPercent": 1.0}
+  ],
+  "notificationsRule": {"enableProjectLevelRecipients": true},
+  "spendCap": {"inputState": "CONFIGURED"}
+}

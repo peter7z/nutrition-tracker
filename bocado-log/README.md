@@ -1,4 +1,4 @@
-# Bocado Log — plugin privado 0.2.0
+# Bocado Log — plugin privado 0.2.1
 
 Paquete portable con `plugin.json`, `mcp.json` e instrucciones en
 `skills/bocado-log/SKILL.md`. La pieza remota vive en el backend del
@@ -8,7 +8,7 @@ monorepo y comparte Postgres, propietarios, validaciones y cálculos con la API.
 
 En ChatGPT Plugins, agregar un MCP propio con:
 
-- URL: `https://nutrition-tracker-api-cljy.onrender.com/mcp`.
+- URL: `https://bocado-api-929368612596.us-east1.run.app/mcp`.
 - OAuth con registro dinámico (DCR); sin client secret.
 - Scopes: `tracking:read tracking:write`.
 

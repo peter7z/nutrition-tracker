@@ -1,0 +1,8 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ['build', '--platform=linux/amd64', '-t', '${_IMAGE}', '.']
+images: ['${_IMAGE}']
+serviceAccount: projects/bocado-511619/serviceAccounts/bocado-build@bocado-511619.iam.gserviceaccount.com
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 600s

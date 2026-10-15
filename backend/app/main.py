@@ -53,7 +53,7 @@ def create_app(settings=None,ai=None):
 
     @app.middleware('http')
     async def security(request,call_next):
-        if settings.environment=='production' and request.url.scheme!='https' and request.url.path!='/healthz':
+        if settings.environment=='production' and request.url.scheme!='https' and request.url.path not in ('/healthz','/health'):
             return JSONResponse(status_code=400,content={'error':{'code':'https_required','message':'HTTPS required.'}})
         length=request.headers.get('content-length')
         if length and (not length.isdigit() or int(length)>11_000_000):
@@ -98,6 +98,7 @@ def create_app(settings=None,ai=None):
         db.execute('INSERT INTO sessions VALUES(?,?,?)',(hashlib.sha256(token.encode()).hexdigest(),owner,expiry))
         return dict(token=token,user_id=owner,expires_at=expiry)
 
+    @app.get('/health')
     @app.get('/healthz')
     def healthz():
         with store.connect() as db: db.execute('SELECT 1').fetchone()

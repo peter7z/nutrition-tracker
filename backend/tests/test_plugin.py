@@ -194,6 +194,95 @@ def test_registration_rejects_untrusted_callbacks_and_consent_csrf(client):
         assert all(tokens['access_token'] not in r['hash'] and len(r['hash'])==64 for r in rows)
 
 
+def consent_page(client, client_id):
+    challenge=base64.urlsafe_b64encode(hashlib.sha256(b'v'*64).digest()).decode().rstrip('=')
+    response=client.get('/authorize',params={'client_id':client_id,'redirect_uri':CALLBACK,
+        'response_type':'code','scope':'tracking:read','resource':RESOURCE,
+        'code_challenge':challenge,'code_challenge_method':'S256'},follow_redirects=False)
+    page=client.get(response.headers['location'])
+    return response.headers['location'], {
+        name:re.search(r'name="'+name+r'" value="([^"]+)"',page.text)[1]
+        for name in ('flow','csrf')}
+
+
+def test_consent_survives_reload_and_parallel_connection(client):
+    _,client_id,_=connect(client)
+    url,first=consent_page(client,client_id)
+    client.get(url)
+    _,second=consent_page(client,client_id)
+    credentials={'email':'plugin@example.com','password':'synthetic plugin password','action':'login'}
+    for form in (first,second):
+        result=client.post('/oauth/connect',data=form|credentials,follow_redirects=False)
+        assert result.status_code==303,result.text
+    assert client.post('/oauth/connect',data=first|credentials,follow_redirects=False).status_code==400
+
+
+def test_consent_csp_allows_registered_callback_redirect_only(client):
+    _,client_id,_=connect(client)
+    url,_=consent_page(client,client_id)
+    page=client.get(url)
+    policy=page.headers['content-security-policy']
+    directives=dict(part.strip().split(' ',1) for part in policy.split(';') if part.strip())
+    assert directives['form-action'].split()==["'self'",'https://chatgpt.com']
+    assert directives['default-src']=="'none'"
+    assert directives['frame-ancestors']=="'none'"
+    assert directives['base-uri']=="'none'"
+
+
+def test_consumed_consent_has_recovery_guidance_without_another_code(client):
+    _,client_id,_=connect(client)
+    _,form=consent_page(client,client_id)
+    credentials={'email':'plugin@example.com','password':'synthetic plugin password','action':'login'}
+    first=client.post('/oauth/connect',data=form|credentials,follow_redirects=False)
+    assert first.status_code==303
+    with client.app.state.store.connect() as db:
+        codes_before=db.execute('SELECT count(*) FROM oauth_codes').fetchone()[0]
+    replay=client.post('/oauth/connect',data=form|credentials,follow_redirects=False)
+    assert replay.status_code==400
+    assert 'ya se usó o venció' in replay.text and 'Volvé a ChatGPT' in replay.text
+    assert 'synthetic plugin password' not in replay.text
+    with client.app.state.store.connect() as db:
+        assert db.execute('SELECT count(*) FROM oauth_codes').fetchone()[0]==codes_before
+
+
+def test_consent_missing_cookie_can_restart_without_authorizing(client):
+    _,client_id,_=connect(client)
+    _,form=consent_page(client,client_id)
+    client.cookies.clear()
+    credentials={'email':'plugin@example.com','password':'synthetic plugin password','action':'login'}
+    result=client.post('/oauth/connect',data=form|credentials,follow_redirects=False)
+    assert result.status_code==400
+    assert 'synthetic plugin password' not in result.text
+    with client.app.state.store.connect() as db:
+        assert db.execute('SELECT COUNT(*) FROM oauth_codes').fetchone()[0]==0
+    retry=re.search(r'href="([^"]+)"',result.text)[1]
+    page=client.get(retry)
+    form['csrf']=re.search(r'name="csrf" value="([^"]+)"',page.text)[1]
+    result=client.post('/oauth/connect',data=form|credentials,follow_redirects=False)
+    assert result.status_code==303,result.text
+
+
+def test_consent_still_rejects_forged_binding_and_expired_flow(client):
+    from app.plugin_auth import hashed
+    _,client_id,_=connect(client)
+    url,form=consent_page(client,client_id)
+    credentials={'email':'plugin@example.com','password':'synthetic plugin password','action':'login'}
+    # Matching cookie and form alone cannot replace the server-side flow binding.
+    client.cookies.clear()
+    forged='x'*43
+    result=client.post('/oauth/connect',data=form|credentials|{'csrf':forged},
+        headers={'Cookie':'nutrition_oauth_csrf='+forged},follow_redirects=False)
+    assert result.status_code==400
+    page=client.get(url)
+    form['csrf']=re.search(r'name="csrf" value="([^"]+)"',page.text)[1]
+    with client.app.state.store.connect() as db:
+        db.execute('UPDATE oauth_flows SET expires_at=0 WHERE hash=?',(hashed(form['flow']),))
+    result=client.post('/oauth/connect',data=form|credentials,follow_redirects=False)
+    assert result.status_code==400
+    with client.app.state.store.connect() as db:
+        assert db.execute('SELECT COUNT(*) FROM oauth_codes').fetchone()[0]==0
+
+
 def test_token_expiry_restart_and_foreign_entry_cannot_mutate(client):
     from app.store import Store
     from app.plugin_auth import hashed

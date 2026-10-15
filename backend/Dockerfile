@@ -5,8 +5,9 @@ COPY requirements.txt requirements-lock.txt ./
 RUN pip install --no-cache-dir -r requirements.txt -c requirements-lock.txt && useradd --uid 10001 --create-home nutrition
 COPY app ./app
 COPY migrations ./migrations
+COPY entrypoint.py ./entrypoint.py
 RUN mkdir /data && chown nutrition:nutrition /data
 USER nutrition
 ENV NUTRITION_DATABASE=/data/nutrition.sqlite3
 EXPOSE 8000
-CMD ["uvicorn","app.asgi:app","--host","0.0.0.0","--port","8000","--no-access-log","--proxy-headers","--forwarded-allow-ips=172.28.0.2"]
+CMD ["python", "entrypoint.py"]
