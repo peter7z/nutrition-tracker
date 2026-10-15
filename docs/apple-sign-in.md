@@ -38,12 +38,12 @@ la identidad entre iOS y web.
    with Apple. El proyecto Xcode ya declara la capability y entitlement.
 2. Crear un Services ID, sugerido `com.pedrozunino.bocado.web`, activar
    Sign in with Apple y seleccionar ese App ID primario.
-3. Registrar dominio `nutrition-tracker-api-cljy.onrender.com` y return URL
-   exacta `https://nutrition-tracker-api-cljy.onrender.com/oauth/apple/callback`.
+3. Registrar dominio `bocado-api-929368612596.us-east1.run.app` y return URL
+   exacta `https://bocado-api-929368612596.us-east1.run.app/oauth/apple/callback`.
 4. Crear una key Sign in with Apple asociada al App ID y descargar su `.p8`
    una sola vez. Guardar Key ID y Team ID. No versionar ni pegar la clave en chat.
 
-Variables de Render:
+Variables de Cloud Run (clave privada en Secret Manager):
 
 - `APPLE_APP_ID=com.pedrozunino.bocado` (default del backend).
 

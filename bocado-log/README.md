@@ -45,8 +45,8 @@ está implementada en el servidor; su renderizado real, la instalación del
 paquete, la conexión con una cuenta real y móvil/voz se deben verificar en el
 host antes de declararlos entregados. No hay publicación en catálogo.
 
-Render Free es una etapa de pruebas; Postgres vence el 9 de noviembre de 2026
-(22:48 Uruguay). Ver [deploy](../docs/render.md). No conectar información real
+El servicio oficial usa Cloud Run y la base existente en Supabase.
+Ver [deploy y presupuesto](../docs/cloud-run.md). No conectar información real
 de Salud hasta completar su consentimiento y sincronización (NUT-18).
 
 Referencias oficiales: [paquete](https://developers.openai.com/plugins/build/plugins),
@@ -73,6 +73,6 @@ iOS incorpora Sign in with Apple. La primera conexión une automáticamente
 una cuenta existente con el mismo email verificado de Apple; con Ocultar mi
 correo, una dirección relay diferente puede crear otra cuenta. Para entrar
 con Apple desde el consentimiento del plugin, primero configurar Services ID
-y key del mismo App ID primario en Apple Developer/Render. Sin esa configuración
+y key del mismo App ID primario en Apple Developer y Cloud Run/Secret Manager. Sin esa configuración
 el botón Apple web permanece oculto.
 [Configuración y aceptación pendiente](https://github.com/peter7z/nutrition-tracker/blob/main/docs/apple-sign-in.md).

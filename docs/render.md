@@ -2,10 +2,11 @@
 
 > Documento histórico. Al 14 de octubre de 2026 el servicio de Render usa
 > Supabase como base existente; el Postgres gratuito de Render descrito abajo
-> no representa la configuración actual. La API se está migrando a
-> [Cloud Run](cloud-run.md), manteniendo Supabase y Render para rollback.
+> no representa la configuración actual. El servicio oficial es
+> [Cloud Run](cloud-run.md), con Supabase. Render queda temporalmente de respaldo
+> con despliegues automáticos desactivados.
 
-`render.yaml` describe la API Python y Postgres 16, ambos en Virginia con
+`archive/render-2026-10-14.yaml` conserva el blueprint histórico que describía la API Python y Postgres 16, ambos en Virginia con
 planes gratuitos para pruebas. No se usa disco persistente en la API.
 `DATABASE_URL` se configura con la conexión interna de Postgres; nunca
 incluir credenciales en Git. `.render` es una clave local ignorada por Git.

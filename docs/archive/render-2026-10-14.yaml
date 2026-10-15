@@ -1,3 +1,4 @@
+# HISTÓRICO: no aplicar. Servicio oficial en Cloud Run; DB existente en Supabase.
 services:
   - type: web
     name: nutrition-tracker-api
@@ -6,7 +7,7 @@ services:
     plan: free
     branch: main
     rootDir: backend
-    autoDeployTrigger: checksPass
+    autoDeployTrigger: off
     buildCommand: pip install -r requirements.txt -c requirements-lock.txt
     startCommand: uvicorn app.asgi:app --host 0.0.0.0 --port $PORT --no-access-log --proxy-headers --forwarded-allow-ips="*"
     healthCheckPath: /healthz

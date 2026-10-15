@@ -8,18 +8,18 @@ Monorepo de un companion iOS para Apple Health y visualización de progreso, un 
 
 La decisión completa, los flujos y límites están en [especificación de producto](docs/product.md); los tickets vigentes están en [backlog](docs/backlog.md).
 
-**Estado del código:** iOS consulta datos, muestra gráficas y sincroniza Salud. El backend tiene herramientas MCP, OAuth y un panel interactivo para el sidebar de ChatGPT con diario por fecha, comidas y evolución de peso (7/30/90 días), además de la tarjeta inline. La apertura y las consultas interactivas se verificaron en ChatGPT web el 14 de octubre de 2026; también siguen pendientes la lectura remota iOS y varias tareas de Salud. **El peso importado de Apple Health sí debe enviarse al servidor (NUT-18)**. Ver [deploy y límites](docs/render.md).
+**Estado del código:** iOS consulta datos, muestra gráficas y sincroniza Salud. El backend tiene herramientas MCP, OAuth y un panel interactivo para el sidebar de ChatGPT con diario por fecha, comidas y evolución de peso (7/30/90 días), además de la tarjeta inline. La apertura y las consultas interactivas se verificaron en ChatGPT web el 14 de octubre de 2026; también siguen pendientes la lectura remota iOS y varias tareas de Salud. **El peso importado de Apple Health sí debe enviarse al servidor (NUT-18)**. El servicio oficial funciona en **Cloud Run**, con la base existente en **Supabase**. Ver [deploy y límites](docs/cloud-run.md).
 
 ## Estructura del monorepo
 
 - `ios/`: proyecto Xcode y fuentes de la app nativa.
 - `backend/`: API FastAPI/Postgres (SQLite para desarrollo local) para autenticación, sincronización y funciones remotas.
-- `bocado-log/`: paquete privado 0.2.0, instrucciones/skill, configuración OAuth/MCP y guía de conexión.
+- `bocado-log/`: paquete privado 0.2.1, instrucciones/skill, configuración OAuth/MCP y guía de conexión.
 - `docs/`: especificación de producto, tickets vigentes y planificación histórica.
 
 ## Abrir y ejecutar
 
-1. Abrir `ios/NutritionTracker.xcodeproj` en Xcode 27.0 (versión verificada en este equipo).
+1. Abrir `ios/Bocado.xcodeproj` en Xcode 27.0 (versión verificada en este equipo).
 2. Seleccionar el esquema compartido `NutritionTracker` y un simulador iPhone con iOS 18 o superior.
 3. Ejecutar con Run. La app también declara soporte iPad.
 
@@ -28,17 +28,17 @@ Configuración: bundle ID `com.pedrozunino.bocado`, nombre visible `Bocado Log`;
 Compilación reproducible sin firma:
 
 ```sh
-xcodebuild -project ios/NutritionTracker.xcodeproj \
+xcodebuild -project ios/Bocado.xcodeproj \
   -scheme NutritionTracker -configuration Debug \
   -destination 'generic/platform=iOS Simulator' \
   -derivedDataPath /tmp/NutritionTrackerDerivedData \
   CODE_SIGNING_ALLOWED=NO build
 ```
 
-El esquema compartido incluye `NutritionTrackerTests`. Ejecutar en un simulador disponible:
+El esquema compartido incluye `BocadoTests`. Ejecutar en un simulador disponible:
 
 ```sh
-xcodebuild -project ios/NutritionTracker.xcodeproj \
+xcodebuild -project ios/Bocado.xcodeproj \
   -scheme NutritionTracker \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.5' \
   -derivedDataPath /tmp/NutritionTrackerHealthDerivedData \
@@ -63,4 +63,4 @@ Para que el plugin consulte Salud, el nuevo alcance agrega consentimiento de sin
 
 El enfoque anterior se conserva en [backlog iOS con chat](docs/archive/backlog-ios-chat-2026-10-09.md) y [snapshot de issues](docs/archive/issues-ios-chat-2026-10-10.json), además del [backlog PWA original](docs/archive/backlog-pwa-2026-10-05.md). La migración preserva historial y datos existentes.
 
-Sign in with Apple en iOS y cuenta compartida con el plugin: [configuración y estado](docs/apple-sign-in.md). La vinculación automática usa el email verificado de Apple. El acceso web requiere configurar Services ID y key en Render.
+Sign in with Apple en iOS y cuenta compartida con el plugin: [configuración y estado](docs/apple-sign-in.md). La vinculación automática usa el email verificado de Apple. El acceso web requiere configurar Services ID y key en Cloud Run/Secret Manager.

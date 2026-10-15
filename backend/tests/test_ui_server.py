@@ -31,8 +31,9 @@ def test_native_fixture_real_auth_and_sync_consumption_correction_hypothesis_clo
             hypothetical=chat('¿Y si como banana?')
             assert hypothetical.status_code==200 and hypothetical.json()['proposals']==[]
             close=chat('Cerrá el día')
-            assert close.status_code==200 and close.json()['proposals'][0]['action']=='close_day'
+            assert close.status_code==200 and close.json()['proposals']==[]
+            assert 'no hace falta cerrar' in close.json()['message']
             state=client.get('/v1/state',headers=owner).json()
-            assert state['revision']==2 and state['records'][0]['payload']['draft']['amount']==100
+            assert state['revision']==2 and next(r for r in state['records'] if r['kind']=='entry')['payload']['draft']['amount']==100
             assert client.get('/v1/state').status_code==401
             assert client.delete('/v1/account',headers=owner).status_code==200

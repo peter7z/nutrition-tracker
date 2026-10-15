@@ -1,13 +1,33 @@
 # Bocado API en Cloud Run
 
-Destino: Cloud Run para Python/FastAPI y MCP; la base existente sigue en
-Supabase. No crear Cloud SQL ni importar/copiar tablas. Render sigue atendiendo
-hasta validar el nuevo servicio y cambiar los clientes.
+Servicio oficial: **Cloud Run** para Python/FastAPI y MCP, con la base
+existente en **Supabase**. La migración y las correcciones de OAuth se integran
+en `main`. El usuario confirmó el funcionamiento real en ChatGPT. Render queda
+temporalmente como respaldo para clientes antiguos, con autodeploy desactivado.
+El blueprint anterior se archivó en `docs/archive/render-2026-10-14.yaml`; no aplicarlo.
+No crear Cloud SQL ni importar/copiar tablas.
 
 Proyecto elegido: `bocado-511619`; cuenta de despliegue:
 `pedrozunino7@gmail.com`. Usar siempre `--project=bocado-511619` y
 `--account=pedrozunino7@gmail.com` explícitos para no modificar ni usar
 la configuración activa de otros proyectos.
+
+
+## Publicar cambios de main
+
+Desde la raíz del repositorio, con `main` limpio, publicado y la sesión Google
+autorizada, ejecutar:
+
+```sh
+bash deploy/cloud-run.sh
+```
+
+El script construye una imagen identificada por el SHA completo de `main`,
+actualiza el servicio existente sin reemplazar variables, secretos, IAM ni
+límites de gasto, envía el tráfico a la revisión nueva y verifica `/health`.
+No hay despliegue automático a Cloud Run por cada push: la publicación se
+hace con este comando después de validar los cambios. Render tiene
+`autoDeployTrigger: off` verificado por API; un push ya no lo despliega.
 
 ## Acceso requerido
 
@@ -160,7 +180,7 @@ el proyecto, escala a cero, máximo de una instancia y limpieza de imágenes.
 No deshabilitar la facturación de otros proyectos ni levantar automáticamente
 un cap que se haya activado.
 
-## Estado operativo — 14 de octubre de 2026
+## Validación inicial — 14 de octubre de 2026 (antes de la promoción)
 
 - Proyecto: `bocado-511619`, número `929368612596`, región `us-east1`.
 - Servicio: `bocado-api`, URL `https://bocado-api-929368612596.us-east1.run.app`.
@@ -262,3 +282,26 @@ Referencia de CSP: https://www.w3.org/TR/CSP/#directive-form-action
   autenticación nativa, desafío Apple, DCR/PKCE, MCP/resources, widget,
   comida CRUD/idempotencia, persistencia compartida con Render y refresh/revoke.
   Cuenta y cliente OAuth sintéticos eliminados al terminar.
+
+## Promoción a servicio oficial — 14 de octubre de 2026
+
+El usuario confirmó que la conexión real funciona y autorizó integrar todo
+el trabajo de migración en `main`. Se conserva también el registro de comidas
+en lote ya publicado en `origin/main`. La integración detectó y corrigió un
+`import re` faltante en ese cambio, que afectaba la validación PKCE de OAuth.
+Las pruebas anteriores que esperaban días cerrados se adaptaron al contrato
+vigente: snapshots automáticos/editables, selección explícita de fuentes e
+ingesta histórica completa como evidencia de revisión.
+
+El endpoint oficial es `https://bocado-api-929368612596.us-east1.run.app`;
+ChatGPT usa `/mcp`, iOS tiene esa URL predeterminada al compilar. Los clientes
+instalados con la URL antigua pueden seguir usando Render hasta actualizarse.
+La base permanece en Supabase; no se migraron ni reiniciaron datos. El cap de
+Cloud Run sigue siendo USD 5/mes, sujeto a los límites explicados arriba.
+
+Validación de la integración: **173 pruebas aprobadas** con SQLite y Postgres
+16 descartable. El Postgres usado por los tests es local y separado de
+Supabase. El script `deploy/cloud-run.sh` pasó `bash -n`; las 17 pruebas iOS
+`AccountSessionTests` del cambio de URL ya habían pasado en Simulator.
+El despliegue oficial etiqueta el servicio y la imagen con el SHA de `main`;
+consultar esa etiqueta y `latestReadyRevision` para conocer la versión activa.

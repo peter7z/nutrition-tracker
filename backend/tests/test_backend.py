@@ -56,7 +56,7 @@ def test_auth_owner_isolation_revocation_and_password_storage(setup):
     assert c.get('/v1/state',headers=b).json()['records']==[]
     stolen=operation(id=entry['id'],version=1,action='delete')
     assert sync(c,b,[stolen]).status_code==409
-    assert len(c.get('/v1/state',headers=a).json()['records'])==1
+    assert sorted(r['kind'] for r in c.get('/v1/state',headers=a).json()['records'])==['day','entry']
     with app.state.store.connect() as db:
         password=db.execute('SELECT password FROM users').fetchone()[0]
         assert 'long password' not in password
@@ -80,7 +80,7 @@ def test_idempotency_and_atomic_version_conflict(setup):
     assert sync(c,a,[good,bad],revision=1).status_code==409
     state=c.get('/v1/state',headers=a).json()
     assert state['revision']==1
-    assert state['records'][0]['payload']['draft']['amount']==150
+    assert next(r for r in state['records'] if r['kind']=='entry')['payload']['draft']['amount']==150
     assert sync(c,a,[good],revision=1).status_code==200
     assert sync(c,a,[good],revision=2).json()['revision']==2
 
@@ -255,14 +255,14 @@ def test_migration_restart_and_database_backup_restore_preserve_owned_records(se
         before=state(db,owner)
     if restarted.postgres:
         with restarted.connect() as db: assert state(db,owner)==before
-        assert len(before['records'])==1
+        assert sorted(r['kind'] for r in before['records'])==['day','entry']
         return
     backup=tmp_path/'restored.sqlite'
     source=sqlite3.connect(path);destination=sqlite3.connect(backup)
     source.backup(destination);destination.close();source.close()
     restored=Store(str(backup))
     with restored.connect() as db: assert state(db,owner)==before
-    assert len(before['records'])==1
+    assert sorted(r['kind'] for r in before['records'])==['day','entry']
 
 def test_two_identity_chat_messages_usage_and_deletion_are_isolated(setup):
     c,ai,app,a,b=setup
@@ -277,9 +277,11 @@ def test_two_identity_chat_messages_usage_and_deletion_are_isolated(setup):
 def test_legacy_day_status_and_entry_update_sync_atomically(setup):
     c,ai,app,a,b=setup
     e=operation();d=operation(kind='day',payload={'id':'2026-10-08','version':1,'isClosed':True,'summaries':[]})
-    assert sync(c,a,[e,d]).status_code==200
+    initial=sync(c,a,[e,d])
+    assert initial.status_code==200
+    day_record=next(r for r in initial.json()['records'] if r['kind']=='day')
     correction=operation(id=e['id'],version=1,payload={'draft':draft(100)})
-    update_day=operation(kind='day',id=d['id'],version=1,payload={'id':'2026-10-08','version':2,'isClosed':True,'summaries':[]})
+    update_day=operation(kind='day',id=d['id'],version=day_record['version'],payload={'id':'2026-10-08','version':day_record['payload']['version']+1,'isClosed':True,'summaries':[]})
     response=sync(c,a,[correction,update_day],1)
     assert response.status_code==200
     assert response.json()['revision']==2
@@ -318,7 +320,7 @@ def test_day_snapshot_is_recomputed_in_code_not_trusted_from_client(setup):
     result=sync(c,a,[operation(),snapshot])
     assert result.status_code==200
     day=next(r for r in result.json()['records'] if r['kind']=='day')
-    totals=day['payload']['summaries'][0]['totals']
+    totals=day['payload']['summaries'][-1]['totals']
     assert totals['energy']['known']==133.5
     assert totals['saturatedFat']['missingCount']==1
     assert totals['entryCount']==1
@@ -404,11 +406,11 @@ def test_review_health_aggregate_scope_and_goal_gate(setup):
     health['consent']=True;health['weights'].append(health['weights'][0])
     assert c.post('/v1/review',headers=a,json={**body,'request_id':uid()}).status_code==422
     health['weights'].pop()
-    # Seed valid owner-scoped closed days directly to isolate review eligibility policy.
+    # Seed complete historical sources; stale day metadata alone is not intake evidence.
     with app.state.store.connect() as db:
         owner=db.execute('SELECT id FROM users WHERE email=?',('a@example.com',)).fetchone()[0]
         for day in ['2026-09-25','2026-09-26','2026-09-27','2026-09-28','2026-09-29','2026-10-02','2026-10-03','2026-10-04','2026-10-05','2026-10-06']:
-            db.execute('INSERT INTO records VALUES(?,?,?,?,?,?)',(owner,uid(),'day',1,json.dumps({'date':day,'isClosed':True,'isComplete':True,'summaries':[{'totals':{k:{'known':v,'knownCount':1,'missingCount':0} for k,v in dict(energy=2000,protein=130,carbohydrates=240,fat=60).items()}}]}),0))
+            db.execute('INSERT INTO records VALUES(?,?,?,?,?,?)',(owner,uid(),'historical',1,json.dumps({'dayID':day,'isComplete':True,'nutrients':dict(energy=2000,protein=130,carbohydrates=240,fat=60)}),0))
     reply=c.post('/v1/review',headers=a,json={**body,'request_id':uid()}).json()
     assert reply['review_coverage']['goal_adjustment_allowed'] is True
     assert reply['review_coverage']['complete_days_by_week']==[5,5]
@@ -474,7 +476,7 @@ def test_spanish_food_estimate_correction_and_hypothetical_require_no_manual_mac
     assert corrected['quantity']==100 and corrected['nutrients']['energy']==89
     assert corrected['requires_clarification'] is False
     state=c.get('/v1/state',headers=a).json()
-    assert state['revision']==1 and state['records'][0]['payload']['draft']['amount']==150
+    assert state['revision']==1 and next(r for r in state['records'] if r['kind']=='entry')['payload']['draft']['amount']==150
     # Even a provider accidentally returning a correction cannot turn planning into consumption.
     assert chat(c,a,text='¿Y si como 100 g de banana?').json()['proposals']==[]
     assert c.get('/v1/state',headers=a).json()['revision']==1
@@ -487,16 +489,17 @@ def test_sync_legacy_day_metadata_allows_snapshot_correction(setup):
     day=dict(id='2026-10-08',version=1,isClosed=True,summaries=[summary])
     reply=sync(c,a,[entry,operation(kind='day',id=day_id,payload=day)])
     assert reply.status_code==200
-    stored=next(r['payload'] for r in reply.json()['records'] if r['kind']=='day')
+    day_record=next(r for r in reply.json()['records'] if r['kind']=='day')
+    stored=day_record['payload']
     assert 'isClosed' not in stored
     # Historical imports do not freeze the current intake or reject updates.
     historic_id=uid(); historic=dict(id=historic_id,dayID='2026-10-08',nutrients=dict(energy=3000),isClosed=True,notes='',importBatchID=uid(),sourceRow='fixture')
     assert sync(c,a,[operation(kind='historical',id=historic_id,payload=historic)],revision=1).status_code==200
-    metadata={**stored,'version':2}
-    reply=sync(c,a,[operation(kind='day',id=day_id,version=1,payload=metadata)],revision=2)
+    metadata={**stored,'version':stored['version']+1}
+    reply=sync(c,a,[operation(kind='day',id=day_id,version=day_record['version'],payload=metadata)],revision=2)
     assert reply.status_code==200
-    edited={**metadata,'version':3,'summaries':[{**summary,'intakeSource':'historical'}]}
-    reply=sync(c,a,[operation(kind='day',id=day_id,version=2,payload=edited)],revision=3)
+    edited={**metadata,'version':metadata['version']+1,'summaries':[{**summary,'intakeSource':'historical'}]}
+    reply=sync(c,a,[operation(kind='day',id=day_id,version=day_record['version']+1,payload=edited)],revision=3)
     assert reply.status_code==200
     result=next(r['payload'] for r in reply.json()['records'] if r['kind']=='day')
     assert 'isClosed' not in result

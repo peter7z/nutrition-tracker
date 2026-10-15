@@ -1,8 +1,8 @@
 # Bocado Log backend
 
-Preparación de la migración de hosting: [Cloud Run con Supabase](../docs/cloud-run.md).
+Servicio oficial: [Cloud Run con Supabase](../docs/cloud-run.md).
 
-FastAPI, Postgres en Supabase y SQLite local, migraciones versionadas, login por contraseña y sesiones revocables. Las comidas guardadas y los datos de HealthKit permanecen disponibles en el dispositivo; registrar o consultar comidas mediante Chat requiere este servicio remoto configurado y conexión. El backend añade sincronización privada, conversación persistente y OpenAI Responses. No hay respuesta de IA simulada offline ni una clave incluida en la app. Despliegue actual y estado de la migración: [Cloud Run](../docs/cloud-run.md); historial de pruebas: [Render](../docs/render.md).
+FastAPI, Postgres en Supabase y SQLite local, migraciones versionadas, login por contraseña y sesiones revocables. Las comidas guardadas y los datos de HealthKit permanecen disponibles en el dispositivo; registrar o consultar comidas mediante Chat requiere este servicio remoto configurado y conexión. El backend añade sincronización privada, conversación persistente y OpenAI Responses. No hay respuesta de IA simulada offline ni una clave incluida en la app. Despliegue y operación: [Cloud Run](../docs/cloud-run.md); historial de pruebas: [Render](../docs/render.md).
 
 ## Desarrollo reproducible
 
@@ -79,4 +79,4 @@ Desde `backend/`, `python -m tests.ui_server --port 8766` inicia un servidor só
 
 ## Postgres
 
-`DATABASE_URL` tiene prioridad sobre el archivo `NUTRITION_DATABASE`. Las migraciones de Postgres están en `migrations/postgres/`; SQLite conserva sus migraciones existentes. No hay importación automática de archivos locales. La suite actual cubre ambos motores con `TEST_POSTGRES_URL` contra una base desechable (borra el schema por caso). Ver [operación en Render](../docs/render.md).
+`DATABASE_URL` tiene prioridad sobre el archivo `NUTRITION_DATABASE`. Las migraciones de Postgres están en `migrations/postgres/`; SQLite conserva sus migraciones existentes. No hay importación automática de archivos locales. La suite actual cubre ambos motores con `TEST_POSTGRES_URL` contra una base desechable (borra el schema por caso). Ver [operación en Cloud Run](../docs/cloud-run.md).

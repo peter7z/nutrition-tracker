@@ -32,7 +32,7 @@ def test_web_diary_scaled_nutrients_nulls_and_account_isolation(setup):
     assert client.get('/v1/diary?day=2026-10-08',headers=second).json()['entries']==[]
 
 
-def test_web_closure_uses_daily_summary_without_adding_food(setup):
+def test_web_historical_selection_without_closing_or_adding_food(setup):
     client,_,_,first,_=setup
     history_id=uid()
     history={'id':history_id,'dayID':'2026-10-08','nutrients':{'energy':2200,'fiber':30},
@@ -40,9 +40,9 @@ def test_web_closure_uses_daily_summary_without_adding_food(setup):
     day={'id':'2026-10-08','version':1,'isClosed':True,'summaries':[{'id':uid(),'version':1,
         'completeness':'incomplete','intakeSource':'historical','totals':{},'entryVersions':{}}]}
     assert sync(client,first,[operation(),operation(kind='historical',id=history_id,payload=history),
-        operation(kind='day',payload=day)]).status_code==200
+        operation(kind='day',payload=day),operation(kind='resolution',payload={'dayID':'2026-10-08','selection':'historical'})]).status_code==200
     result=client.get('/v1/diary?day=2026-10-08',headers=first).json()
-    assert result['closed'] and result['intake_selection']=='historical'
+    assert 'closed' not in result and result['intake_selection']=='historical'
     assert result['totals']['energy']==2200 and result['totals']['fiber']==30
     assert result['totals']['protein'] is None
     assert len(result['entries'])==1 and result['entries'][0]['totals']['energy']==133.5
