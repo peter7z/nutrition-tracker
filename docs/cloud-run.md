@@ -206,3 +206,24 @@ Fuentes:
 - https://docs.cloud.google.com/billing/docs/how-to/budget-api-spend-cap
 - https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps
 - https://docs.cloud.google.com/run/docs/known-issues#reserved-url-paths
+
+## Corrección de reconexión — 14 de octubre de 2026
+
+Se reutilizó la corrección preparada en la tarea "Reparar conexión caída",
+sin publicar ni modificar los cambios pendientes de main. Fuente guardada en
+`codex/cloud-run-oauth-fix`, commit `af40614`. El CSRF se mantiene estable entre
+recargas/conexiones simultáneas del mismo navegador y se conserva la validación
+de cookie, formulario, vinculación persistida, expiración y PKCE.
+
+- Build `4db45ff1-c8b4-4eab-a775-83e695a8ebbd`: SUCCESS.
+- Revisión `bocado-api-00004-vn4`: lista, 100% de tráfico.
+- 35 pruebas enfocadas aprobadas (OAuth/Apple/arranque/health).
+- Login REST y OAuth comprobados contra Render y Cloud Run con una cuenta
+  sintética; ambos pasaron. Cloud Run pasó además el login con formulario
+  recargado después de capturar sus campos. Datos sintéticos eliminados.
+- Supabase verificado mediante consulta read-only: schema 1–5, 2 cuentas y
+  68 entradas de comida existentes. No se hizo una auditoría histórica de
+  integridad de cada registro; el check acredita conectividad y presencia.
+- Máximo global de una instancia y spend cap USD 5/mes siguen configurados.
+- Render no recibió esta corrección: su login funciona con una conexión fresca;
+  las mejoras del flujo de reconexión están desplegadas solo en Cloud Run.
