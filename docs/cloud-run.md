@@ -183,9 +183,16 @@ un cap que se haya activado.
   comida CRUD/idempotencia, totales, persistencia compartida comprobada desde
   Render y refresh/revocación. Cuenta y registro OAuth sintéticos eliminados.
   El login Apple con un Apple ID real y render visual en ChatGPT no están
-  acreditados por estos checks. Publicación y smoke HTTP público pendientes de
-  autorización explícita del acceso público. iOS/plugin preparados en la
-  rama, sin publicación en main. Render permanece disponible para rollback.
+  acreditados por estos checks.
+- Publicación autorizada explícitamente y aplicada: `allUsers` con
+  `roles/run.invoker` sobre `bocado-api`. Smoke HTTP público repetido sin
+  identidad Google: pasó los mismos checks de OAuth/MCP/CRUD/persistencia y
+  revocación. `/health` y ambos discovery respondieron 200; `/v1/state` sin
+  autenticación respondió 401. Cuenta y cliente OAuth sintéticos eliminados.
+- iOS/plugin preparados en la rama, sin publicación en main. La app instalada
+  necesita una nueva compilación con la URL nueva; el plugin instalado debe
+  actualizar su conexión a `/mcp` de Cloud Run y reconectar OAuth. Render
+  permanece disponible para rollback y para clientes con la URL anterior.
 - Pruebas locales enfocadas: 32 backend aprobadas y 17 de `AccountSessionTests`
   aprobadas en iPhone 17 Pro Simulator. La suite general tenía diez fallos
   ajenos a estos cambios, reproducidos en el código anterior; no se declara
