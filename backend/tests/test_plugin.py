@@ -217,6 +217,34 @@ def test_consent_survives_reload_and_parallel_connection(client):
     assert client.post('/oauth/connect',data=first|credentials,follow_redirects=False).status_code==400
 
 
+def test_consent_csp_allows_registered_callback_redirect_only(client):
+    _,client_id,_=connect(client)
+    url,_=consent_page(client,client_id)
+    page=client.get(url)
+    policy=page.headers['content-security-policy']
+    directives=dict(part.strip().split(' ',1) for part in policy.split(';') if part.strip())
+    assert directives['form-action'].split()==["'self'",'https://chatgpt.com']
+    assert directives['default-src']=="'none'"
+    assert directives['frame-ancestors']=="'none'"
+    assert directives['base-uri']=="'none'"
+
+
+def test_consumed_consent_has_recovery_guidance_without_another_code(client):
+    _,client_id,_=connect(client)
+    _,form=consent_page(client,client_id)
+    credentials={'email':'plugin@example.com','password':'synthetic plugin password','action':'login'}
+    first=client.post('/oauth/connect',data=form|credentials,follow_redirects=False)
+    assert first.status_code==303
+    with client.app.state.store.connect() as db:
+        codes_before=db.execute('SELECT count(*) FROM oauth_codes').fetchone()[0]
+    replay=client.post('/oauth/connect',data=form|credentials,follow_redirects=False)
+    assert replay.status_code==400
+    assert 'ya se usó o venció' in replay.text and 'Volvé a ChatGPT' in replay.text
+    assert 'synthetic plugin password' not in replay.text
+    with client.app.state.store.connect() as db:
+        assert db.execute('SELECT count(*) FROM oauth_codes').fetchone()[0]==codes_before
+
+
 def test_consent_missing_cookie_can_restart_without_authorizing(client):
     _,client_id,_=connect(client)
     _,form=consent_page(client,client_id)

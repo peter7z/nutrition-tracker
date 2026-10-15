@@ -138,11 +138,14 @@ class PluginOAuth:
         response=RedirectResponse(str(params.redirect_uri)+separator+urlencode(values),status_code=303)
         return response
 
-    def connection_error(self, flow):
-        with self.store.connect() as db:
-            active = db.execute('SELECT 1 FROM oauth_flows WHERE hash=? AND expires_at>?',
-                (hashed(flow), int(time.time()))).fetchone()
-        message = 'La conexión venció. Cerrá esta ventana y volvé a conectar Bocado Log desde ChatGPT.'
+    def connection_error(self, flow, active=None):
+        if active is None:
+            with self.store.connect() as db:
+                active = db.execute('SELECT 1 FROM oauth_flows WHERE hash=? AND expires_at>?',
+                    (hashed(flow), int(time.time()))).fetchone()
+        message = ('Este intento de conexión ya se usó o venció. '
+                   'Volvé a ChatGPT y pulsá Conectar para iniciar uno nuevo. '
+                   'No vuelvas a enviar este formulario.')
         if active:
             retry = html.escape('/oauth/connect?' + urlencode({'flow':flow}), quote=True)
             message = ('No se pudo validar esta ventana de conexión. Volvé a abrir el formulario para reintentar.'
@@ -172,10 +175,16 @@ class PluginOAuth:
                 name = json.loads(client['metadata']).get('client_name') or 'ChatGPT'
                 params = AuthorizationParams.model_validate_json(row['params'])
                 db.execute('UPDATE oauth_flows SET csrf_hash=? WHERE hash=?', (hashed(csrf), hashed(flow)))
+            # Browsers enforce form-action on the redirect after the POST too.
+            # The redirect URI already passed registration/authorization checks;
+            # allow its origin so the browser can complete the OAuth callback.
+            callback = urlsplit(str(params.redirect_uri))
+            form_origins = ["'self'", f'{callback.scheme}://{callback.netloc}']
             permissions = '<li>Consultar comidas, peso y progreso.</li>'
             if 'tracking:write' in params.scopes: permissions += '<li>Registrar y corregir tracking cuando lo pidas.</li>'
             apple_button = ''
             if app.state.apple_identity.web_enabled:
+                form_origins.append('https://appleid.apple.com')
                 apple_button = f'<form method="post" action="/oauth/apple/start"><input type="hidden" name="flow" value="{html.escape(flow)}"><input type="hidden" name="csrf" value="{csrf}"><button>Continuar con Apple y autorizar</button></form>'
             page = f''' <!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>Conectar Bocado Log</title><body><main><h1>Conectar Bocado Log</h1>
@@ -187,7 +196,8 @@ class PluginOAuth:
 <p><label>Contraseña <input type="password" name="password" required minlength="12" maxlength="256" autocomplete="current-password"></label></p>
 <button name="action" value="login">Ingresar y autorizar</button>
 <button name="action" value="signup">Crear cuenta y autorizar</button></form></main></body></html>'''
-            response = HTMLResponse(page, headers={'Content-Security-Policy':"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'", 'Referrer-Policy':'no-referrer'})
+            policy = "default-src 'none'; form-action " + ' '.join(form_origins) + "; frame-ancestors 'none'; base-uri 'none'"
+            response = HTMLResponse(page, headers={'Content-Security-Policy':policy, 'Referrer-Policy':'no-referrer'})
             response.set_cookie('nutrition_oauth_csrf', csrf, httponly=True, secure=self.settings.environment=='production', samesite='lax', max_age=600, path='/oauth')
             return response
 
@@ -209,7 +219,7 @@ class PluginOAuth:
                 db.execute('BEGIN IMMEDIATE')
                 row = flow_row(db, flow)
                 if not row or not secrets.compare_digest(row['csrf_hash'], hashed(csrf)):
-                    return HTMLResponse('Conexión inválida o vencida.', status_code=400)
+                    return self.connection_error(flow, active=bool(row))
                 user = db.execute('SELECT * FROM users WHERE email=?', (credentials.email,)).fetchone()
                 if form.get('action')=='signup':
                     if user: return HTMLResponse('No se pudo crear la cuenta. Usá ingresar si ya tenés una.', status_code=400)
