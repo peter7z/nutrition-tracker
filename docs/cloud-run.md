@@ -227,3 +227,38 @@ de cookie, formulario, vinculación persistida, expiración y PKCE.
 - Máximo global de una instancia y spend cap USD 5/mes siguen configurados.
 - Render no recibió esta corrección: su login funciona con una conexión fresca;
   las mejoras del flujo de reconexión están desplegadas solo en Cloud Run.
+
+## Corrección del retorno OAuth en navegador — 14 de octubre de 2026
+
+La captura del teléfono mostró otro defecto que los checks HTTP no detectaban:
+el primer POST de consentimiento devolvía 303 y emitía un código; el navegador
+bloqueaba el redirect a ChatGPT porque el formulario tenía `form-action 'self'`.
+Un segundo POST sobre el flujo consumido mostraba "Conexión inválida o vencida".
+Los logs del teléfono registraron 303 y 400 separados por medio segundo, sin
+intercambio de código en `/token` por ChatGPT.
+
+Se reprodujo en Chrome con una cuenta sintética y un solo clic. El navegador
+permaneció en Bocado y Chrome registró una infracción CSP de `form-action`.
+El fix agrega a `form-action` únicamente el origen del callback previamente
+validado al registrar/autorizar el cliente. Apple se añade solo si su login web
+está configurado. Se mantienen `default-src 'none'`, `frame-ancestors 'none'`,
+`base-uri 'none'`, cookies, validación CSRF persistida y PKCE. Los flujos consumidos
+siguen rechazándose, ahora con una página que explica cómo reconectar.
+
+- Fuente: `496b10c`, rama `codex/cloud-run-oauth-fix`; main conserva sus cambios.
+- Build `e548211f-df5f-4818-ae85-0a50cc78b966`: SUCCESS.
+- Revisión `bocado-api-00005-v2f`: lista y sirviendo todo el tráfico.
+- 37 pruebas enfocadas aprobadas.
+- Prueba real en Chrome tras el fix: el formulario sale de Bocado y alcanza
+  `chatgpt.com`. El estado de la prueba es deliberadamente sintético, por lo
+  que ChatGPT informa que faltan datos del callback; no se conectó una cuenta
+  sintética al ChatGPT del usuario. Esta prueba acredita el desbloqueo del
+  retorno, no la conexión de la cuenta real ni aceptación en Safari de iPhone.
+- Las cuentas y registros OAuth de las pruebas de navegador se eliminaron.
+- Máximo global 1 y spend cap USD 5 permanecen configurados.
+
+Referencia de CSP: https://www.w3.org/TR/CSP/#directive-form-action
+- Smoke HTTP público completo aprobado sobre esta revisión: discovery,
+  autenticación nativa, desafío Apple, DCR/PKCE, MCP/resources, widget,
+  comida CRUD/idempotencia, persistencia compartida con Render y refresh/revoke.
+  Cuenta y cliente OAuth sintéticos eliminados al terminar.
