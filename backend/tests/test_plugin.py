@@ -119,7 +119,7 @@ def test_read_only_scope_and_owner_isolation(client):
 def test_food_receipt_idempotency_correction_delete_and_server_totals(client):
     tokens,_,_=connect(client);token=tokens['access_token']
     tools=rpc(client,token,'tools/list')['result']['tools']
-    assert {t['name'] for t in tools}=={'get_profile','get_day','show_day_summary','get_progress','open_tracker','record_food','update_food','delete_food','record_day_totals'}
+    assert {t['name'] for t in tools}=={'get_profile','get_day','show_day_summary','get_progress','open_tracker','set_nutrition_goals','record_food','update_food','delete_food','record_day_totals'}
     day_reader=next(t for t in tools if t['name']=='get_day')
     day_renderer=next(t for t in tools if t['name']=='show_day_summary')
     sidebar=next(t for t in tools if t['name']=='open_tracker')
