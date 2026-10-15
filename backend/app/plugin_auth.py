@@ -136,8 +136,22 @@ class PluginOAuth:
         if params.state is not None: values['state']=params.state
         separator='&' if urlsplit(str(params.redirect_uri)).query else '?'
         response=RedirectResponse(str(params.redirect_uri)+separator+urlencode(values),status_code=303)
-        response.delete_cookie('nutrition_oauth_csrf',path='/oauth')
         return response
+
+    def connection_error(self, flow):
+        with self.store.connect() as db:
+            active = db.execute('SELECT 1 FROM oauth_flows WHERE hash=? AND expires_at>?',
+                (hashed(flow), int(time.time()))).fetchone()
+        message = 'La conexión venció. Cerrá esta ventana y volvé a conectar Bocado Log desde ChatGPT.'
+        if active:
+            retry = html.escape('/oauth/connect?' + urlencode({'flow':flow}), quote=True)
+            message = ('No se pudo validar esta ventana de conexión. Volvé a abrir el formulario para reintentar.'
+                       f'<p><a href="{retry}">Volver a intentar</a></p>')
+        return HTMLResponse('<!doctype html><html lang="es"><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width"><title>Reconectar Bocado Log</title>'
+            f'<body><main><h1>Reconectar Bocado Log</h1><div>{message}</div></main></body></html>',
+            status_code=400, headers={'Referrer-Policy':'no-referrer',
+                'Content-Security-Policy':"default-src 'none'; frame-ancestors 'none'; base-uri 'none'"})
 
     def connect_routes(self, app, password_hash, auth_limit):
         def flow_row(db, flow):
@@ -146,7 +160,11 @@ class PluginOAuth:
 
         @app.get('/oauth/connect', response_class=HTMLResponse)
         def connect(request:Request, flow:str):
-            csrf = secrets.token_urlsafe(32)
+            # Keep the browser binding stable across reloads and concurrent flows.
+            # Each flow still checks its persisted hash before issuing a code.
+            csrf = request.cookies.get('nutrition_oauth_csrf', '')
+            if not re.fullmatch(r'[A-Za-z0-9_-]{43}', csrf):
+                csrf = secrets.token_urlsafe(32)
             with self.store.connect() as db:
                 row = flow_row(db, flow)
                 if not row: return HTMLResponse('Conexión vencida. Volvé a conectar el plugin.', status_code=400)
@@ -183,7 +201,7 @@ class PluginOAuth:
             auth_limit(request)
             flow, csrf = str(form.get('flow','')), str(form.get('csrf',''))
             if not csrf or not secrets.compare_digest(csrf, request.cookies.get('nutrition_oauth_csrf','')):
-                return HTMLResponse('Conexión inválida. Volvé a conectar.', status_code=400)
+                return self.connection_error(flow)
             try: credentials = AuthInput(email=form.get('email',''), password=form.get('password',''))
             except ValueError: return HTMLResponse('Revisá email y contraseña (mínimo 12 caracteres).', status_code=400)
             import uuid
@@ -217,5 +235,4 @@ class PluginOAuth:
             if params.state is not None: values['state']=params.state
             separator = '&' if urlsplit(str(params.redirect_uri)).query else '?'
             response = RedirectResponse(str(params.redirect_uri)+separator+urlencode(values), status_code=303)
-            response.delete_cookie('nutrition_oauth_csrf', path='/oauth')
             return response
