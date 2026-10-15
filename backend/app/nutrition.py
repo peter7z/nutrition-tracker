@@ -95,7 +95,8 @@ def context_for(db,owner,day):
                 values.append(n*d.multiplier())
             else: totals[key]=sum(values)
     goals=[r['payload'] for r in records if r['kind']=='goal' and str(r['payload'].get('effectiveDay',r['payload'].get('effectiveFrom',r['payload'].get('effectiveDate','0000'))))[:10]<=day]
-    goals.sort(key=lambda p:str(p.get('effectiveDay',p.get('effectiveFrom',p.get('effectiveDate','0000')))))
+    goals.sort(key=lambda p:(str(p.get('effectiveDay',p.get('effectiveFrom',p.get('effectiveDate','0000')))),
+        str(p.get('createdAt','')),str(p.get('id',''))))
     historical=[r['payload'] for r in records if r['kind']=='historical' and r['payload'].get('dayID')==day]
     resolutions=[r['payload']['selection'] for r in records if r['kind']=='resolution' and r['payload'].get('dayID')==day]
     selection=resolutions[-1] if resolutions else None

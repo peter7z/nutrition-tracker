@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "bocado-log",
-  "version": "0.2.1",
-  "description": "Consulta tu progreso y registra comidas desde ChatGPT con estimaciones de calorías y macros.",
+  "version": "0.2.2",
+  "description": "Consulta tu progreso, registra comidas y establece objetivos diarios de calorías y macros desde ChatGPT.",
   "author": {"name": "Peter Zunino"},
   "repository": "https://github.com/peter7z/nutrition-tracker",
   "keywords": ["nutrition", "tracking", "progress"],
@@ -10,11 +10,11 @@
     "com.openai": {
       "interface": {
         "displayName": "Bocado Log",
-        "shortDescription": "Comidas y progreso en ChatGPT",
-        "longDescription": "Consulta datos y registra comidas desde ChatGPT. Abrí el resumen diario de Bocado Log desde el sidebar; la app iOS complementa Apple Health y las gráficas.",
+        "shortDescription": "Comidas, progreso y objetivos",
+        "longDescription": "Consulta tu progreso, registra comidas y define objetivos diarios de calorías y macros desde ChatGPT. Abrí Bocado Log desde el sidebar; la app iOS complementa Apple Health y las gráficas.",
         "developerName": "Peter Zunino",
         "capabilities": ["Read", "Write", "Interactive"],
-        "defaultPrompt": ["Comí una banana, registrala.", "¿Cuántas calorías llevo hoy?"]
+        "defaultPrompt": ["Comí una banana, registrala.", "¿Cuántas calorías llevo hoy?", "Ayudame a definir mis objetivos diarios."]
       }
     }
   }

@@ -1,4 +1,4 @@
-# Bocado Log — plugin privado 0.2.1
+# Bocado Log — plugin privado 0.2.2
 
 Paquete portable con `plugin.json`, `mcp.json` e instrucciones en
 `skills/bocado-log/SKILL.md`. La pieza remota vive en el backend del
@@ -23,7 +23,7 @@ exacta mediante `OAUTH_REDIRECT_URIS`, separadas por comas. Nunca usar wildcards
 para callbacks propios. OAuth publica discovery, PKCE S256, resource, scopes,
 access tokens opacos de una hora, refresh rotatorio y revocación persistida.
 
-Herramientas: `get_profile`, `get_day`, `show_day_summary`, `get_progress`, `open_tracker`, `record_food`,
+Herramientas: `get_profile`, `get_day`, `show_day_summary`, `get_progress`, `open_tracker`, `set_nutrition_goals`, `record_food`,
 `update_food`, `delete_food`, `record_day_totals`. ChatGPT estima el snapshot;
 no hay catálogo ni inferencia de OpenAI en el servidor. Las mutaciones devuelven
 recibos y exigen revisión/versiones. Al registrar o corregir una comida, el MCP
@@ -36,6 +36,9 @@ comida, hora, gramos y nutrientes como entrada independiente. El lote comparte
 un mismo día local y devuelve una sola tarjeta con el resumen actualizado; el
 historial desplegable muestra kcal y macros por alimento. La API HTTP ofrece el mismo registro atómico en
 `POST /v1/foods`.
+`set_nutrition_goals` guarda objetivos versionados de kcal y macros solo después
+de la aprobación explícita de sus valores y fecha efectiva. Si falta contexto,
+la guía indica al agente que pregunte antes de proponerlos.
 Este cambio debe desplegarse y reconectarse en ChatGPT para que aparezca.
 
 ## Verificación y alcance

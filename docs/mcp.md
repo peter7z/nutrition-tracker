@@ -8,6 +8,7 @@ Transporte HTTP: `/mcp`, autenticado por OAuth. Las consultas requieren
 | `get_profile` | Cuenta conectada. |
 | `get_day` | Comidas, totales y revisión de una fecha. |
 | `get_progress` | Totales y pesos para hasta 90 días. |
+| `set_nutrition_goals` | Guardar objetivos diarios versionados de calorías y macros, tras aprobación explícita. |
 | `record_food` | Agregar una o varias comidas consumidas como entradas separadas, con gramos y nutrientes por alimento. |
 | `update_food` | Corregir una comida por ID y versión. |
 | `delete_food` | Borrar una comida identificada y confirmada. |
@@ -22,6 +23,14 @@ no conocidos se mantienen como `null`, no como cero.
 completa y los selecciona para esa fecha. Las comidas existentes siguen
 registradas, pero no se suman al total suministrado. No sobrescribe resúmenes
 históricos existentes. Esto no crea un estado del día ni bloquea correcciones.
+
+`set_nutrition_goals` recibe `operation_id`, `base_revision`, `effective_day`,
+energía en kcal, proteína/carbohidratos/grasas en gramos, `rationale` y
+`confirmed`. Lee primero `get_day` para esa fecha. El agente usa los valores
+exactos del usuario; si faltan datos para proponerlos, hace preguntas breves y
+explica los supuestos. Solo guarda después de que el usuario aprueba los cuatro
+valores y la fecha. Cada alta crea una versión con vigencia, sin reescribir el
+historial.
 Los snapshots se guardan automáticamente al registrar la primera comida del día
 siguiente y se versionan si luego cambia el historial.
 

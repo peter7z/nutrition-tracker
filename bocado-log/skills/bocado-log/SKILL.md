@@ -1,6 +1,6 @@
 ---
 name: bocado-log
-description: Consultar el historial y progreso de Bocado Log o registrar y corregir comidas consumidas desde ChatGPT, estimando calorías y macros automáticamente.
+description: Consultar el historial y progreso de Bocado Log, registrar comidas y establecer objetivos diarios de calorías y macros desde ChatGPT.
 ---
 
 Usar las herramientas de Bocado Log para consultar datos reales y guardar
@@ -75,6 +75,28 @@ catálogo de alimentos ni otra llamada a un modelo desde las herramientas.
 6. `delete_food` requiere identificar la entrada y confirmación explícita del
    usuario. Nunca elegir silenciosamente entre entradas parecidas.
 
+## Objetivos diarios de nutrición
+
+- Si el usuario quiere fijar o cambiar sus objetivos de calorías y macros, primero
+  consultar `get_day` para la fecha de vigencia. Si ya hay un objetivo vigente,
+  mostrarlo y aclarar si quiere reemplazarlo.
+- Usar los valores exactos que el usuario ya indicó. Si pide ayuda para definirlos
+  y falta contexto, hacer preguntas breves y solo sobre lo necesario para una
+  propuesta razonable: objetivo (mantener, perder o ganar peso), edad, altura,
+  peso actual y nivel de actividad; preguntar el dato de sexo solo si lo requiere
+  la fórmula que se explique. Preguntar además si tiene un objetivo indicado por
+  un profesional o alguna condición/restricción relevante. No inferir datos
+  personales ni presentar una estimación como prescripción médica.
+- Explicar los supuestos y proponer calorías diarias, proteína, carbohidratos y
+  grasas en kcal/g. Antes de guardar una propuesta, pedir aprobación explícita de
+  esos cuatro valores y la fecha desde la que rigen. Si el usuario ya pidió
+  guardar valores exactos, esa instrucción explícita cuenta como aprobación.
+- Llamar `set_nutrition_goals` solo tras esa aprobación, con la fecha efectiva,
+  una razón breve, `confirmed=true`, la revisión devuelta por `get_day` y un UUID
+  nuevo. Reintentar con el mismo UUID y argumentos. Afirmar que se guardó solo si
+  la herramienta devuelve `saved=true` y un recibo; después confirmar los valores
+  y la fecha efectiva. Un objetivo nuevo se versiona y no modifica el historial.
+
 ## Conexión y límites de esta versión
 
 La conexión OAuth abre Bocado Log para login/creación de cuenta y
@@ -92,6 +114,6 @@ No cierra el día ni bloquea correcciones. Acepta calorías,
 macros, grasa saturada, fibra y los micronutrientes indicados por
 `nutrient_units`; valores desconocidos permanecen null.
 
-Registrar peso/actividad por herramientas específicas, metas y deshacer siguen
+Registrar peso/actividad por herramientas específicas y deshacer siguen
 pendientes. No existe cierre/reapertura del día. iOS consulta datos y sincroniza peso; el registro
 de comidas sigue ocurriendo en ChatGPT.
