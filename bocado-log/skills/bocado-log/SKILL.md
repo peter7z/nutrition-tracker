@@ -24,11 +24,16 @@ catálogo de alimentos ni otra llamada a un modelo desde las herramientas.
   grasas para la porción consumida. No pedir al usuario los macros ni abrir un
   formulario. Si falta una cantidad, usar una porción habitual con el supuesto
   explicado; aclarar solo detalles que cambian materialmente la estimación.
-- Llamar `record_food` una vez por comida y enviar `foods` con un elemento por
-  alimento. Cada elemento debe incluir `serving_size_grams` para guardar su
-  cantidad en el historial. `foods[i].nutrients` contiene los totales de esa
-  cantidad, en kcal y g, no valores por 100 g. Por ejemplo, arándanos de 125 g
-  y yogur de 100 g llevan nutrientes separados. Usar `source=estimate` salvo
+- Llamar `record_food` una vez por pedido de registro o foto, con `foods` y un
+  elemento por porción de alimento reconocida, aunque la foto muestre más de una
+  comida. Mantener en cada elemento su propio nombre de comida y hora; no combinar
+  entradas ni inventar horas compartidas. Todos los elementos de una llamada
+  deben pertenecer al mismo día local. Así se guarda el lote de forma atómica y
+  se muestra una sola tarjeta actualizada. Cada elemento debe incluir
+  `serving_size_grams` para guardar su cantidad en el historial.
+  `foods[i].nutrients` contiene los totales de esa cantidad, en kcal y g, no
+  valores por 100 g. Por ejemplo, arándanos de 125 g y yogur de 100 g llevan
+  nutrientes separados. Usar `source=estimate` salvo
   que una etiqueta aportada por el usuario permita `source=label`. Mantener
   nutrientes desconocidos como `null`; no inventar ceros. Incluir descripción y
   supuestos breves. Todos los alimentos de una llamada deben ser del mismo día
@@ -50,9 +55,10 @@ catálogo de alimentos ni otra llamada a un modelo desde las herramientas.
 1. Leer `get_day` antes de escribir. El pedido explícito de registrar o una
    descripción clara de consumo autoriza `record_food`; no exigir otra
    confirmación rutinaria para la misma acción.
-2. Crear un UUID de operación y conservarlo, junto con los mismos argumentos,
-   en cualquier retry. `base_revision` viene del servidor. Cada nuevo evento
-   de consumo usa otro UUID aunque la comida sea igual.
+2. Crear un UUID de operación por lote de `record_food` y conservarlo, junto
+   con los mismos argumentos, en cualquier retry. `base_revision` viene del
+   servidor. Un lote puede contener varias entradas de comida; cada nuevo pedido
+   de registro usa otro UUID aunque repita alimentos del lote anterior.
 3. Para «eran 100 gramos», identificar exactamente una entrada del usuario y
    llamar `update_food` con su ID y versión, actualizando también
    `serving_size_grams` y los nutrientes de esa cantidad. Si hay varios
