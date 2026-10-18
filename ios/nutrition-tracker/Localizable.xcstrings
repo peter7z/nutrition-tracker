@@ -3328,9 +3328,9 @@
         }
       }
     },
-    "Apple Health supports waist circumference, so Bocado syncs the waist measurement at the navel. Neck, minimum waist, biceps, thigh and hip stay in Bocado and MCP." : {
+    "Apple Health supports waist circumference, so Bocado syncs the waist measurement at the navel. Neck, minimum waist, biceps, thigh, hip and chest stay in Bocado and MCP." : {
       "localizations" : {
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Apple Health admite la circunferencia de cintura; Bocado sincroniza la medida a la altura del ombligo. El cuello, la cintura mínima, el bíceps, el muslo y la cadera quedan en Bocado y MCP." } }
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Apple Health admite la circunferencia de cintura; Bocado sincroniza la medida a la altura del ombligo. El cuello, la cintura mínima, el bíceps, el muslo, la cadera y el pecho quedan en Bocado y MCP." } }
       }
     },
     "Body measurements in Apple Health" : { "localizations" : { "es" : { "stringUnit" : { "state" : "translated", "value" : "Medidas corporales en Apple Health" } } } },

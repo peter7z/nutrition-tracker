@@ -54,7 +54,7 @@ catálogo de alimentos ni otra llamada a un modelo desde las herramientas.
 
 - Consultar `get_body_measurements(start_date, end_date)` antes de responder sobre medidas o escribir una nueva.
 - Guardar solo cuando la persona lo pida, con `record_body_measurements`, un UUID nuevo de `operation_id` y la revisión más reciente. Reutilizar el mismo ID y argumentos en reintentos.
-- Todas las medidas son opcionales y se expresan en centímetros: `neck_cm`, `waist_navel_cm`, `waist_minimum_cm`, `biceps_cm`, `thigh_cm` y `hip_cm`. Un registro puede tener una o varias; no inventar faltantes ni confundir los dos puntos de cintura.
+- Todas las medidas son opcionales y se expresan en centímetros: `neck_cm`, `waist_navel_cm`, `waist_minimum_cm`, `biceps_cm`, `thigh_cm`, `hip_cm` y `chest_cm`. Un registro puede tener una o varias; no inventar faltantes ni confundir los dos puntos de cintura.
 - Incluir fecha y hora con zona horaria. Estos registros son históricos y no se sobrescriben; ante una corrección, explicitar que se agrega un nuevo registro.
 
 ## Registrar o corregir
@@ -114,7 +114,7 @@ chat. Ante permisos insuficientes, indicar reconectar con el permiso necesario.
 el usuario autorizó y subió desde iOS. `get_body_measurements` devuelve las
 medidas guardadas en Bocado. La sincronización iOS con Apple Health exporta
 opcionalmente la cintura a la altura del ombligo; Apple Health no tiene tipos
-para cuello, cintura mínima, bíceps, muslo ni cadera. No afirmar que una medida
+para cuello, cintura mínima, bíceps, muslo, cadera ni pecho. No afirmar que una medida
 está en Salud si la persona no activó la sincronización y el registro no aparece.
 
 `record_day_totals` guarda totales explícitos de todo el día como fuente
