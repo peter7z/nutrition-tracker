@@ -6,6 +6,7 @@ import Foundation
     @State private var health: HealthSyncModel
     @State private var weights = HealthWeightUpload()
     @State private var nutritionHealth = HealthNutritionUpload()
+    @State private var bodyMeasurementHealth = HealthBodyMeasurementUpload()
     private let history: LegacyHistory
     private let uiTesting: Bool
     init() {
@@ -39,7 +40,8 @@ import Foundation
     var body: some Scene {
         WindowGroup {
             AccountTrackingRoot(history: history, uiTesting: uiTesting)
-                .environment(account).environment(health).environment(weights).environment(nutritionHealth).environment(\.legacyHistory, history)
+                .environment(account).environment(health).environment(weights).environment(nutritionHealth)
+                .environment(bodyMeasurementHealth).environment(\.legacyHistory, history)
                 .preferredColorScheme(testAppearance)
         }
     }
@@ -59,6 +61,7 @@ private struct AccountTrackingRoot: View {
     @Environment(HealthSyncModel.self) private var health
     @Environment(HealthWeightUpload.self) private var weights
     @Environment(HealthNutritionUpload.self) private var nutritionHealth
+    @Environment(HealthBodyMeasurementUpload.self) private var bodyMeasurementHealth
     @State private var nutrition: NutritionStore
     private let history: LegacyHistory
     private let uiTesting: Bool
@@ -89,10 +92,12 @@ private struct AccountTrackingRoot: View {
                 nutrition.selectAccount(account.session?.user_id)
                 weights.selectAccount(account.session?.user_id)
                 nutritionHealth.selectAccount(account.session?.user_id)
+                bodyMeasurementHealth.selectAccount(account.session?.user_id)
                 guard account.session != nil else { return }
                 await weights.sync(account: account, health: health)
                 await nutrition.refresh(account: account)
                 await nutritionHealth.syncIfEnabled(entries: nutrition.snapshot.entries, owner: account.session?.user_id)
+                await bodyMeasurementHealth.sync(account: account)
             }
     }
 }

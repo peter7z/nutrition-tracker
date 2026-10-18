@@ -60,13 +60,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bocado Log saves the calories and nutrients from your food diary to Apple Health when you enable nutrition sync."
+            "value" : "Bocado Log saves calories and nutrients from your food diary and waist measurements to Apple Health when you enable syncing."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bocado Log guarda en Apple Health las calorías y los nutrientes de tu diario cuando activás la sincronización de nutrición."
+            "value" : "Bocado Log guarda en Apple Health las calorías y los nutrientes de tu diario y las medidas de cintura cuando activás la sincronización."
           }
         }
       }

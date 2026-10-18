@@ -10,18 +10,18 @@ Bocado Log tiene una app companion iOS y un **plugin de ChatGPT** que comparten 
 
 Toda entrada y corrección de tracking se realiza conversando con ChatGPT y usando el plugin. El plugin incluye herramientas MCP e instrucciones de uso; eventualmente tendrá widgets renderizados mediante **ChatGPT Extensions**, como tarjetas de calorías, peso y tendencias. El MCP es parte de esa integración, no la totalidad del producto.
 
-La experiencia buscada es: hablar o escribir en ChatGPT, dejar que estime los nutrientes y registre lo consumido mediante herramientas, y abrir la app para ver los datos y la evolución. No queremos una base de alimentos ni pedir al usuario que introduzca los macros de cada alimento.
+La experiencia buscada es: hablar o escribir en ChatGPT, dejar que estime los nutrientes y registre lo consumido mediante herramientas, guardar medidas corporales con MCP, y abrir la app para ver los datos y la evolución. No queremos una base de alimentos ni pedir al usuario que introduzca los macros de cada alimento.
 
 ## Responsabilidades
 
 | Componente | Responsabilidad |
 |---|---|
-| iOS | Leer HealthKit, sincronizar la copia autorizada, descargar tracking y visualizar Hoy, Datos y Progreso. Cuenta, permisos, consentimiento y estado de sincronización. |
+| iOS | Leer HealthKit, sincronizar la copia autorizada, descargar tracking y visualizar Hoy, Datos y Progreso. La exportación de nutrición y de cintura a Apple Health es optativa y requiere permiso explícito. Cuenta, permisos, consentimiento y estado de sincronización. |
 | ChatGPT | Conversación, voz/imágenes cuando el host las soporte, interpretación de la comida, estimación de nutrientes, preguntas y explicación de resultados. |
 | Plugin | Identidad, paquete/manifiestos, instrucciones/skills y herramientas para leer y modificar datos. Futuras extensiones visuales dentro de ChatGPT. |
 | Servidor MCP | Exponer herramientas de consulta y escritura del plugin con esquemas, autenticación y resultados estructurados. |
 | Backend | Persistencia por propietario, validación, cálculos determinísticos, versiones, auditoría, idempotencia y API de consulta para iOS y el plugin. |
-| Apple Health | Fuente original de observaciones de Salud. La app lee esa fuente; no la modifica ni escribe en ella en este alcance. |
+| Apple Health | Fuente de observaciones de Salud. iOS lee los tipos seleccionados y solo escribe nutrición o circunferencia de cintura cuando la persona activa esa sincronización. |
 
 ```mermaid
 flowchart LR
@@ -33,7 +33,7 @@ flowchart LR
     P -->|fase posterior| W[Widgets con ChatGPT Extensions]
 ```
 
-La importación técnica de Salud, la gestión de cuenta y el consentimiento no son registro manual de tracking. Que iOS pueda subir datos importados no habilita formularios para crear comidas, pesajes, actividades u objetivos.
+La importación técnica de Salud, la gestión de cuenta y el consentimiento no son registro manual de tracking. La escritura a Salud queda limitada a los flujos opcionales de nutrición y cintura; medidas corporales se registran con el plugin.
 
 ## Cómo debe ser la app iOS
 

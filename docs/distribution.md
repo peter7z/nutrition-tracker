@@ -22,7 +22,7 @@ Estado de preparación: 9 de octubre de 2026. El archivo vigente es **1.0 (build
 - Team de desarrollo conservado: `2KHYMP6SN7`. Confirmar que tiene membresía vigente, acuerdos aceptados y acceso a App Store Connect antes de distribuir.
 - Icono: `AppIcon.appiconset/AppIcon.png`, 1024 × 1024, RGB opaco, hoja blanca y anillo sobre verde bosque. El catálogo genera los tamaños del sistema; no contiene texto ni un borde redondeado dibujado.
 - Base de marketing: 1.0; incrementar `CURRENT_PROJECT_VERSION` antes de cada upload. Verificar los valores efectivos con `xcodebuild -showBuildSettings`; no dar por publicado un número escrito en documentación.
-- HealthKit: lectura solamente; la descripción de uso debe estar localizada en inglés/español. Cámara contextual para capturar una imagen; PhotosPicker para selección limitada del sistema. Revisar los textos efectivos en el producto, no únicamente las claves del catálogo.
+- HealthKit: lectura de los tipos elegidos y exportaciones optativas de nutrición y cintura tras autorización; la descripción de uso debe estar localizada en inglés/español. Cámara contextual para capturar una imagen; PhotosPicker para selección limitada del sistema. Revisar los textos efectivos en el producto, no únicamente las claves del catálogo.
 - Manifest: `ios/nutrition-tracker/PrivacyInfo.xcprivacy`. Debe aparecer en la raíz del `.app` construido.
 
 ## Alcance de producto para esta aceptación

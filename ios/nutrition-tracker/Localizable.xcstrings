@@ -3328,6 +3328,23 @@
         }
       }
     },
+    "Apple Health supports waist circumference, so Bocado syncs the waist measurement at the navel. Neck, minimum waist, biceps, thigh and hip stay in Bocado and MCP." : {
+      "localizations" : {
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Apple Health admite la circunferencia de cintura; Bocado sincroniza la medida a la altura del ombligo. El cuello, la cintura mínima, el bíceps, el muslo y la cadera quedan en Bocado y MCP." } }
+      }
+    },
+    "Body measurements in Apple Health" : { "localizations" : { "es" : { "stringUnit" : { "state" : "translated", "value" : "Medidas corporales en Apple Health" } } } },
+    "Could not enable waist sync to Apple Health. Check Health access and try again." : { "localizations" : { "es" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo activar la sincronización de cintura con Apple Health. Revisá el acceso e intentá de nuevo." } } } },
+    "Could not read body measurement sync settings. Apple Health was not changed." : { "localizations" : { "es" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo leer la configuración de sincronización de medidas. Apple Health no se modificó." } } } },
+    "Could not save body measurement sync settings. Try again." : { "localizations" : { "es" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo guardar la configuración de sincronización de medidas. Intentá de nuevo." } } } },
+    "Could not sync body measurements to Apple Health. Check Health access and try again." : { "localizations" : { "es" : { "stringUnit" : { "state" : "translated", "value" : "No se pudieron sincronizar las medidas con Apple Health. Revisá el acceso e intentá de nuevo." } } } },
+    "Enable waist sync" : { "localizations" : { "es" : { "stringUnit" : { "state" : "translated", "value" : "Activar sincronización de cintura" } } } },
+    "Enable waist sync?" : { "localizations" : { "es" : { "stringUnit" : { "state" : "translated", "value" : "¿Activar la sincronización de cintura?" } } } },
+    "Last waist sync" : { "localizations" : { "es" : { "stringUnit" : { "state" : "translated", "value" : "Última sincronización de cintura" } } } },
+    "Sign in to sync body measurements." : { "localizations" : { "es" : { "stringUnit" : { "state" : "translated", "value" : "Iniciá sesión para sincronizar las medidas corporales." } } } },
+    "Stop waist sync" : { "localizations" : { "es" : { "stringUnit" : { "state" : "translated", "value" : "Detener sincronización de cintura" } } } },
+    "Sync waist now" : { "localizations" : { "es" : { "stringUnit" : { "state" : "translated", "value" : "Sincronizar cintura ahora" } } } },
+    "Bocado will save waist measurements taken at the navel to Apple Health. Other measurements and the minimum waist measurement remain in Bocado. Stopping sync will keep records already saved in Health." : { "localizations" : { "es" : { "stringUnit" : { "state" : "translated", "value" : "Bocado guardará en Apple Health las medidas de cintura tomadas a la altura del ombligo. Las demás medidas y la cintura mínima quedan en Bocado. Al detener la sincronización, se conservan los registros que ya estén en Salud." } } } },
     "Zinc" : {
       "extractionState" : "stale",
       "localizations" : {

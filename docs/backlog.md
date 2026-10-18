@@ -44,7 +44,7 @@ La app importa datos existentes de Salud y permite consultarlos localmente. La a
 
 Criterios de aceptación:
 
-- [ ] Permisos de lectura contextuales por tipo y rango: peso, pasos, energía activa/basal, ejercicio/entrenamientos y nutrientes disponibles; no crear comidas desde totales ni escribir/borrar en Apple Health.
+- [ ] Permisos de lectura contextuales por tipo y rango: peso, pasos, energía activa/basal, ejercicio/entrenamientos y nutrientes disponibles; no crear comidas desde totales. El flujo de importación de este ticket no escribe ni borra en Apple Health; la exportación optativa de nutrición y cintura se mantiene separada.
 - [ ] Persistir muestras, procedencia, unidades normalizadas, zona horaria y cursores de forma atómica; importación incremental con altas/eliminaciones, reintentos idempotentes y cobertura/última sincronización visibles.
 - [ ] Usar agregaciones HealthKit para evitar doble conteo de iPhone/Watch y entrenamientos; conservar pesajes y distinguir desconocido de cero. No interpretar autorización completada como lectura concedida.
 - [ ] Desconectar detiene consultas y ofrece borrar la copia local sin alterar Salud. Validar conversiones, superposición, reimportación y permisos reales en iPhone. Compartir con backend requiere NUT-18 y consentimiento adicional.

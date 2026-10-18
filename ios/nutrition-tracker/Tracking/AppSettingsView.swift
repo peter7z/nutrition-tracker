@@ -5,6 +5,7 @@ struct AppSettingsView: View {
     @Environment(NutritionStore.self) private var nutrition
     @Environment(HealthWeightUpload.self) private var weightUpload
     @Environment(HealthNutritionUpload.self) private var nutritionUpload
+    @Environment(HealthBodyMeasurementUpload.self) private var bodyMeasurementUpload
     @Environment(HealthSyncModel.self) private var health
     @Environment(\.dismiss) private var dismiss
     @State private var showHealth = false
@@ -12,6 +13,7 @@ struct AppSettingsView: View {
     @State private var confirmWeightSharing = false
     @State private var confirmDeleteWeights = false
     @State private var confirmNutritionSync = false
+    @State private var confirmBodyMeasurementSync = false
 
     var body: some View {
         NavigationStack {
@@ -79,6 +81,25 @@ struct AppSettingsView: View {
                     if nutritionUpload.isWorking { ProgressView() }
                 }
                 .disabled(nutritionUpload.isWorking)
+                Section("Body measurements in Apple Health") {
+                    Text("Apple Health supports waist circumference, so Bocado syncs the waist measurement at the navel. Neck, minimum waist, biceps, thigh and hip stay in Bocado and MCP.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                    if account.session == nil {
+                        Text("Sign in to sync body measurements.")
+                    } else if bodyMeasurementUpload.isEnabled {
+                        Button("Sync waist now") { Task { await bodyMeasurementUpload.sync(account: account) } }
+                        Button("Stop waist sync", role: .destructive) { bodyMeasurementUpload.disable() }
+                    } else {
+                        Button("Enable waist sync") { confirmBodyMeasurementSync = true }
+                            .disabled(!bodyMeasurementUpload.isAvailable || bodyMeasurementUpload.isWorking)
+                    }
+                    if let date = bodyMeasurementUpload.lastSyncDate {
+                        LabeledContent("Last waist sync") { Text(date, format: .dateTime.day().month().hour().minute()) }
+                    }
+                    if let error = bodyMeasurementUpload.errorKey { Text(LocalizedStringKey(error)).foregroundStyle(.red) }
+                    if bodyMeasurementUpload.isWorking { ProgressView() }
+                }
+                .disabled(bodyMeasurementUpload.isWorking)
                 if let key = health.errorKey {
                     Section {
                         OperationErrorView(key: key)
@@ -105,6 +126,12 @@ struct AppSettingsView: View {
                 Button("Cancel", role: .cancel) {}
             } message: {
                 Text("Your food diary's calories, macros, fiber, vitamins and minerals will be saved to Apple Health. New and edited diary entries will sync when your diary refreshes. You can stop sync here; records already saved in Health will remain.")
+            }
+            .confirmationDialog("Enable waist sync?", isPresented: $confirmBodyMeasurementSync, titleVisibility: .visible) {
+                Button("Enable waist sync") { Task { await bodyMeasurementUpload.enable(account: account) } }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Bocado will save waist measurements taken at the navel to Apple Health. Other measurements and the minimum waist measurement remain in Bocado. Stopping sync will keep records already saved in Health.")
             }
             .confirmationDialog("Delete uploaded weights?", isPresented: $confirmDeleteWeights, titleVisibility: .visible) {
                 Button("Delete server copy", role: .destructive) { Task {
