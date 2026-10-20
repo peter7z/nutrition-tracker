@@ -21,7 +21,8 @@ Permite consultar una fecha, navegar al día anterior o siguiente y ver:
 `context_for`, compartido con MCP. Sin fecha devuelve hoy en la zona horaria
 del perfil. Los nutrientes por comida se escalan en el servidor según su
 porción. Los cierres históricos sustituyen la fuente de totales sin sumarse
-a las comidas; los valores desconocidos se muestran como —.
+a las comidas. `totals` deja incompletos como desconocidos; `known_totals` suma
+lo disponible y se etiqueta como conocido cuando faltan datos de otras comidas.
 
 La interfaz muestra las últimas 50 entradas del día, mientras los totales
 consideran todas. No modifica datos nutricionales. Cerrar sesión revoca la

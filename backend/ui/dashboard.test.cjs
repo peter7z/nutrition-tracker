@@ -1,5 +1,7 @@
 const { chromium } = require('playwright');
 const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
 const assert = require('node:assert/strict');
 (async () => {
  const browser = await chromium.launch({headless:true, executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || undefined});
@@ -13,6 +15,15 @@ const assert = require('node:assert/strict');
  assert.equal(await page.locator('#energy').textContent(),'447');
  assert.match(await page.locator('#goal-line').textContent(),/2.000/);
  assert.equal(await page.locator('#meal-list strong').textContent(),'<script>untrusted</script>');
+ const partialDay={...day,totals:{...day.totals,fiber:null},known_totals:{fiber:2.64},nutrient_coverage:{fiber:{knownCount:1,missingCount:1}},entries:[
+  {draft:{name:'Kiwi',consumedAt:'2026-10-14T10:00:00-03:00',amount:88,unit:'gram',mealName:'Desayuno'},totals:{fiber:2.64}},
+  {draft:{name:'Dulce de leche',consumedAt:'2026-10-14T10:00:00-03:00',amount:32,unit:'gram',mealName:'Desayuno'},totals:{fiber:null}}
+ ]};
+ await page.evaluate(({day,progress})=>renderBocadoLogSummary({...day,dashboard:true,progress}),{day:partialDay,progress});
+ assert.equal(await page.locator('#fiber-label').textContent(),'Fibra');
+ assert.equal(await page.locator('#fiber').textContent(),'2,6 g');
+ assert.match(await page.locator('#notice').textContent(),/Dulce de leche/);
+ await page.evaluate(({day,progress})=>renderBocadoLogSummary({...day,dashboard:true,progress}),{day,progress});
  await page.click('#previous');await page.waitForFunction(()=>document.querySelector('#day-picker').value==='2026-10-13');
  await page.click('#tab-progress');assert.equal(await page.locator('#weight-chart circle').count(),2);
  await page.locator('#weight-chart circle').last().click();assert.match(await page.locator('#chart-info').textContent(),/75 kg/);
@@ -20,14 +31,14 @@ const assert = require('node:assert/strict');
  await page.locator('#day-history button').last().click();await page.waitForFunction(()=>document.querySelector('#day-picker').value==='2026-10-12');
  await page.evaluate(()=>window.bocadoCallTool=async()=>{throw Error('offline');});await page.click('#next');await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('No se pudo'));
  assert.equal(await page.locator('#day-picker').inputValue(),'2026-10-12');assert.equal(await page.locator('#energy').textContent(),'447');
- await page.setViewportSize({width:375,height:900});await page.screenshot({path:'/private/tmp/bocado-dashboard-mobile.png',fullPage:true});
+ await page.setViewportSize({width:375,height:900});await page.screenshot({path:path.join(os.tmpdir(),'bocado-dashboard-mobile.png'),fullPage:true});
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
- await page.evaluate(()=>document.documentElement.dataset.theme='dark');await page.click('#tab-progress');await page.screenshot({path:'/private/tmp/bocado-dashboard-dark.png',fullPage:true});
+ await page.evaluate(()=>document.documentElement.dataset.theme='dark');await page.click('#tab-progress');await page.screenshot({path:path.join(os.tmpdir(),'bocado-dashboard-dark.png'),fullPage:true});
  await page.evaluate(()=>renderBocadoLogSummary({day:'2026-10-14',dashboard:true,entries:[],totals:{energy:null},weights:[],progress:{start_day:'2026-10-08',end_day:'2026-10-14',days:[]}}));
  assert.equal(await page.locator('#weight-chart circle').count(),0);assert.match(await page.locator('#latest-weight').textContent(),/Sin mediciones/);
  assert.deepEqual(errors,[]);
- await page.setViewportSize({width:1100,height:1000});await page.evaluate(({day,progress})=>{document.documentElement.dataset.theme='light';renderBocadoLogSummary({...day,dashboard:true,progress});}, {day,progress});await page.screenshot({path:'/private/tmp/bocado-dashboard-progress.png',fullPage:true});
- await page.click('#tab-day');await page.screenshot({path:'/private/tmp/bocado-dashboard-day.png',fullPage:true});
+ await page.setViewportSize({width:1100,height:1000});await page.evaluate(({day,progress})=>{document.documentElement.dataset.theme='light';renderBocadoLogSummary({...day,dashboard:true,progress});}, {day,progress});await page.screenshot({path:path.join(os.tmpdir(),'bocado-dashboard-progress.png'),fullPage:true});
+ await page.click('#tab-day');await page.screenshot({path:path.join(os.tmpdir(),'bocado-dashboard-day.png'),fullPage:true});
  // Standard MCP Apps bridge, with a simulated parent host.
  const bundle=fs.readFileSync(`${__dirname}/../app/web/nutrition-day-app.bundle.js`,'utf8');
  await page.setContent('<iframe id="app" style="width:100%;height:950px;border:0"></iframe>');

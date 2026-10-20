@@ -95,7 +95,7 @@
   <section id="day-view">
   <article class="card" aria-live="polite" aria-busy="true">
     <div class="top"><h1 id="title">Resumen del día</h1><span class="date" id="date"></span></div>
-    <div class="calories"><strong id="energy">—</strong><span>kcal</span></div>
+    <div class="calories"><strong id="energy">—</strong><span id="energy-unit">kcal</span></div>
     <div id="goal-wrap" hidden>
       <div class="progress-track" role="progressbar" aria-label="Progreso de calorías" aria-valuemin="0" aria-valuemax="100"><div class="progress-fill" id="progress"></div></div>
       <div class="goal-line" id="goal-line"></div>
@@ -150,8 +150,8 @@
       window.addEventListener('load', reportHeight, { once: true });
       const locale = (document.documentElement.lang || 'es-UY').toLowerCase().startsWith('es') ? 'es-UY' : 'en-US';
       const copy = locale.startsWith('es')
-        ? { title: 'Resumen del día', energy: 'Calorías', protein: 'Proteínas', carbohydrates: 'Carbohidratos', fat: 'Grasas', fiber: 'Fibra', progress: 'Progreso de calorías', pending: 'El total del día está pendiente de conciliación.', unavailable: 'El total de calorías no está disponible.', meals: (n) => `${n} ${n === 1 ? 'comida registrada' : 'comidas registradas'}`, goal: (used, target, pct) => `${used} de ${target} kcal · ${pct}% del objetivo`, manual: 'Consumo registrado', historical: 'Resumen del día' }
-        : { title: 'Daily summary', energy: 'Calories', protein: 'Protein', carbohydrates: 'Carbs', fat: 'Fat', fiber: 'Fiber', progress: 'Calorie progress', pending: 'The daily total needs reconciliation.', unavailable: 'Daily calories are unavailable.', meals: (n) => `${n} ${n === 1 ? 'meal logged' : 'meals logged'}`, goal: (used, target, pct) => `${used} of ${target} kcal · ${pct}% of goal`, manual: 'Logged intake', historical: 'Daily summary' };
+        ? { title: 'Resumen del día', energy: 'Calorías', protein: 'Proteínas', carbohydrates: 'Carbohidratos', fat: 'Grasas', fiber: 'Fibra', partialEnergyUnit: 'kcal', partialNamed: (label, names) => `Falta el dato de ${label.toLowerCase()} para ${names.join(', ')}.`, partialCount: (label, count) => `Falta el dato de ${label.toLowerCase()} en ${count} ${count === 1 ? 'comida' : 'comidas'}.`, progress: 'Progreso de calorías', pending: 'El total del día está pendiente de conciliación.', unavailable: 'El total de calorías no está disponible.', meals: (n) => `${n} ${n === 1 ? 'comida registrada' : 'comidas registradas'}`, goal: (used, target, pct) => `${used} de ${target} kcal · ${pct}% del objetivo`, manual: 'Consumo registrado', historical: 'Resumen del día' }
+        : { title: 'Daily summary', energy: 'Calories', protein: 'Protein', carbohydrates: 'Carbs', fat: 'Fat', fiber: 'Fiber', partialEnergyUnit: 'kcal', partialNamed: (label, names) => `The ${label.toLowerCase()} value is missing for ${names.join(', ')}.`, partialCount: (label, count) => `The ${label.toLowerCase()} value is missing for ${count} ${count === 1 ? 'meal' : 'meals'}.`, progress: 'Calorie progress', pending: 'The daily total needs reconciliation.', unavailable: 'Daily calories are unavailable.', meals: (n) => `${n} ${n === 1 ? 'meal logged' : 'meals logged'}`, goal: (used, target, pct) => `${used} of ${target} kcal · ${pct}% of goal`, manual: 'Logged intake', historical: 'Daily summary' };
       root.lang = locale;
       $('title').textContent = copy.title;
       $('protein-label').textContent = copy.protein;
@@ -177,9 +177,16 @@
         renderDetails(day);
         if (progress) renderProgress();
         const totals = day.totals ?? {};
+        const knownTotals = day.known_totals ?? {};
+        const nutrientCoverage = day.nutrient_coverage ?? {};
+        const partialKeys = [];
         const goals = day.goals ?? {};
         const target = Number(goals.energy ?? goals.nutrition?.energy ?? goals.goals?.energy ?? goals.targets?.energy);
-        const energy = totals.energy;
+        const energyCoverage = nutrientCoverage.energy ?? {};
+        const energyPartial = Number(energyCoverage.knownCount) > 0 && Number(energyCoverage.missingCount) > 0;
+        const energy = energyPartial ? knownTotals.energy : totals.energy;
+        $('energy-unit').textContent = energyPartial ? copy.partialEnergyUnit : 'kcal';
+        if (energyPartial) partialKeys.push({ key: 'energy', label: copy.energy, missingCount: Number(energyCoverage.missingCount) });
         if (day.day) {
           const [year, month, date] = day.day.split('-').map(Number);
           $('date').textContent = new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(year, month - 1, date, 12));
@@ -188,10 +195,15 @@
         }
         $('energy').textContent = kcal(energy);
         for (const key of ['protein', 'carbohydrates', 'fat', 'fiber']) {
-          $(key).textContent = totals[key] == null ? '—' : `${number(totals[key], 1)} g`;
+          const coverage = nutrientCoverage[key] ?? {};
+          const partial = Number(coverage.knownCount) > 0 && Number(coverage.missingCount) > 0;
+          const value = partial ? knownTotals[key] : totals[key];
+          $(`${key}-label`).textContent = copy[key];
+          $(key).textContent = value == null ? '—' : `${number(value, 1)} g`;
+          if (partial) partialKeys.push({ key, label: copy[key], missingCount: Number(coverage.missingCount) });
         }
         const goalWrap = $('goal-wrap');
-        if (Number.isFinite(target) && target > 0 && energy != null && Number.isFinite(Number(energy))) {
+        if (!energyPartial && Number.isFinite(target) && target > 0 && energy != null && Number.isFinite(Number(energy))) {
           const used = Number(energy);
           const pct = Math.round(used / target * 100);
           goalWrap.hidden = false;
@@ -201,17 +213,19 @@
         } else {
           goalWrap.hidden = true;
         }
-        const notice = $('notice');
-        if (day.needs_reconciliation) {
-          notice.hidden = false;
-          notice.textContent = copy.pending;
-        } else if (energy == null) {
-          notice.hidden = false;
-          notice.textContent = copy.unavailable;
-        } else {
-          notice.hidden = true;
-          notice.textContent = '';
+        const notices = [];
+        if (day.needs_reconciliation) notices.push(copy.pending);
+        else for (const { key, label, missingCount } of partialKeys) {
+          const missingNames = (day.entries ?? []).filter(entry => entry.totals?.[key] == null)
+            .map(entry => entry.draft?.name).filter(Boolean);
+          notices.push(missingNames.length === missingCount && missingNames.length > 0
+            ? copy.partialNamed(label, missingNames)
+            : copy.partialCount(label, missingCount));
         }
+        if (energy == null && !day.needs_reconciliation) notices.push(copy.unavailable);
+        const notice = $('notice');
+        notice.hidden = notices.length === 0;
+        notice.textContent = notices.join(' ');
         $('entries').textContent = copy.meals(Array.isArray(day.entries) ? day.entries.length : 0);
         $('source').textContent = day.intake_selection === 'historical' ? copy.historical : copy.manual;
         root.querySelector('article').setAttribute('aria-busy', 'false');

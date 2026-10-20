@@ -85,15 +85,25 @@ def context_for(db,owner,day):
             entries.append(dict(id=r['id'],version=r['payload'].get('version',r['version']),draft=provider_draft))
     entries.sort(key=lambda entry:(datetime.fromisoformat(entry['draft']['consumedAt'].replace('Z','+00:00')).timestamp(),entry['id']))
     totals={key:None for key in NUTRIENTS}
+    known_totals={key:None for key in NUTRIENTS}
+    nutrient_coverage={key:{'knownCount':0,'missingCount':0} for key in NUTRIENTS}
     if entries:
         for key in NUTRIENTS:
-            values=[]
+            known_values=[]
+            missing_count=0
             for entry in entries:
                 d=EntryDraft.model_validate(entry['draft'])
                 n=getattr(d.nutrition,key)
-                if n is None: break
-                values.append(n*d.multiplier())
-            else: totals[key]=sum(values)
+                if n is None:
+                    missing_count+=1
+                else:
+                    known_values.append(n*d.multiplier())
+            known_count=len(known_values)
+            nutrient_coverage[key]={'knownCount':known_count,'missingCount':missing_count}
+            if known_count:
+                known_totals[key]=sum(known_values)
+                if missing_count==0:
+                    totals[key]=known_totals[key]
     goals=[r['payload'] for r in records if r['kind']=='goal' and str(r['payload'].get('effectiveDay',r['payload'].get('effectiveFrom',r['payload'].get('effectiveDate','0000'))))[:10]<=day]
     goals.sort(key=lambda p:(str(p.get('effectiveDay',p.get('effectiveFrom',p.get('effectiveDate','0000')))),
         str(p.get('createdAt','')),str(p.get('id',''))))
@@ -103,8 +113,12 @@ def context_for(db,owner,day):
     needs_reconciliation=bool(entries and historical and selection is None) or len(historical)>1
     if selection=='health' or needs_reconciliation:
         totals={key:None for key in NUTRIENTS}
+        known_totals={key:None for key in NUTRIENTS}
+        nutrient_coverage={key:{'knownCount':0,'missingCount':0} for key in NUTRIENTS}
     elif selection=='historical' or (not entries and len(historical)==1):
         totals={key:historical[0]['nutrients'].get(key) if historical else None for key in NUTRIENTS}
+        known_totals=totals.copy()
+        nutrient_coverage={key:{'knownCount':int(totals[key] is not None),'missingCount':int(totals[key] is None)} for key in NUTRIENTS}
     # Day summaries are history only. Current totals always come from the selected
     # source records, so a late correction can never be hidden by an old snapshot.
     def same_day(payload):
@@ -113,4 +127,4 @@ def context_for(db,owner,day):
     from .health_weights import weight_records
     weights.extend({'id':r['id'],'recorded_at':r['payload']['recordedAt'],'kilograms':r['payload']['kilograms'],'source':'appleHealth'} for r in weight_records(db,owner) if same_day(r['payload']))
     activities=[{'id':r['id'],'recorded_at':r['payload']['recordedAt'],'kind':r['payload']['kind'],'duration_minutes':r['payload'].get('durationMinutes'),'active_kcal':r['payload'].get('activeEnergy')} for r in records if r['kind']=='activity' and same_day(r['payload'])]
-    return dict(weights=weights[-10:],activities=activities[-10:],intake_selection=selection or ('historical' if historical and not entries else 'manual'),needs_reconciliation=needs_reconciliation,historical_summary=historical[0] if len(historical)==1 else None,day=day,time_zone=zone.key,entries=entries[-50:],totals=totals,goals=goals[-1] if goals else None,preferences=profile.get('preferences',{})), records
+    return dict(weights=weights[-10:],activities=activities[-10:],intake_selection=selection or ('historical' if historical and not entries else 'manual'),needs_reconciliation=needs_reconciliation,historical_summary=historical[0] if len(historical)==1 else None,day=day,time_zone=zone.key,entries=entries[-50:],totals=totals,known_totals=known_totals,nutrient_coverage=nutrient_coverage,goals=goals[-1] if goals else None,preferences=profile.get('preferences',{})), records

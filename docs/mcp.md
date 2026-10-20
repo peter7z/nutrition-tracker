@@ -16,7 +16,11 @@ Transporte HTTP: `/mcp`, autenticado por OAuth. Las consultas requieren
 
 Los nutrientes de comidas y días son `energy` (kcal), `protein`,
 `carbohydrates`, `fat`, `saturatedFat` y `fiber` (gramos). Los valores
-no conocidos se mantienen como `null`, no como cero.
+no conocidos se mantienen como `null`, no como cero. En el agregado diario,
+`totals` queda `null` si falta el valor en alguna comida; `known_totals` suma
+los valores disponibles y `nutrient_coverage` indica `knownCount` y
+`missingCount`. Los valores parciales se muestran como conocidos, con el aviso
+de las comidas que no tienen ese dato; no representan el total completo.
 
 `record_day_totals` recibe `operation_id`, `base_revision`, `day`,
 `consumption_text` y `nutrients`. Guarda los totales como fuente histórica
@@ -51,12 +55,13 @@ del historial conserva la cantidad en gramos y devuelve `totals` calculados por
 el servidor. El endpoint general `POST /v1/sync` sigue aceptando varias
 operaciones para sincronización.
 
-`record_food` y `update_food` devuelven `day_summary` con los totales y metas
-autoritativos del día después de guardar. Esas herramientas enlazan el recurso
+`record_food` y `update_food` devuelven `day_summary` con los totales, sumas
+conocidas, cobertura y metas autoritativas del día después de guardar. Esas herramientas enlazan el recurso
 MCP Apps `ui://nutrition-tracker/day-summary-v1.html` para mostrar una tarjeta
 inline con calorías, progreso del objetivo disponible, proteínas,
-carbohidratos, grasas y fibra. Los valores desconocidos siguen apareciendo
-como no disponibles; la tarjeta no vuelve a calcular los totales.
+carbohidratos, grasas y fibra. Los valores incompletos se etiquetan como
+conocidos y la tarjeta muestra qué comidas carecen del dato; la tarjeta no
+vuelve a calcular los totales.
 
 Antes de escribir, consultar `get_day`. Reintentar con el mismo
 `operation_id` y los mismos argumentos devuelve el recibo original sin

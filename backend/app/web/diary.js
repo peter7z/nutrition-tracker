@@ -23,7 +23,7 @@ function render(data) {
   $('day').value=data.day;
   $('day-title').textContent=new Intl.DateTimeFormat('es-UY',{dateStyle:'long',timeZone:'UTC'}).format(new Date(data.day+'T12:00:00Z'));
   $('source').textContent='Totales de '+({manual:'las comidas registradas',historical:'un resumen diario',health:'Apple Health'}[data.intake_selection]||'la fuente seleccionada')+' · '+data.time_zone;
-  $('totals').replaceChildren(...nutrients.map(([key,title,unit])=>{const dl=node('dl',undefined,'metric');dl.append(node('dt',title));const dd=node('dd',format(data.totals[key]));dd.append(node('small',' '+unit));dl.append(dd);return dl;}));
+  $('totals').replaceChildren(...nutrients.map(([key,title,unit])=>{const dl=node('dl',undefined,'metric');const coverage=data.nutrient_coverage?.[key]||{};const partial=Number(coverage.knownCount)>0&&Number(coverage.missingCount)>0;dl.append(node('dt',title));const value=partial?data.known_totals?.[key]:data.totals[key];const dd=node('dd',format(value));dd.append(node('small',' '+unit));if(partial)dd.append(node('small',` · falta dato en ${coverage.missingCount} ${coverage.missingCount===1?'comida':'comidas'}`));dl.append(dd);return dl;}));
   $('warning').hidden=!data.needs_reconciliation;
   $('warning').textContent='Hay comidas y resúmenes superpuestos. Los totales quedan pendientes hasta resolver qué fuente usar.';
   $('meal-count').textContent='('+data.entries.length+')';

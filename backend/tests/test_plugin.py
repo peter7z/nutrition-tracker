@@ -179,6 +179,25 @@ def test_food_receipt_idempotency_correction_delete_and_server_totals(client):
     assert tool(client,token,'get_progress',{'start_day':'2026-01-01','end_day':'2026-10-10'})['isError']
 
 
+def test_day_summary_keeps_known_nutrient_sum_when_an_entry_is_unknown(client):
+    tokens,_,_=connect(client);token=tokens['access_token']
+    def portion(name,fiber):
+        return {'name':name,'meal':'Merienda','consumed_at':'2026-10-10T12:00:00-03:00',
+            'serving_size_grams':32,'portion_description':name,'source':'estimate','assumptions':'',
+            'nutrients':food()['nutrients']|{'fiber':fiber}}
+    kiwi=portion('Kiwi',2.64)
+    dulce=portion('Dulce de leche',None)
+    result=tool(client,token,'record_food',{'operation_id':str(uuid.uuid4()),'base_revision':0,
+        'consumption_text':'Comí kiwi y dulce de leche','foods':[kiwi,dulce]})['structuredContent']
+    summary=result['day_summary']
+    assert summary['totals']['fiber'] is None
+    assert summary['known_totals']['fiber']==2.64
+    assert summary['nutrient_coverage']['fiber']=={'knownCount':1,'missingCount':1}
+    assert [entry['draft']['name'] for entry in summary['entries'] if entry['totals']['fiber'] is None]==['Dulce de leche']
+    day=tool(client,token,'get_day',{'day':'2026-10-10'})['structuredContent']
+    assert day['known_totals']['fiber']==2.64 and day['nutrient_coverage']['fiber']['missingCount']==1
+
+
 def test_registration_rejects_untrusted_callbacks_and_consent_csrf(client):
     assert client.post('/register',json={'redirect_uris':['https://evil.example/callback'],
         'token_endpoint_auth_method':'none'}).status_code==400

@@ -460,9 +460,20 @@ def create_app(settings=None,ai=None):
             latency=int((time.monotonic()-started)*1000)
             cost=(input_tokens*settings.input_price+output_tokens*settings.output_price)/1_000_000
             totals=context['totals']
-            formatted=' · '.join(f'{key}: {round(value,1)} {NUTRIENT_UNITS[key]}' for key,value in totals.items() if value is not None) or 'no nutrient totals available'
+            formatted_values=[]
+            for key in NUTRIENTS:
+                value=totals.get(key)
+                nutrient_coverage=context.get('nutrient_coverage',{}).get(key,{})
+                if value is not None:
+                    formatted_values.append(f'{key}: {round(value,1)} {NUTRIENT_UNITS[key]}')
+                else:
+                    known=context.get('known_totals',{}).get(key)
+                    missing_count=nutrient_coverage.get('missingCount',0)
+                    if known is not None and missing_count:
+                        formatted_values.append(f'{key} known (partial; missing in {missing_count} entr{"y" if missing_count==1 else "ies"}): {round(known,1)} {NUTRIENT_UNITS[key]}')
+            formatted=' · '.join(formatted_values) or 'no nutrient totals available'
             message=output.message+'\n\nAcumulado real / Actual consumed: '+formatted
-            result={'request_id':rid,'message':message,'intent':output.intent,'proposals':[p.model_dump(mode='json',exclude={'product_id','product_version','recipe_id','recipe_version'}) for p in output.proposals],'totals':totals,'usage':dict(input_tokens=input_tokens,output_tokens=output_tokens,estimated_cost_usd=cost,latency_ms=latency)}
+            result={'request_id':rid,'message':message,'intent':output.intent,'proposals':[p.model_dump(mode='json',exclude={'product_id','product_version','recipe_id','recipe_version'}) for p in output.proposals],'totals':totals,'known_totals':context.get('known_totals',{}),'nutrient_coverage':context.get('nutrient_coverage',{}),'usage':dict(input_tokens=input_tokens,output_tokens=output_tokens,estimated_cost_usd=cost,latency_ms=latency)}
             result['goal_proposal']=output.goal_proposal.model_dump(mode='json') if output.goal_proposal else None
             result['review_coverage']=coverage if review else None
             with store.connect() as db:
