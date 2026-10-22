@@ -2,11 +2,12 @@ import SwiftUI
 import Foundation
 
 @main struct NutritionTrackerApp: App {
+    @UIApplicationDelegateAdaptor(HealthBackgroundAppDelegate.self) private var appDelegate
     @State private var account: AccountSession
     @State private var health: HealthSyncModel
-    @State private var weights = HealthWeightUpload()
+    @State private var weights = HealthBackgroundRuntime.shared.weights
     @State private var nutritionHealth = HealthNutritionUpload()
-    @State private var bodyMeasurementHealth = HealthBodyMeasurementUpload()
+    @State private var bodyMeasurementHealth = HealthBackgroundRuntime.shared.measurements
     private let history: LegacyHistory
     private let uiTesting: Bool
     init() {
@@ -25,16 +26,16 @@ import Foundation
             try? JSONEncoder().encode(CompanionTestFixture.progress(on: .now)).write(to: testURL, options: .atomic)
         }
         history = uiTesting ? LegacyHistory(ownerID: nil) : .stored()
-        _health = State(initialValue: uiTesting ? HealthSyncModel(persistence: HealthFileRepository(fileURL: testHealthURL)) : HealthSyncModel())
+        _health = State(initialValue: uiTesting ? HealthSyncModel(persistence: HealthFileRepository(fileURL: testHealthURL)) : HealthBackgroundRuntime.shared.health)
         #else
         uiTesting = false
         history = .stored()
-        _health = State(initialValue: HealthSyncModel())
+        _health = State(initialValue: HealthBackgroundRuntime.shared.health)
         #endif
         #if DEBUG
-        _account = State(initialValue: uiTesting ? AccountUITestFixture.makeSession() : AccountSession())
+        _account = State(initialValue: uiTesting ? AccountUITestFixture.makeSession() : HealthBackgroundRuntime.shared.account)
         #else
-        _account = State(initialValue: AccountSession())
+        _account = State(initialValue: HealthBackgroundRuntime.shared.account)
         #endif
     }
     var body: some Scene {
@@ -70,6 +71,9 @@ private struct AccountTrackingRoot: View {
         let url = uiTesting ? URL.temporaryDirectory.appendingPathComponent("nutrition-ui-testing.json") : history.fileURL
         _nutrition = State(initialValue: NutritionStore(persistence: NutritionFileRepository(fileURL: url)))
     }
+    private var backgroundConfiguration: String {
+        "\(account.session?.user_id ?? ""):\(weights.isEnabled):\(bodyMeasurementHealth.isEnabled):\(health.snapshot.isConnected):\(health.snapshot.configuration?.metrics.contains(.weight) == true)"
+    }
     var body: some View {
         Group {
             if account.session == nil {
@@ -83,6 +87,10 @@ private struct AccountTrackingRoot: View {
         }
             .environment(nutrition)
             .environment(\.legacyHistory, account.session.map { LegacyHistory(ownerID: UUID(uuidString: $0.user_id)) } ?? history)
+            .onChange(of: backgroundConfiguration) { _, _ in
+                guard !uiTesting else { return }
+                HealthBackgroundRuntime.shared.configure()
+            }
             .onChange(of: nutrition.snapshot.entries) { _, entries in
                 guard !uiTesting, account.session != nil else { return }
                 Task { await nutritionHealth.syncIfEnabled(entries: entries, owner: account.session?.user_id) }
@@ -93,6 +101,7 @@ private struct AccountTrackingRoot: View {
                 weights.selectAccount(account.session?.user_id)
                 nutritionHealth.selectAccount(account.session?.user_id)
                 bodyMeasurementHealth.selectAccount(account.session?.user_id)
+                HealthBackgroundRuntime.shared.configure()
                 guard account.session != nil else { return }
                 await weights.sync(account: account, health: health)
                 await nutrition.refresh(account: account)

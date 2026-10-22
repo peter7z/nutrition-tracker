@@ -4,7 +4,8 @@ import XCTest
 private final class TestSessionPersistence: SessionPersistence {
     var value: ServerSession?
     var failClear = false
-    func load() throws -> ServerSession? { value }
+    var failLoad = false
+    func load() throws -> ServerSession? { if failLoad { throw AccountError.storage }; return value }
     func save(_ session: ServerSession) throws { value = session }
     func clear() throws { if failClear { throw AccountError.storage }; value = nil }
 }
@@ -56,6 +57,29 @@ private final class AccountURLProtocol: URLProtocol, @unchecked Sendable {
         config.protocolClasses = [AccountURLProtocol.self]
         return (AccountSession(persistence: persistence, network: URLSession(configuration: config)), persistence)
     }
+    func testSessionUnavailableWhileLockedCanBeRestoredWithoutSigningInAgain() {
+        let persistence = TestSessionPersistence()
+        persistence.value = ServerSession(token: "test-token", user_id: "owner", expires_at: "2099-01-01T00:00:00Z")
+        persistence.failLoad = true
+        let account = AccountSession(persistence: persistence)
+        XCTAssertNil(account.session)
+        XCTAssertNotNil(persistence.value)
+        persistence.failLoad = false
+        account.restoreSessionIfNeeded()
+        XCTAssertEqual(account.session?.user_id, "owner")
+        XCTAssertNil(account.errorKey)
+    }
+
+    func testUnlockDoesNotRestoreAnExpiredSession() {
+        let persistence = TestSessionPersistence()
+        persistence.value = ServerSession(token: "test-token", user_id: "owner", expires_at: "2000-01-01T00:00:00Z")
+        persistence.failLoad = true
+        let account = AccountSession(persistence: persistence)
+        persistence.failLoad = false
+        account.restoreSessionIfNeeded()
+        XCTAssertNil(account.session)
+    }
+
     func testProfileUsesStoredBearerAndRejectsDifferentOwner() async {
         let (account, _) = setup()
         AccountURLProtocol.handler = { request in

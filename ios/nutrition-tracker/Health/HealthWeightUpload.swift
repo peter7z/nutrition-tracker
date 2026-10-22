@@ -33,8 +33,8 @@ private struct WeightReceipt: Decodable { var saved: Bool; var request_id: UUID 
         self.root = root ?? URL.applicationSupportDirectory.appendingPathComponent("NutritionTracker/WeightUpload", isDirectory: true)
     }
     private var fileURL: URL? { ownerID.flatMap(UUID.init(uuidString:)).map { root.appendingPathComponent($0.uuidString + ".json") } }
-    func selectAccount(_ owner: String?) {
-        guard owner != ownerID else { return }
+    func selectAccount(_ owner: String?, reload: Bool = false) {
+        guard owner != ownerID || (reload && !isWorking) else { return }
         generation = UUID(); ownerID = owner; state = WeightUploadState(); isWorking = false; errorKey = nil
         guard let fileURL, FileManager.default.fileExists(atPath: fileURL.path) else { return }
         do { state = try JSONDecoder().decode(WeightUploadState.self, from: Data(contentsOf: fileURL)) }

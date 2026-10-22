@@ -374,6 +374,7 @@
 				DEVELOPMENT_TEAM = 2KHYMP6SN7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Bocado-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Bocado;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Bocado reads your weight, activity and nutrition data from Apple Health to show your history and progress.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Bocado saves food diary calories and nutrients to Apple Health when nutrition sync is enabled.";
@@ -421,6 +422,7 @@
 				DEVELOPMENT_TEAM = 2KHYMP6SN7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Bocado-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Bocado;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Bocado reads your weight, activity and nutrition data from Apple Health to show your history and progress.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Bocado saves food diary calories and nutrients to Apple Health when nutrition sync is enabled.";

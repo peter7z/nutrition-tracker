@@ -20,6 +20,8 @@ struct AppSettingsView: View {
             Form {
                 AccountSection()
                 Section("Share weight with your account") {
+                    Text("While sharing is enabled, Bocado also uploads weight changes in the background when Apple Health notifies it. Updates may wait until you unlock your iPhone.")
+                        .font(.footnote).foregroundStyle(.secondary)
                     Text("Upload weight measurements and their dates from Apple Health to your Bocado account. They will be available in the web diary and ChatGPT. Food, activity and other Health data are not uploaded.")
                         .font(.footnote).foregroundStyle(.secondary)
                     Text("Stopping uploads keeps previously shared weights. Delete the server copy to remove them from your account.")
@@ -82,6 +84,8 @@ struct AppSettingsView: View {
                 }
                 .disabled(nutritionUpload.isWorking)
                 Section("Body measurements in Apple Health") {
+                    Text("While waist sync is enabled, Bocado checks for new measurements in the background when iOS allows it and when weight updates arrive. Updates do not follow a fixed schedule.")
+                        .font(.footnote).foregroundStyle(.secondary)
                     Text("Apple Health supports waist circumference, so Bocado syncs the waist measurement at the navel. Neck, minimum waist, biceps, thigh and hip stay in Bocado and MCP.")
                         .font(.footnote).foregroundStyle(.secondary)
                     if account.session == nil {

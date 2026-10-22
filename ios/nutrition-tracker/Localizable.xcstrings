@@ -3224,6 +3224,26 @@
         }
       }
     },
+    "While sharing is enabled, Bocado also uploads weight changes in the background when Apple Health notifies it. Updates may wait until you unlock your iPhone." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mientras compartas el peso, Bocado también subirá los cambios en segundo plano cuando Apple Health le avise. Las actualizaciones pueden esperar hasta que desbloquees el iPhone."
+          }
+        }
+      }
+    },
+    "While waist sync is enabled, Bocado checks for new measurements in the background when iOS allows it and when weight updates arrive. Updates do not follow a fixed schedule." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mientras la sincronización de cintura esté activada, Bocado buscará medidas nuevas en segundo plano cuando iOS lo permita y cuando lleguen cambios de peso. Las actualizaciones no tienen un horario fijo."
+          }
+        }
+      }
+    },
     "Workouts" : {
       "extractionState" : "stale",
       "localizations" : {

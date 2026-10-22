@@ -25,8 +25,8 @@ private struct BodyMeasurementSyncPreference: Codable {
         self.root = root ?? URL.applicationSupportDirectory.appendingPathComponent("NutritionTracker/BodyMeasurementUpload", isDirectory: true)
     }
 
-    func selectAccount(_ owner: String?) {
-        guard owner != ownerID else { return }
+    func selectAccount(_ owner: String?, reload: Bool = false) {
+        guard owner != ownerID || (reload && !isWorking) else { return }
         ownerID = owner
         preference = BodyMeasurementSyncPreference()
         errorKey = nil
@@ -75,6 +75,8 @@ private struct BodyMeasurementSyncPreference: Codable {
                     versions[key] = max(versions[key] ?? 0, sample.metadata?[HKMetadataKeySyncVersion] as? Int ?? 0)
                 }
             }
+            guard account.session?.user_id == ownerID, self.ownerID == ownerID, preference.enabled else { return }
+            try Task.checkCancellation()
             let updates = desired.filter { key, sample in
                 (existing[key] ?? 0) < (sample.metadata?[HKMetadataKeySyncVersion] as? Int ?? 1)
             }.map(\.value)

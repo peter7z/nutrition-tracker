@@ -15,7 +15,19 @@ permiso de lectura.
 Antes de cada envío se persisten el lote, un ID de petición y su próximo cursor.
 El cursor avanza solamente después de recibir el recibo del servidor. Los fallos
 de red se reintentan al volver a la app, actualizar Hoy/Progreso o tocar
-Sincronizar peso. No se promete sincronización en segundo plano en esta etapa.
+Sincronizar peso. Con el permiso de compartir peso activado, un `HKObserverQuery`
+para `bodyMass` y HealthKit background delivery también disparan la carga al
+recibir cambios, sin abrir la pantalla. Los observadores se registran desde el
+inicio de la aplicación, incluso en un lanzamiento en segundo plano. Se detienen
+al cerrar sesión, desconectar Salud o dejar de compartir peso. Los avisos se
+procesan en serie y cada completion se llama después de su pasada; un cambio
+que llega durante otra subida provoca una segunda pasada.
+
+La lectura y las credenciales conservan su protección mientras el teléfono está
+bloqueado. Se reintenta al desbloquear y al volver al primer plano, sin avanzar
+el cursor si una operación falla. iOS controla cuándo entrega los avisos: no se
+promete ejecución inmediata ni un intervalo fijo. La tarea periódica de cintura,
+cuando está habilitada, también reintenta el peso pendiente.
 El estado de la carga está separado por cuenta y excluido del backup del teléfono.
 
 El backend tiene dos tablas nuevas: `health_weight_consent` y `health_weights`.

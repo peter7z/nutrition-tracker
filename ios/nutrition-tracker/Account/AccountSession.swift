@@ -80,6 +80,17 @@ struct AccountProfile: Decodable { let user_id: String; let email: String }
             } else { session = stored }
         } catch { errorKey = "Could not securely restore your session." }
     }
+    /// A HealthKit launch may precede access to the protected keychain.
+    func restoreSessionIfNeeded() {
+        guard enabled, session == nil else { return }
+        do {
+            guard let stored = try persistence.load() else { return }
+            guard stored.expirationDate.map({ $0 > .now }) == true else { return }
+            session = stored
+            errorKey = nil
+        } catch { /* Retry when protected data becomes available. */ }
+    }
+
     private func request<T: Decodable>(_ path: String, method: String = "GET", body: Data? = nil, authenticated: Bool = false) async throws -> T {
         var request = URLRequest(url: base.appendingPathComponent(path))
         request.httpMethod = method; request.httpBody = body; request.timeoutInterval = 45
