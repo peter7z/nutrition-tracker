@@ -39,7 +39,13 @@ enum TrackingBridge {
         if !historical.isEmpty { candidates.append(.historical) }
         if healthValues.allValues.contains(where: { $0 != nil }) { candidates.append(.health) }
         let saved = manual.intakeResolutions.first { $0.dayID == dayID }?.selection
-        let choice = saved.flatMap { candidates.contains($0) ? $0 : nil } ?? (candidates.count == 1 ? candidates[0] : nil)
+        let energySamples = healthEnergySamples(on: date, snapshot: health, calendar: manual.profile.calendar)
+        let diaryIsHealthKitSource = entries.isEmpty == false
+            && candidates.contains(.health)
+            && energySamples.allSatisfy(isBocadoSample)
+            && energySamples.contains(where: isBocadoSample)
+        let automaticChoice: IntakeSelection? = candidates.count == 1 ? candidates[0] : (diaryIsHealthKitSource ? .manual : nil)
+        let choice = saved.flatMap { candidates.contains($0) ? $0 : nil } ?? automaticChoice
         let values: NutrientValues
         switch choice {
         case .manual: values = NutrientValues(energy: total.energy.value, protein: total.protein.value, carbohydrates: total.carbohydrates.value, fat: total.fat.value, saturatedFat: total.saturatedFat.value, fiber: total.fiber.value)
@@ -49,6 +55,20 @@ enum TrackingBridge {
         }
         return ResolvedDailyNutrition(values: values, candidates: candidates, selection: choice, hasConflict: candidates.count > 1 && choice == nil || choice == .historical && historical.count > 1,
             hasMissingNutrients: choice == .manual ? !total.isComplete : [values.energy, values.protein, values.carbohydrates, values.fat].contains(where: { $0 == nil }))
+    }
+
+    private static let bocadoBundleIdentifier = "com.pedrozunino.bocado"
+
+    private static func healthEnergySamples(on date: Date, snapshot: HealthSnapshot, calendar: Calendar) -> [HealthSampleRecord] {
+        let start = calendar.startOfDay(for: date)
+        guard let end = calendar.date(byAdding: .day, value: 1, to: start) else { return [] }
+        return snapshot.samples.filter {
+            $0.metric == .dietaryEnergy && $0.startDate >= start && $0.startDate < end
+        }
+    }
+
+    private static func isBocadoSample(_ sample: HealthSampleRecord) -> Bool {
+        sample.sourceBundleIdentifier == bocadoBundleIdentifier
     }
 
 }
