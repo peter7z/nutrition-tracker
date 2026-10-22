@@ -60,7 +60,7 @@ import CoreFoundation
             var candidate = HealthSnapshot()
             candidate.configuration = configuration
             candidate.goals = snapshot.goals
-            candidate.closedNutritionDays = snapshot.closedNutritionDays
+            candidate.nutritionDaySnapshots = snapshot.nutritionDaySnapshots
             candidate.pendingChatContexts = snapshot.pendingChatContexts
             candidate = try await collect(into: candidate, operation: operation)
             guard operation == generation else { return }
@@ -74,7 +74,7 @@ import CoreFoundation
         guard !isWorking, !storageNeedsRecovery, var candidate = stagedImport?.snapshot else { return }
         do {
             candidate.isConnected = true
-            candidate.closedNutritionDays = snapshot.closedNutritionDays
+            candidate.nutritionDaySnapshots = snapshot.nutritionDaySnapshots
             candidate.pendingChatContexts = snapshot.pendingChatContexts
             try persistence.save(candidate)
             snapshot = candidate
@@ -148,16 +148,16 @@ import CoreFoundation
             guard day.metric.isCumulative, day.value.isFinite, day.value >= 0, day.date.timeIntervalSince1970.isFinite,
                   value.configuration?.metrics.contains(day.metric) == true else { throw HealthOperationError.invalidData }
         }
-        let closures = value.closedNutritionDays ?? []
-        guard closures.count <= 100_000, Set(closures.map(\.id)).count == closures.count else { throw HealthOperationError.invalidData }
-        for closure in closures {
+        let daySnapshots = value.nutritionDaySnapshots ?? []
+        guard daySnapshots.count <= 100_000, Set(daySnapshots.map(\.id)).count == daySnapshots.count else { throw HealthOperationError.invalidData }
+        for daySnapshot in daySnapshots {
             let formatter = DateFormatter(); formatter.calendar = Calendar(identifier: .gregorian); formatter.timeZone = .gmt
             formatter.locale = Locale(identifier: "en_US_POSIX"); formatter.dateFormat = "yyyy-MM-dd"; formatter.isLenient = false
-            guard closure.accountScope == "local" || UUID(uuidString: closure.accountScope) != nil,
-                  formatter.date(from: closure.dayID).map({ formatter.string(from: $0) == closure.dayID }) == true,
-                  closure.closedAt.timeIntervalSince1970.isFinite, closure.goals?.isValid != false,
-                  closure.values.count <= 33, Set(closure.values.map(\.metric)).count == closure.values.count else { throw HealthOperationError.invalidData }
-            for day in closure.values {
+            guard daySnapshot.accountScope == "local" || UUID(uuidString: daySnapshot.accountScope) != nil,
+                  formatter.date(from: daySnapshot.dayID).map({ formatter.string(from: $0) == daySnapshot.dayID }) == true,
+                  daySnapshot.capturedAt.timeIntervalSince1970.isFinite, daySnapshot.goals?.isValid != false,
+                  daySnapshot.values.count <= 33, Set(daySnapshot.values.map(\.metric)).count == daySnapshot.values.count else { throw HealthOperationError.invalidData }
+            for day in daySnapshot.values {
                 guard day.metric.isNutrition, day.value.isFinite, day.value >= 0, day.date.timeIntervalSince1970.isFinite,
                       day.sourceNames.count <= 100, day.sourceNames.allSatisfy({ $0.count <= 1000 }) else { throw HealthOperationError.invalidData }
             }

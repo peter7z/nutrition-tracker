@@ -56,7 +56,7 @@ import XCTest
         }
     }
 
-    func testAccountFileAndClosureScopeStayIsolated() async throws {
+    func testAccountFileAndHealthSnapshotScopeStayIsolated() async throws {
         let owner = UUID(); let other = UUID()
         let root = URL.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         let data = try JSONSerialization.data(withJSONObject: ["userID": owner.uuidString, "token": "disposable", "endpoint": "https://fixture.example"])
@@ -71,8 +71,8 @@ import XCTest
         manual.days[0].summaries[0].intakeSource = .health
         manual.days[0].summaries[0].totals = NutritionTotals()
         var health = HealthSnapshot()
-        health.closedNutritionDays = [HealthNutritionClosure(id: summary.id, accountScope: history.accountScope,
-            dayID: manual.days[0].id, closedAt: date, values: [HealthDayValue(metric: .dietaryEnergy, date: date, value: 800, sourceNames: ["Fixture"])], goals: nil)]
+        health.nutritionDaySnapshots = [HealthNutritionDaySnapshot(id: summary.id, accountScope: history.accountScope,
+            dayID: manual.days[0].id, capturedAt: date, values: [HealthDayValue(metric: .dietaryEnergy, date: date, value: 800, sourceNames: ["Fixture"])], goals: nil)]
         XCTAssertEqual(TrackingBridge.nutrition(on: date, manual: manual, health: health, accountScope: history.accountScope).values.energy, 800)
         XCTAssertNil(TrackingBridge.nutrition(on: date, manual: manual, health: health, accountScope: other.uuidString).values.energy)
     }
@@ -86,6 +86,35 @@ import XCTest
         XCTAssertTrue(display.hasConflict)
         XCTAssertNil(display.values.energy)
         XCTAssertTrue(manual.intakeResolutions.isEmpty)
+    }
+
+    func testMealCorrectionAfterDailySnapshotUsesCurrentTotals() {
+        var manual = CompanionTestFixture.history(on: date)
+        let storedTotal = manual.days[0].summaries[0].totals.energy.value
+        manual.entries[0].draft.nutrition.energy = 200
+        manual.entries[0].version += 1
+        let corrected = TrackingBridge.nutrition(on: date, manual: manual, health: HealthSnapshot())
+        XCTAssertEqual(corrected.values.energy, 300)
+        XCTAssertNotEqual(corrected.values.energy, storedTotal)
+        XCTAssertFalse(corrected.hasConflict)
+        manual.entries[0].deleted = true
+        let deleted = TrackingBridge.nutrition(on: date, manual: manual, health: HealthSnapshot())
+        XCTAssertNil(deleted.values.energy, "A saved summary must not resurrect deleted food totals")
+    }
+
+    func testHealthDaySnapshotRetainsLegacyStorageKeys() throws {
+        let manual = CompanionTestFixture.history(on: date)
+        let summary = manual.days[0].summaries[0]
+        var snapshot = HealthSnapshot()
+        snapshot.nutritionDaySnapshots = [HealthNutritionDaySnapshot(id: summary.id, accountScope: "local",
+            dayID: manual.days[0].id, capturedAt: date, values: [], goals: nil)]
+        let bytes = try JSONEncoder().encode(snapshot)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: bytes) as? [String: Any])
+        XCTAssertNotNil(object["closedNutritionDays"])
+        XCTAssertNil(object["nutritionDaySnapshots"])
+        XCTAssertEqual(try JSONDecoder().decode(HealthSnapshot.self, from: bytes), snapshot)
+        XCTAssertEqual(try JSONDecoder().decode(NutritionChangeKind.self, from: Data("\"closeDay\"".utf8)), .legacyCloseDay)
+        XCTAssertEqual(try JSONDecoder().decode(NutritionChangeKind.self, from: Data("\"reopenDay\"".utf8)), .legacyReopenDay)
     }
 
     func testPartialPortionPreservesLabelCaloriesAndUnknownNutrients() async throws {

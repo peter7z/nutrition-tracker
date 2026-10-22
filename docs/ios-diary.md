@@ -11,6 +11,22 @@ se derivan de la fuente seleccionada. Un resumen diario no crea comidas.
 Fibra se conserva en entradas y totales; los resúmenes antiguos sin ese campo
 siguen siendo legibles.
 
+El modelo usa `DailyNutritionSnapshot` y `capturedAt`; no hay operaciones de
+cerrar/reabrir ni inicializadores que acepten un estado de cierre. Las claves
+antiguas `closedAt` y `closedNutritionDays` se conservan únicamente en la
+serialización para leer el servidor y los archivos guardados. `isClosed` en
+resúmenes históricos antiguos se interpreta como evidencia de completitud, no
+como un bloqueo de edición. Los eventos antiguos de cierre/reapertura se leen
+como eventos de auditoría heredados.
+
+Al registrar el primer alimento de una fecha, el servidor genera el resumen de
+la fecha anterior según la zona horaria del perfil, si hay datos para resumir.
+Las correcciones y los borrados posteriores generan otra versión del resumen;
+no se necesita reabrir el día. Los totales visibles de comidas siguen calculándose
+con los registros actuales, aunque exista un resumen previo. Un resumen histórico
+de totales y las comidas son fuentes alternativas: se respeta la selección
+explícita y nunca se suman entre sí.
+
 La descarga ocurre al restaurar o iniciar una sesión, al volver al primer plano
 y al deslizar para actualizar Hoy o Progreso. Cada descarga reemplaza la copia
 del servidor: correcciones y borrados no se duplican ni quedan como entradas

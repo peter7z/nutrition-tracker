@@ -512,3 +512,45 @@ def test_older_health_closure_values_cannot_be_hidden_in_sync_history(setup):
     day={'id':'2026-10-08','version':1,'isClosed':True,'summaries':[{'intakeSource':'health','totals':{'energy':{'known':1500,'knownCount':1,'missingCount':0}}},{'intakeSource':'manual','totals':{}}]}
     assert sync(c,a,[operation(kind='day',payload=day)]).status_code==422
     assert c.get('/v1/state',headers=a).json()['records']==[]
+
+
+def test_new_local_day_captures_previous_day_and_late_edits_refresh_summary(setup, monkeypatch):
+    from datetime import datetime
+    c, ai, app, a, b = setup
+    current = datetime.fromisoformat('2026-10-08T23:45:00-03:00')
+    monkeypatch.setattr('app.main.now', lambda: current)
+    first = operation(payload={'draft': {**draft(), 'consumedAt': '2026-10-08T23:30:00-03:00'}})
+    second = operation()
+    initial = sync(c, a, [first, second])
+    assert initial.status_code == 200
+    assert not any(row['kind'] == 'day' for row in initial.json()['records'])
+
+    current = datetime.fromisoformat('2026-10-09T08:00:00-03:00')
+    next_day = operation(payload={'draft': {**draft(), 'consumedAt': current.isoformat()}})
+    request_id = uid()
+    rollover = sync(c, a, [next_day], initial.json()['revision'], request_id=request_id)
+    assert rollover.status_code == 200
+    def prior_day(response):
+        return next(row['payload'] for row in response.json()['records']
+                    if row['kind'] == 'day' and row['payload']['id'] == '2026-10-08')
+    saved = prior_day(rollover)
+    assert 'isClosed' not in saved
+    assert len(saved['summaries']) == 1
+    assert saved['summaries'][-1]['totals']['energy']['known'] == 267
+    assert saved['summaries'][-1]['completeness'] == 'incomplete'
+    replay = sync(c, a, [next_day], initial.json()['revision'], request_id=request_id)
+    assert prior_day(replay) == saved
+
+    correction = operation(id=first['id'], version=1,
+        payload={'draft': {**draft(100), 'consumedAt': '2026-10-08T23:30:00-03:00'}})
+    corrected = sync(c, a, [correction], rollover.json()['revision'])
+    assert corrected.status_code == 200
+    updated = prior_day(corrected)
+    assert len(updated['summaries']) == 2
+    assert updated['summaries'][-1]['version'] == 2
+    assert updated['summaries'][-1]['totals']['energy']['known'] == 222.5
+    assert updated['summaries'][0] == saved['summaries'][0]
+
+    deleted = sync(c, a, [operation(id=second['id'], version=1, action='delete')], corrected.json()['revision'])
+    assert deleted.status_code == 200
+    assert prior_day(deleted)['summaries'][-1]['totals']['energy']['known'] == 89

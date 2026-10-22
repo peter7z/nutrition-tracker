@@ -28,8 +28,8 @@ enum CompanionTestFixture {
         snapshot.goals = [NutritionGoalVersion(id: goalID, effectiveDay: day, effectiveDate: date,
             goals: NutritionGoals(energy: 2000, protein: 100, carbohydrates: 250, fat: 60), createdAt: date)]
         var totals = NutritionTotals(); totals.include(snapshot.entries[0].values)
-        snapshot.days = [NutritionDayLog(id: day, isClosed: true, summaries: [ClosedDaySummary(
-            id: UUID(), version: 1, closedAt: date, completeness: .incomplete, totals: totals,
+        snapshot.days = [NutritionDayLog(id: day, summaries: [DailyNutritionSnapshot(
+            id: UUID(), version: 1, capturedAt: date, completeness: .incomplete, totals: totals,
             entryVersions: [snapshot.entries[0].id.uuidString: 2], goalVersionID: goalID, intakeSource: .manual)])]
         let messageID = UUID()
         snapshot.chatDraft = "Previously unsent draft"

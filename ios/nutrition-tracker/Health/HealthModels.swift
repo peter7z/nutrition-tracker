@@ -112,13 +112,17 @@ struct NutritionGoals: Codable, Equatable {
     var isValid: Bool { [energy, protein, carbohydrates, fat].allSatisfy { $0.isFinite && $0 > 0 && $0 < 100_000 } }
 }
 
-struct HealthNutritionClosure: Codable, Equatable, Identifiable {
+struct HealthNutritionDaySnapshot: Codable, Equatable, Identifiable {
     var id: UUID
     var accountScope: String
     var dayID: String
-    var closedAt: Date
+    var capturedAt: Date
     var values: [HealthDayValue]
     var goals: NutritionGoals?
+    private enum CodingKeys: String, CodingKey {
+        case id, accountScope, dayID, values, goals
+        case capturedAt = "closedAt"
+    }
 }
 
 struct HealthSnapshot: Codable, Equatable {
@@ -130,8 +134,13 @@ struct HealthSnapshot: Codable, Equatable {
     var dailyValues: [HealthDayValue] = []
     var lastSyncDate: Date?
     var goals: NutritionGoals?
-    var closedNutritionDays: [HealthNutritionClosure]? = nil
+    var nutritionDaySnapshots: [HealthNutritionDaySnapshot]? = nil
     var pendingChatContexts: [String: Data]? = nil
+    // Legacy storage names remain at the serialization boundary only.
+    private enum CodingKeys: String, CodingKey {
+        case schemaVersion, configuration, isConnected, samples, anchors, dailyValues, lastSyncDate, goals, pendingChatContexts
+        case nutritionDaySnapshots = "closedNutritionDays"
+    }
 
     func value(for metric: HealthMetric, on date: Date) -> Double? {
         let calendar = configuration?.calendar ?? Calendar.current

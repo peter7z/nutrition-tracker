@@ -31,17 +31,17 @@ import XCTest
         XCTAssertEqual(snapshot.entries[0].values.energy, 133.5)
         XCTAssertTrue(snapshot.messages.isEmpty)
     }
-    func testClosedDailySummaryCreatesNoMealsAndDoesNotDoubleCount() throws {
+    func testDailyTotalsUseExplicitHistoricalSelectionWithoutAddingMeals() throws {
         let fixture = CompanionTestFixture.history(on: Date(timeIntervalSince1970: 1_791_475_200))
         let dayID = fixture.days[0].id
         let batch = UUID()
         let values = NutrientValues(energy: 2200, protein: 140, carbohydrates: 250, fat: 70, saturatedFat: 15, fiber: 30)
         var totals = NutritionTotals(); totals.include(values)
-        let summary = ClosedDaySummary(id: UUID(), version: 1, closedAt: .now, completeness: .complete,
+        let summary = DailyNutritionSnapshot(id: UUID(), version: 1, capturedAt: .now, completeness: .complete,
             totals: totals, entryVersions: [:], goalVersionID: nil, intakeSource: .historical)
-        let day = NutritionDayLog(id: dayID, version: 1, isClosed: true, summaries: [summary])
+        let day = NutritionDayLog(id: dayID, version: 1, summaries: [summary])
         let historical = HistoricalNutritionSummary(id: UUID(), dayID: dayID, nutrients: values,
-            isClosed: true, notes: "Día completo", importBatchID: batch, sourceRow: "MCP whole-day totals")
+            isComplete: true, notes: "Día completo", importBatchID: batch, sourceRow: "MCP whole-day totals")
         var records: [[String: Any]] = [
             ["id": UUID().uuidString, "kind": "day", "version": 1, "payload": try payload(day)],
             ["id": historical.id.uuidString, "kind": "historical", "version": 1, "payload": try payload(historical)]
@@ -52,6 +52,8 @@ import XCTest
         let entry = fixture.entries[0]
         records.append(["id": entry.id.uuidString, "kind": "entry", "version": entry.version,
             "payload": ["draft": try payload(entry.draft)]])
+        records.append(["id": UUID().uuidString, "kind": "resolution", "version": 1,
+            "payload": ["dayID": dayID, "selection": "historical"]])
         let snapshot = try BackendDiary.decode(wire(records))
         let result = TrackingBridge.nutrition(on: entry.draft.consumedAt, manual: snapshot, health: HealthSnapshot())
         XCTAssertEqual(result.values.energy, 2200)
@@ -59,7 +61,31 @@ import XCTest
         XCTAssertFalse(result.hasConflict)
         XCTAssertEqual(snapshot.entries.count, 1)
     }
-    func testOldClosuresWithoutFiberStillDecodeAndMalformedStateFails() throws {
+    func testLegacyDayFlagIsIgnoredAndOldSummaryTimestampRemainsReadable() throws {
+        let fixture = CompanionTestFixture.history(on: .now)
+        var day = try payload(fixture.days[0])
+        day["isClosed"] = true
+        let summaries = try XCTUnwrap(day["summaries"] as? [[String: Any]])
+        XCTAssertNotNil(summaries[0]["closedAt"])
+        let snapshot = try BackendDiary.decode(wire([["id": UUID().uuidString, "kind": "day", "version": 1, "payload": day]]))
+        XCTAssertEqual(snapshot.days[0].summaries[0].capturedAt.timeIntervalSince1970,
+            fixture.days[0].summaries[0].capturedAt.timeIntervalSince1970, accuracy: 1)
+        XCTAssertNil(try payload(snapshot.days[0])["isClosed"])
+    }
+
+    func testLegacyHistoricalCompletenessStillDecodes() throws {
+        let id = UUID()
+        let historical: [String: Any] = ["id": id.uuidString, "dayID": "2026-10-08",
+            "nutrients": ["energy": 2200], "isClosed": true, "notes": "Legacy total",
+            "importBatchID": UUID().uuidString, "sourceRow": "Legacy import"]
+        let snapshot = try BackendDiary.decode(wire([["id": id.uuidString, "kind": "historical", "version": 1, "payload": historical]]))
+        XCTAssertTrue(snapshot.historicalSummaries[0].isComplete)
+        let encoded = try payload(snapshot.historicalSummaries[0])
+        XCTAssertEqual(encoded["isComplete"] as? Bool, true)
+        XCTAssertNil(encoded["isClosed"])
+    }
+
+    func testOldSummariesWithoutFiberStillDecodeAndMalformedStateFails() throws {
         let fixture = CompanionTestFixture.history(on: .now)
         var day = try payload(fixture.days[0])
         var summaries = try XCTUnwrap(day["summaries"] as? [[String: Any]])

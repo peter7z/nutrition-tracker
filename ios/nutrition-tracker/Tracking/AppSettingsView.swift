@@ -52,7 +52,7 @@ struct AppSettingsView: View {
                         Button("Sync now") { Task { await health.refreshIfConnected() } }
                             .disabled(health.isWorking || health.storageNeedsRecovery)
                     }
-                    if health.snapshot.configuration != nil || health.snapshot.closedNutritionDays?.isEmpty == false || health.snapshot.pendingChatContexts?.isEmpty == false {
+                    if health.snapshot.configuration != nil || health.snapshot.nutritionDaySnapshots?.isEmpty == false || health.snapshot.pendingChatContexts?.isEmpty == false {
                         Button("Disconnect or delete local copy", role: .destructive) { showDisconnect = true }
                             .disabled(health.isWorking)
                     }

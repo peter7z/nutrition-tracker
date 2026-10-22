@@ -16,18 +16,12 @@ enum TrackingBridge {
     static func nutrition(on date: Date, manual: NutritionSnapshot, health: HealthSnapshot, accountScope: String = "local") -> ResolvedDailyNutrition {
         let dayID = manual.profile.dayID(for: date)
         if let day = manual.days.first(where: { $0.id == dayID }), let summary = day.summaries.last, summary.intakeSource == .health {
-            let source = summary.intakeSource ?? .manual
-            let values: NutrientValues
-            if source == .health {
-                // Link by the ordinary day-summary ID; Health values never enter manual sync.
-                let scope = accountScope.lowercased()
-                let archive = health.closedNutritionDays?.first { $0.id == summary.id && $0.dayID == dayID && $0.accountScope.lowercased() == scope }
-                func value(_ metric: HealthMetric) -> Double? { archive?.values.first { $0.metric == metric }?.value }
-                values = NutrientValues(energy: value(.dietaryEnergy), protein: value(.protein), carbohydrates: value(.carbohydrates), fat: value(.fat), saturatedFat: value(.saturatedFat), fiber: value(.fiber), vitaminA: value(.vitaminA), thiamin: value(.thiamin), riboflavin: value(.riboflavin), niacin: value(.niacin), pantothenicAcid: value(.pantothenicAcid), vitaminB6: value(.vitaminB6), biotin: value(.biotin), vitaminB12: value(.vitaminB12), vitaminC: value(.vitaminC), vitaminD: value(.vitaminD), vitaminE: value(.vitaminE), vitaminK: value(.vitaminK), folate: value(.folate), calcium: value(.calcium), chloride: value(.chloride), iron: value(.iron), magnesium: value(.magnesium), phosphorus: value(.phosphorus), potassium: value(.potassium), sodium: value(.sodium), zinc: value(.zinc), chromium: value(.chromium), copper: value(.copper), iodine: value(.iodine), manganese: value(.manganese), molybdenum: value(.molybdenum), selenium: value(.selenium))
-            } else {
-                values = summary.totals.completeValues
-            }
-            return ResolvedDailyNutrition(values: values, candidates: [source], selection: source, hasConflict: false, hasMissingNutrients: [values.energy, values.protein, values.carbohydrates, values.fat].contains { $0 == nil })
+            // Link by the ordinary day-summary ID; Health values never enter manual sync.
+            let scope = accountScope.lowercased()
+            let archive = health.nutritionDaySnapshots?.first { $0.id == summary.id && $0.dayID == dayID && $0.accountScope.lowercased() == scope }
+            func value(_ metric: HealthMetric) -> Double? { archive?.values.first { $0.metric == metric }?.value }
+            let values = NutrientValues(energy: value(.dietaryEnergy), protein: value(.protein), carbohydrates: value(.carbohydrates), fat: value(.fat), saturatedFat: value(.saturatedFat), fiber: value(.fiber), vitaminA: value(.vitaminA), thiamin: value(.thiamin), riboflavin: value(.riboflavin), niacin: value(.niacin), pantothenicAcid: value(.pantothenicAcid), vitaminB6: value(.vitaminB6), biotin: value(.biotin), vitaminB12: value(.vitaminB12), vitaminC: value(.vitaminC), vitaminD: value(.vitaminD), vitaminE: value(.vitaminE), vitaminK: value(.vitaminK), folate: value(.folate), calcium: value(.calcium), chloride: value(.chloride), iron: value(.iron), magnesium: value(.magnesium), phosphorus: value(.phosphorus), potassium: value(.potassium), sodium: value(.sodium), zinc: value(.zinc), chromium: value(.chromium), copper: value(.copper), iodine: value(.iodine), manganese: value(.manganese), molybdenum: value(.molybdenum), selenium: value(.selenium))
+            return ResolvedDailyNutrition(values: values, candidates: [.health], selection: .health, hasConflict: false, hasMissingNutrients: [values.energy, values.protein, values.carbohydrates, values.fat].contains { $0 == nil })
         }
         let entries = manual.entries.filter { !$0.deleted && $0.dayID == dayID }
         var total = NutritionTotals()

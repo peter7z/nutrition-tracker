@@ -61,7 +61,7 @@ enum NutritionBackup {
             guard validDay(day.id), day.version > 0 else { throw NutritionError.invalidData }
             for summary in day.summaries {
                 let totals = [summary.totals.energy, summary.totals.protein, summary.totals.carbohydrates, summary.totals.fat, summary.totals.saturatedFat, summary.totals.fiber, summary.totals.vitaminA, summary.totals.thiamin, summary.totals.riboflavin, summary.totals.niacin, summary.totals.pantothenicAcid, summary.totals.vitaminB6, summary.totals.biotin, summary.totals.vitaminB12, summary.totals.vitaminC, summary.totals.vitaminD, summary.totals.vitaminE, summary.totals.vitaminK, summary.totals.folate, summary.totals.calcium, summary.totals.chloride, summary.totals.iron, summary.totals.magnesium, summary.totals.phosphorus, summary.totals.potassium, summary.totals.sodium, summary.totals.zinc, summary.totals.chromium, summary.totals.copper, summary.totals.iodine, summary.totals.manganese, summary.totals.molybdenum, summary.totals.selenium]
-                guard summary.version > 0, summary.closedAt.timeIntervalSince1970.isFinite,
+                guard summary.version > 0, summary.capturedAt.timeIntervalSince1970.isFinite,
                       summary.totals.entryCount >= 0,
                       totals.allSatisfy({ $0.known.isFinite && $0.known >= 0 && $0.knownCount >= 0 && $0.missingCount >= 0 }),
                       summary.entryVersions.allSatisfy({ UUID(uuidString: $0.key) != nil && $0.value > 0 }),

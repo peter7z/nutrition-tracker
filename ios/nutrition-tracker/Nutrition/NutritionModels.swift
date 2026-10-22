@@ -209,14 +209,18 @@ enum DayCompleteness: String, Codable, CaseIterable { case complete, incomplete 
 struct DailyNutritionSnapshot: Codable, Equatable, Identifiable {
     var id: UUID
     var version: Int
-    var closedAt: Date
+    var capturedAt: Date
     var completeness: DayCompleteness
     var totals: NutritionTotals
     var entryVersions: [String: Int]
     var goalVersionID: UUID?
     var intakeSource: IntakeSelection? = nil
+    // Preserve the existing server/backup key; this timestamp never freezes a day.
+    private enum CodingKeys: String, CodingKey {
+        case id, version, completeness, totals, entryVersions, goalVersionID, intakeSource
+        case capturedAt = "closedAt"
+    }
 }
-typealias ClosedDaySummary = DailyNutritionSnapshot
 struct NutritionDayLog: Codable, Equatable, Identifiable {
     var id: String
     var version: Int
@@ -224,10 +228,6 @@ struct NutritionDayLog: Codable, Equatable, Identifiable {
     private enum CodingKeys: String, CodingKey { case id, version, summaries }
     init(id: String, version: Int = 1, summaries: [DailyNutritionSnapshot] = []) {
         self.id = id; self.version = version; self.summaries = summaries
-    }
-    // Source compatibility for fixtures and older callers; the legacy flag is ignored.
-    init(id: String, version: Int = 1, isClosed: Bool, summaries: [DailyNutritionSnapshot] = []) {
-        self.init(id: id, version: version, summaries: summaries)
     }
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
@@ -303,9 +303,6 @@ struct HistoricalNutritionSummary: Codable, Equatable, Identifiable {
         self.id = id; self.dayID = dayID; self.nutrients = nutrients; self.isComplete = isComplete
         self.notes = notes; self.importBatchID = importBatchID; self.sourceRow = sourceRow
     }
-    init(id: UUID, dayID: String, nutrients: NutrientValues, isClosed: Bool, notes: String, importBatchID: UUID, sourceRow: String) {
-        self.init(id: id, dayID: dayID, nutrients: nutrients, isComplete: isClosed, notes: notes, importBatchID: importBatchID, sourceRow: sourceRow)
-    }
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
@@ -371,7 +368,12 @@ struct PersistentChatMessage: Codable, Equatable, Identifiable {
 }
 struct ChatOutboxItem: Codable, Equatable, Identifiable { var id: UUID; var messageID: UUID; var attempts: Int = 0; var state: ChatDeliveryState = .queued }
 struct NutritionAttachment: Codable, Equatable, Identifiable { var id: UUID; var relativePath: String; var mimeType: String; var byteCount: Int; var createdAt: Date; var remoteOwnerID: String? = nil; var remoteAttachmentID: String? = nil }
-enum NutritionChangeKind: String, Codable { case addEntry, updateEntry, deleteEntry, closeDay, reopenDay, undo }
+enum NutritionChangeKind: String, Codable {
+    case addEntry, updateEntry, deleteEntry, undo
+    // Decode old audit events without exposing close/reopen operations in the diary.
+    case legacyCloseDay = "closeDay"
+    case legacyReopenDay = "reopenDay"
+}
 struct NutritionChangeEvent: Codable, Equatable, Identifiable {
     var id: UUID
     var operationID: UUID

@@ -234,6 +234,7 @@ def create_app(settings=None,ai=None):
             payload.update({'id':day,'version':int(payload.get('version',1))+1,'summaries':summaries})
             db.execute('UPDATE records SET version=?,payload=? WHERE user_id=? AND id=?',(row['version']+1,canonical(payload),owner,row['id']))
         else:
+            # Keep the legacy UUID namespace so existing daily records retain their identity.
             identifier=str(uuid.uuid5(uuid.NAMESPACE_URL,'closed-day:'+owner+':'+day))
             payload={'id':day,'version':1,'summaries':[summary]}
             db.execute('INSERT INTO records VALUES(?,?,?,?,?,0)',(owner,identifier,'day',1,canonical(payload)))
