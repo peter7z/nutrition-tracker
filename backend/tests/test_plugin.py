@@ -119,7 +119,7 @@ def test_read_only_scope_and_owner_isolation(client):
 def test_food_receipt_idempotency_correction_delete_and_server_totals(client):
     tokens,_,_=connect(client);token=tokens['access_token']
     tools=rpc(client,token,'tools/list')['result']['tools']
-    assert {t['name'] for t in tools}=={'get_profile','get_day','show_day_summary','get_progress','open_tracker','set_nutrition_goals','record_food','update_food','delete_food','record_day_totals','get_body_measurements','record_body_measurements'}
+    assert {t['name'] for t in tools}=={'get_profile','get_day','show_day_summary','get_progress','open_tracker','set_nutrition_goals','record_food','update_food','delete_food','record_day_totals','get_body_measurements','record_body_measurements','update_body_measurements'}
     day_reader=next(t for t in tools if t['name']=='get_day')
     day_renderer=next(t for t in tools if t['name']=='show_day_summary')
     sidebar=next(t for t in tools if t['name']=='open_tracker')
@@ -196,6 +196,59 @@ def test_day_summary_keeps_known_nutrient_sum_when_an_entry_is_unknown(client):
     assert [entry['draft']['name'] for entry in summary['entries'] if entry['totals']['fiber'] is None]==['Dulce de leche']
     day=tool(client,token,'get_day',{'day':'2026-10-10'})['structuredContent']
     assert day['known_totals']['fiber']==2.64 and day['nutrient_coverage']['fiber']['missingCount']==1
+
+
+def test_body_measurement_correction_preserves_fields_and_replays_receipt(client):
+    tokens,_,_=connect(client);token=tokens['access_token']
+    original={'recorded_at':'2026-10-23T09:00:00-03:00','waist_navel_cm':90,
+        'neck_cm':38,'chest_cm':100,'notes':'Medición de la mañana'}
+    saved=tool(client,token,'record_body_measurements',{'operation_id':str(uuid.uuid4()),
+        'base_revision':0,'measurement':original})['structuredContent']
+    args={'operation_id':str(uuid.uuid4()),'base_revision':saved['revision'],
+        'record_id':saved['record_id'],'expected_version':1,'changes':{'waist_navel_cm':87.5}}
+    updated=tool(client,token,'update_body_measurements',args)['structuredContent']
+    assert updated['saved'] is True and updated['receipt']==[args['operation_id']]
+    assert updated['record_id']==saved['record_id'] and updated['version']==2 and updated['revision']==2
+    assert updated['measurement']==saved['measurement']|{'waist_navel_cm':87.5,'version':2}
+    assert tool(client,token,'update_body_measurements',args)['structuredContent']==updated
+    assert 'idempotency_conflict' in tool(client,token,'update_body_measurements',
+        args|{'changes':{'waist_navel_cm':88}})['content'][0]['text']
+    assert 'revision_conflict' in tool(client,token,'update_body_measurements',
+        args|{'operation_id':str(uuid.uuid4())})['content'][0]['text']
+    assert 'version_conflict' in tool(client,token,'update_body_measurements',
+        args|{'operation_id':str(uuid.uuid4()),'base_revision':2})['content'][0]['text']
+    current=args|{'operation_id':str(uuid.uuid4()),'base_revision':2,'expected_version':2}
+    removed=tool(client,token,'update_body_measurements',current|{'changes':{'neck_cm':None}})['structuredContent']
+    assert 'neck_cm' not in removed['measurement'] and removed['measurement']['chest_cm']==100
+    read=tool(client,token,'get_body_measurements',{'start_date':'2026-10-23','end_date':'2026-10-23'})['structuredContent']
+    assert read['revision']==3 and read['measurements']==[removed['measurement']]
+
+
+def test_body_measurement_correction_validates_changes_and_owner(client):
+    tokens,_,_=connect(client);token=tokens['access_token']
+    saved=tool(client,token,'record_body_measurements',{'operation_id':str(uuid.uuid4()),
+        'base_revision':0,'measurement':{'recorded_at':'2026-10-23T09:00:00-03:00','waist_navel_cm':90}})['structuredContent']
+    args={'operation_id':str(uuid.uuid4()),'base_revision':1,'record_id':saved['record_id'],
+        'expected_version':1,'changes':{'waist_navel_cm':87}}
+    for changes in ({},{'waist_navel_cm':None},{'waist_navel_cm':0},{'waist_navel_cm':True},
+        {'waist_navel_cm':401},{'recorded_at':None},{'recorded_at':'2026-10-23T09:00:00'},
+        {'notes':None},{'unknown_cm':10}):
+        assert tool(client,token,'update_body_measurements',args|{'changes':changes})['isError']
+    assert tool(client,token,'update_body_measurements',args|{'expected_version':0})['isError']
+    other,_,_=connect(client,email='other@example.com')
+    foreign=tool(client,other['access_token'],'update_body_measurements',args|{'base_revision':0})
+    assert foreign['isError'] and 'record_not_found' in foreign['content'][0]['text']
+    read,_,_=connect(client,email='plugin@example.com',scopes='tracking:read',signup=False)
+    denied=tool(client,read['access_token'],'update_body_measurements',args)
+    assert denied['isError'] and 'tracking:write' in denied['_meta']['mcp/www_authenticate'][0]
+    current=tool(client,token,'get_body_measurements',{'start_date':'2026-10-23','end_date':'2026-10-23'})['structuredContent']
+    assert current['revision']==1 and current['measurements']==[saved['measurement']]
+    corrected=tool(client,token,'update_body_measurements',args|{'changes':{
+        'recorded_at':'2026-10-22T10:00:00-03:00','notes':'  Fecha corregida  '}})['structuredContent']
+    assert corrected['measurement']['notes']=='Fecha corregida'
+    assert corrected['measurement']['waist_navel_cm']==90
+    assert tool(client,token,'get_body_measurements',{'start_date':'2026-10-23','end_date':'2026-10-23'})['structuredContent']['measurements']==[]
+    assert tool(client,token,'get_body_measurements',{'start_date':'2026-10-22','end_date':'2026-10-22'})['structuredContent']['measurements']==[corrected['measurement']]
 
 
 def test_registration_rejects_untrusted_callbacks_and_consent_csrf(client):

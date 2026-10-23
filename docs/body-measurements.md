@@ -16,6 +16,20 @@ El MCP expone `record_body_measurements` para escritura y
 son registros históricos idempotentes y quedan dentro del mismo aislamiento de
 cuenta y revisión que el resto del tracking.
 
+Para corregir una medición existente se usa `update_body_measurements`, sin
+crear otro registro. Primero se consulta `get_body_measurements` para obtener
+`record_id` (el `id` del registro), `expected_version` y `base_revision`. Se envía
+un `operation_id` nuevo y un objeto `changes` con solo los campos a corregir,
+por ejemplo `{"waist_navel_cm": 86.5}`. Los campos omitidos conservan su valor,
+incluidas la fecha y las notas. Un valor `null` elimina una medida opcional,
+pero siempre debe quedar al menos una. La fecha no admite `null`.
+
+La corrección conserva el ID e incrementa la versión y la revisión. Repetir la
+misma petición devuelve el mismo recibo sin aplicar otra modificación; reutilizar
+el identificador con otros argumentos o escribir sobre una versión antigua
+produce un conflicto. Si hay varias mediciones posibles o no está claro el sitio
+medido, el asistente debe aclararlo antes de guardar.
+
 La sincronización con Apple Health es optativa en iOS. HealthKit ofrece un tipo
 de cintura, pero no tipos separados para la cintura al ombligo, cintura mínima,
 cuello, bíceps, muslo, cadera o pecho. Bocado exporta solamente `waist_navel_cm` como

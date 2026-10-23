@@ -52,10 +52,11 @@ catálogo de alimentos ni otra llamada a un modelo desde las herramientas.
 
 ## Medidas corporales
 
-- Consultar `get_body_measurements(start_date, end_date)` antes de responder sobre medidas o escribir una nueva.
+- Consultar `get_body_measurements(start_date, end_date)` antes de responder sobre medidas, escribir una nueva o corregir una existente.
 - Guardar solo cuando la persona lo pida, con `record_body_measurements`, un UUID nuevo de `operation_id` y la revisión más reciente. Reutilizar el mismo ID y argumentos en reintentos.
 - Todas las medidas son opcionales y se expresan en centímetros: `neck_cm`, `waist_navel_cm`, `waist_minimum_cm`, `biceps_cm`, `thigh_cm`, `hip_cm` y `chest_cm`. Un registro puede tener una o varias; no inventar faltantes ni confundir los dos puntos de cintura.
-- Incluir fecha y hora con zona horaria. Estos registros son históricos y no se sobrescriben; ante una corrección, explicitar que se agrega un nuevo registro.
+- Para corregir una medición existente, usar `update_body_measurements` con su `record_id`, `expected_version`, la revisión más reciente y un UUID nuevo de `operation_id`. Enviar en `changes` solo los campos a corregir; los omitidos conservan su valor, fecha y notas incluidas. Se conserva el ID y aumenta la versión, sin crear otra medición. Reutilizar el mismo ID de operación y argumentos en reintentos.
+- Un `null` explícito elimina una medida opcional, pero debe quedar al menos una. La fecha no admite `null`; si se cambia, debe incluir hora y zona horaria. Si hay varios registros posibles o no está claro el punto de cintura, aclararlo antes de escribir. Confirmar el guardado solo tras recibir el recibo exitoso.
 
 ## Registrar o corregir
 
