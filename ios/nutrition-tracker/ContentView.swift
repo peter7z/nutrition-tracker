@@ -377,7 +377,7 @@ private struct DailyNutritionView: View {
     private var mealsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Your meals").font(.title3.weight(.bold))
-            let entries = nutrition.entries(on: selectedDate)
+            let entries = nutrition.entries(on: selectedDate).reversed()
             if entries.isEmpty {
                 ContentUnavailableView("No meals recorded", systemImage: "fork.knife", description: Text("Daily summaries and Apple Health totals do not create meal records."))
             }
